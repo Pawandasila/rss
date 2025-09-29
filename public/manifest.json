@@ -1,0 +1,29 @@
+{
+  "name": "राष्ट्रीय सेवा संघ - RASHTRIYA SEVA SANGH",
+  "short_name": "RSS",
+  "description": "अब समय केवल देखने का नहीं, कुछ करने का है। सेवा ही धर्म है — और यही राष्ट्र का भाग्य बदल सकता है।",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#fd9800",
+  "icons": [
+    {
+      "src": "/logo/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["social", "news", "lifestyle"],
+  "lang": "hi",
+  "dir": "ltr",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "id": "rashtriya-seva-sangh"
+}
