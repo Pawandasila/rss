@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
-import { Lato, Poppins, Nunito } from "next/font/google";
+import { Lato, Poppins, Hind } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import Provider from "./Provider";
+import { Toaster } from "@/components/ui/sonner";
+
 
 const lato = Lato({
   variable: "--font-lato",
@@ -15,66 +18,82 @@ const poppins = Poppins({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-const nunito = Nunito({
-  variable: "--font-nunito",
+const hind = Hind({
+  variable: "--font-hind",
   subsets: ["latin"],
-  weight: ["300", "400", "600", "700", "800"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
-
 export const metadata: Metadata = {
-  metadataBase: new URL('https://joinrss.org.in'),
+  metadataBase: new URL("https://joinrss.org.in"),
   title: {
     default: "राष्ट्रीय सेवा संघ - RASHTRIYA SEVA SANGH",
-    template: "%s | राष्ट्रीय सेवा संघ"
+    template: "%s | राष्ट्रीय सेवा संघ",
   },
-  description: "अब समय केवल देखने का नहीं, कुछ करने का है। सेवा ही धर्म है — और यही राष्ट्र का भाग्य बदल सकता है। राष्ट्रीय सेवा संघ से जुड़िए, राष्ट्र आपकी प्रतीक्षा कर रहा है।",
-  keywords: ["राष्ट्रीय सेवा संघ", "RSS", "Rashtriya Seva Sangh", "सेवा", "धर्म", "राष्ट्र", "भारत", "वैदिक", "संस्कार", "social service", "community service", "dharma", "nation building"],
+  description:
+    "अब समय केवल देखने का नहीं, कुछ करने का है। सेवा ही धर्म है — और यही राष्ट्र का भाग्य बदल सकता है। राष्ट्रीय सेवा संघ से जुड़िए, राष्ट्र आपकी प्रतीक्षा कर रहा है।",
+  keywords: [
+    "राष्ट्रीय सेवा संघ",
+    "RSS",
+    "Rashtriya Seva Sangh",
+    "सेवा",
+    "धर्म",
+    "राष्ट्र",
+    "भारत",
+    "वैदिक",
+    "संस्कार",
+    "social service",
+    "community service",
+    "dharma",
+    "nation building",
+  ],
   authors: [{ name: "RASHTRIYA SEVA SANGH", url: "https://joinrss.org.in" }],
   creator: "RASHTRIYA SEVA SANGH",
   publisher: "RASHTRIYA SEVA SANGH",
-  category: 'Social Organization',
-  classification: 'Social Service Organization',
+  category: "Social Organization",
+  classification: "Social Service Organization",
   robots: {
     index: true,
     follow: true,
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
   openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: 'https://joinrss.org.in/',
-    siteName: 'RASHTRIYA SEVA SANGH',
-    title: 'राष्ट्रीय सेवा संघ - RASHTRIYA SEVA SANGH',
-    description: 'अब समय केवल देखने का नहीं, कुछ करने का है। सेवा ही धर्म है — और यही राष्ट्र का भाग्य बदल सकता है। राष्ट्रीय सेवा संघ से जुड़िए, राष्ट्र आपकी प्रतीक्षा कर रहा है।',
+    type: "website",
+    locale: "en_US",
+    url: "https://joinrss.org.in/",
+    siteName: "RASHTRIYA SEVA SANGH",
+    title: "राष्ट्रीय सेवा संघ - RASHTRIYA SEVA SANGH",
+    description:
+      "अब समय केवल देखने का नहीं, कुछ करने का है। सेवा ही धर्म है — और यही राष्ट्र का भाग्य बदल सकता है। राष्ट्रीय सेवा संघ से जुड़िए, राष्ट्र आपकी प्रतीक्षा कर रहा है।",
     images: [
       {
-        url: '/logo/logo.png',
+        url: "/logo/logo.png",
         width: 1200,
         height: 630,
-        alt: 'राष्ट्रीय सेवा संघ - RASHTRIYA SEVA SANGH',
+        alt: "राष्ट्रीय सेवा संघ - RASHTRIYA SEVA SANGH",
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
-    site: '@joinrssgroup',
-    creator: '@joinrssgroup',
-    title: 'राष्ट्रीय सेवा संघ - RASHTRIYA SEVA SANGH',
-    description: 'अब समय केवल देखने का नहीं, कुछ करने का है। सेवा ही धर्म है — और यही राष्ट्र का भाग्य बदल सकता है। राष्ट्रीय सेवा संघ से जुड़िए, राष्ट्र आपकी प्रतीक्षा कर रहा है।',
-    images: ['/logo/logo.png'],
+    card: "summary_large_image",
+    site: "@joinrssgroup",
+    creator: "@joinrssgroup",
+    title: "राष्ट्रीय सेवा संघ - RASHTRIYA SEVA SANGH",
+    description:
+      "अब समय केवल देखने का नहीं, कुछ करने का है। सेवा ही धर्म है — और यही राष्ट्र का भाग्य बदल सकता है। राष्ट्रीय सेवा संघ से जुड़िए, राष्ट्र आपकी प्रतीक्षा कर रहा है।",
+    images: ["/logo/logo.png"],
   },
   verification: {
-    google: 'your-google-verification-code',
+    google: "your-google-verification-code",
   },
   alternates: {
-    canonical: 'https://joinrss.org.in/',
+    canonical: "https://joinrss.org.in/",
   },
   icons: {
     icon: [
@@ -103,7 +122,7 @@ export const metadata: Metadata = {
       },
     ],
   },
-  manifest: '/manifest.json',
+  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -111,15 +130,18 @@ export const metadata: Metadata = {
     startupImage: [
       {
         url: "/logo/logo.png",
-        media: "(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)",
+        media:
+          "(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)",
       },
       {
         url: "/logo/logo.png",
-        media: "(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)",
+        media:
+          "(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)",
       },
       {
         url: "/logo/logo.png",
-        media: "(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)",
+        media:
+          "(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)",
       },
     ],
   },
@@ -146,18 +168,16 @@ export default function RootLayout({
   return (
     <html lang="hi" dir="ltr">
       <head>
-        
         <link rel="icon" href="/logo/logo.png" type="image/png" />
         <link rel="shortcut icon" href="/logo/logo.png" type="image/png" />
-        
+
         <meta name="theme-color" content="#fd9800" />
         <meta name="msapplication-TileColor" content="#fd9800" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
-        
+
         <meta name="color-scheme" content="light" />
         <meta name="supported-color-schemes" content="light" />
-        
-        
+
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -167,74 +187,77 @@ export default function RootLayout({
                 {
                   "@type": "Organization",
                   "@id": "https://joinrss.org.in/#organization",
-                  "name": "RASHTRIYA SEVA SANGH",
-                  "alternateName": "राष्ट्रीय सेवा संघ",
-                  "description": "United for Dharma, Dedicated for Nation. A social service organization dedicated to nation building through dharmic values.",
-                  "url": "https://joinrss.org.in/",
-                  "foundingDate": "2023",
-                  "areaServed": "India",
-                  "knowsLanguage": ["hi", "en"],
-                  "logo": {
+                  name: "RASHTRIYA SEVA SANGH",
+                  alternateName: "राष्ट्रीय सेवा संघ",
+                  description:
+                    "United for Dharma, Dedicated for Nation. A social service organization dedicated to nation building through dharmic values.",
+                  url: "https://joinrss.org.in/",
+                  foundingDate: "2023",
+                  areaServed: "India",
+                  knowsLanguage: ["hi", "en"],
+                  logo: {
                     "@type": "ImageObject",
-                    "url": "https://joinrss.org.in/logo/logo.png",
-                    "width": 300,
-                    "height": 300,
-                    "caption": "राष्ट्रीय सेवा संघ Logo"
+                    url: "https://joinrss.org.in/logo/logo.png",
+                    width: 300,
+                    height: 300,
+                    caption: "राष्ट्रीय सेवा संघ Logo",
                   },
-                  "sameAs": [
+                  sameAs: [
                     "https://www.facebook.com/joinrssgroup",
-                    "https://x.com/joinrssgroup", 
+                    "https://x.com/joinrssgroup",
                     "https://www.instagram.com/joinrssgroupofficial",
-                    "https://youtube.com/@joinrssgroup"
+                    "https://youtube.com/@joinrssgroup",
                   ],
-                  "contactPoint": {
+                  contactPoint: {
                     "@type": "ContactPoint",
-                    "contactType": "customer service",
-                    "areaServed": "IN",
-                    "availableLanguage": ["Hindi", "English"]
-                  }
+                    contactType: "customer service",
+                    areaServed: "IN",
+                    availableLanguage: ["Hindi", "English"],
+                  },
                 },
                 {
                   "@type": "WebSite",
                   "@id": "https://joinrss.org.in/#website",
-                  "url": "https://joinrss.org.in/",
-                  "name": "RASHTRIYA SEVA SANGH",
-                  "alternateName": "राष्ट्रीय सेवा संघ",
-                  "publisher": {
-                    "@id": "https://joinrss.org.in/#organization"
+                  url: "https://joinrss.org.in/",
+                  name: "RASHTRIYA SEVA SANGH",
+                  alternateName: "राष्ट्रीय सेवा संघ",
+                  publisher: {
+                    "@id": "https://joinrss.org.in/#organization",
                   },
-                  "inLanguage": ["hi-IN", "en-IN"],
-                  "isAccessibleForFree": true,
-                  "potentialAction": {
+                  inLanguage: ["hi-IN", "en-IN"],
+                  isAccessibleForFree: true,
+                  potentialAction: {
                     "@type": "SearchAction",
-                    "target": "https://joinrss.org.in/?s={search_term_string}",
-                    "query-input": "required name=search_term_string"
-                  }
-                }
-              ]
-            })
+                    target: "https://joinrss.org.in/?s={search_term_string}",
+                    "query-input": "required name=search_term_string",
+                  },
+                },
+              ],
+            }),
           }}
         />
-        
-        
+
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        
-        
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin=""
+        />
+
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
       </head>
       <body
-        className={`${lato.variable} ${poppins.variable} ${nunito.variable} antialiased m-0 p-0 w-full overflow-x-hidden`}
+        className={`${lato.variable} ${poppins.variable} ${hind.variable} antialiased m-0 p-0 w-full overflow-x-hidden`}
       >
         <Link
-          href="#main-content" 
+          href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-orange-600 text-white px-4 py-2 rounded-md z-50 focus:outline-none focus:ring-2 focus:ring-white"
         >
           Skip to main content
         </Link>
-        {children}
+        <Provider>{children}</Provider>
+        <Toaster richColors/>
       </body>
     </html>
   );
 }
-

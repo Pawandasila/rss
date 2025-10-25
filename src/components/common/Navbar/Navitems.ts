@@ -71,14 +71,14 @@ export const navigationItems: NavItem[] = [
       {
         id: "become-member",
         title: "Become a Member",
-        href: "https://app.joinrss.org.in/registration",
+        href: "/become-member",
         icon: UserCheck,
         description: "सदस्यता के लिए पंजीकरण",
       },
       {
         id: "volunteer-registration",
         title: "Volunteer Registration",
-        href: "https://app.joinrss.org.in/registration",
+        href: "/vyapari",
         icon: Users,
         description: "स्वयंसेवक बनें",
       },
@@ -122,7 +122,7 @@ export const navigationItems: NavItem[] = [
       {
         id: "blog-articles",
         title: "Blog / Articles",
-        href: "/category/upcomming_events",
+        href: "/blog",
         icon: Edit3,
         description: "ब्लॉग और लेख",
       },
