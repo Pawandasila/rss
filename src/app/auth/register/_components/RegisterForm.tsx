@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -8,7 +8,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -47,7 +46,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 
-const RegisterForm = () => {
+const RegisterFormContent = () => {
   const searchParams = useSearchParams();
   const referralParam = searchParams.get("ref") || "";
 
@@ -465,4 +464,28 @@ const RegisterForm = () => {
   );
 };
 
-export default RegisterForm;
+export default function RegisterForm() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-orange-50 to-white p-4">
+        <Card className="w-full max-w-2xl shadow-lg">
+          <CardHeader className="space-y-2 text-center">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-orange-100">
+              <UserPlus className="h-7 w-7 text-orange-600" />
+            </div>
+            <CardTitle className="text-3xl font-bold text-orange-600">
+              Loading...
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-center h-32">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <RegisterFormContent />
+    </Suspense>
+  );
+}
