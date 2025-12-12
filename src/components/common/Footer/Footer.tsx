@@ -1,207 +1,262 @@
-"use client";
+import { Facebook, Twitter, Linkedin, Instagram, Youtube } from "lucide-react";
 
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import {
-  MapPin,
-  Phone,
-  Mail,
-  ExternalLink,
-  Heart,
-  Facebook,
-  Twitter,
-  Youtube,
-  Instagram,
-} from "lucide-react";
-import {
-  quickLinks,
-  importantLinks,
-  offices,
-  contactInfo,
-  socialLinks,
-  organizationInfo,
-  FooterLink,
-} from "./FooterData";
-
-const Footer: React.FC = () => {
-  const getSocialIcon = (platform: string) => {
-    switch (platform.toLowerCase()) {
-      case "facebook":
-        return <Facebook className="w-5 h-5" />;
-      case "twitter":
-        return <Twitter className="w-5 h-5" />;
-      case "youtube":
-        return <Youtube className="w-5 h-5" />;
-      case "instagram":
-        return <Instagram className="w-5 h-5" />;
-      default:
-        return <ExternalLink className="w-5 h-5" />;
-    }
-  };
-
-  const renderFooterLink = (link: FooterLink) => {
-    if (link.external) {
-      return (
-        <a
-          href={link.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-gray-300 hover:text-orange-400 transition-colors duration-300 flex items-center gap-1 group"
-        >
-          {link.label}
-          <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-        </a>
-      );
-    }
-
-    return (
-      <Link
-        href={link.href}
-        className="text-gray-300 hover:text-orange-400 transition-colors duration-300"
-      >
-        {link.label}
-      </Link>
-    );
-  };
-
+const Footer = () => {
+  const LOCATIONS = [
+    "RSS Delhi Prant",
+    "RSS Mumbai Mahanagar",
+    "RSS Karnataka Dakshin",
+    "RSS Kerala Prant",
+    "RSS Uttar Pradesh East",
+    "RSS Rajasthan Jaipur",
+    "RSS Gujarat Prant",
+    "RSS West Bengal",
+    "RSS Madhya Bharat",
+    "RSS Konkan Prant",
+    "RSS Devgiri Prant",
+    "RSS Vidarbha",
+    "RSS Tamil Nadu North",
+    "RSS Telangana",
+    "RSS Punjab",
+    "RSS Himachal",
+  ];
   return (
-    <footer className="bg-gradient-to-b from-gray-900 to-black text-white">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-          <div className="lg:col-span-2 space-y-6">
+    <div>
+      <section className="border-t border-gray-100 py-6 bg-gray-50">
+        <div className="container mx-auto flex flex-wrap justify-center md:justify-around gap-6 text-[10px] md:text-xs text-gray-500 font-medium uppercase tracking-wide">
+          <div className="flex items-center gap-2">
+            <span className="text-apml-red">✎</span> Feedback
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-apml-red">📷</span> Gallery
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-apml-red">🏆</span> History
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-apml-red">▶</span> Media
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-apml-red">?</span> FAQ's
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-apml-red">📋</span> Literature
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-apml-red">🎧</span> Helpline
+          </div>
+        </div>
+      </section>
+
+      <footer className="bg-white border-t border-gray-200 mt-12">
+        {/* Prants Location */}
+        <div className="container mx-auto px-4 py-8">
+          <h4 className="text-apml-red font-bold text-sm uppercase mb-4 border-b border-gray-200 pb-2">
+            RSS Prants (Regions)
+          </h4>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+            {LOCATIONS.map((loc, i) => (
+              <a
+                key={i}
+                href="#"
+                className="text-[10px] text-gray-500 hover:text-apml-red hover:underline block truncate"
+              >
+                {loc}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* Main Red Footer */}
+        <div className="bg-apml-darkRed text-white pt-12 pb-6">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 text-sm">
+              {/* About */}
+              <div className="space-y-3">
+                <h5 className="font-bold text-white text-base mb-4">
+                  About RSS
+                </h5>
+                <ul className="space-y-2 text-gray-300 text-xs">
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      Vision & Mission
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      History
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      Founder
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      Sarsanghchalaks
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      Timeline
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Resources */}
+              <div className="space-y-3">
+                <h5 className="font-bold text-white text-base mb-4">
+                  Resources
+                </h5>
+                <ul className="space-y-2 text-gray-300 text-xs">
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      Downloads
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      Literature
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      Songs (Geet)
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      Photo Gallery
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      Archives
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Activities */}
+              <div className="space-y-3">
+                <h5 className="font-bold text-white text-base mb-4">
+                  Activities
+                </h5>
+                <ul className="space-y-2 text-gray-300 text-xs">
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      Seva Projects
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      Rural Development
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      Cow Protection
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      Family Counseling
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      Environment
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Connect */}
+              <div className="space-y-3">
+                <h5 className="font-bold text-white text-base mb-4">Connect</h5>
+                <ul className="space-y-2 text-gray-300 text-xs">
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      Join RSS
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      Contact Us
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      Locate Shakha
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white">
+                      Sitemap
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Contact Box */}
+              <div className="bg-red-900/50 p-6 rounded-lg border border-red-800">
+                <h5 className="font-bold text-white text-base mb-4">
+                  Central Office
+                </h5>
+                <p className="text-xs text-gray-300 mb-2">
+                  Dr. Hedgewar Bhavan, Mahal, Nagpur - 440032
+                </p>
+                <p className="text-xl font-bold text-white mb-4">
+                  +91 712 272 3003
+                </p>
+                <button className="bg-white text-apml-red px-4 py-2 rounded text-xs font-bold w-full mb-4 hover:bg-gray-100 transition">
+                  Donate Online
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Copyright Bar */}
+        <div className="bg-[#4a0404] text-white/60 py-4 text-[10px]">
+          <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>© 2024 Rashtriya Swayamsevak Sangh. All Rights Reserved</div>
             <div className="flex items-center gap-4">
-              <div className="relative w-16 h-16 flex-shrink-0">
-                <Image
-                  src={organizationInfo.logo}
-                  alt={organizationInfo.name}
-                  fill
-                  className="object-contain rounded-lg"
-                  sizes="64px"
+              <a href="#" className="hover:text-white">
+                Privacy Policy
+              </a>
+              <span className="text-white/30">|</span>
+              <a href="#" className="hover:text-white">
+                Terms of Use
+              </a>
+              <div className="flex items-center gap-3 ml-4">
+                <Facebook
+                  size={14}
+                  className="hover:text-white cursor-pointer"
+                />
+                <Twitter
+                  size={14}
+                  className="hover:text-white cursor-pointer"
+                />
+                <Linkedin
+                  size={14}
+                  className="hover:text-white cursor-pointer"
+                />
+                <Instagram
+                  size={14}
+                  className="hover:text-white cursor-pointer"
+                />
+                <Youtube
+                  size={14}
+                  className="hover:text-white cursor-pointer"
                 />
               </div>
-              <div>
-                <h3 className="text-2xl font-bold text-white mb-1">
-                  {organizationInfo.name}
-                </h3>
-                <p className="text-orange-400 text-sm font-medium italic">
-                  &ldquo;{organizationInfo.tagline}&rdquo;
-                </p>
-              </div>
-            </div>
-
-            <p className="text-gray-300 leading-relaxed text-sm max-w-2xl">
-              {organizationInfo.description}
-            </p>
-
-            <div>
-              <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <Heart className="w-5 h-5 text-orange-500" />
-                Follow Us
-              </h4>
-              <div className="flex gap-4">
-                {socialLinks.map((social, index) => (
-                  <a
-                    key={index}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 bg-gray-800 hover:bg-orange-600 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg"
-                    aria-label={`Follow us on ${social.platform}`}
-                  >
-                    {getSocialIcon(social.platform)}
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <h4 className="text-xl font-semibold text-white border-b border-orange-600 pb-2 mb-6">
-              Quick Links
-            </h4>
-            <ul className="space-y-3">
-              {quickLinks.map((link, index) => (
-                <li key={index}>{renderFooterLink(link)}</li>
-              ))}
-            </ul>
-
-            <div className="pt-6">
-              <h4 className="text-xl font-semibold text-white border-b border-orange-600 pb-2 mb-6">
-                Important
-              </h4>
-              <ul className="space-y-3">
-                {importantLinks.map((link, index) => (
-                  <li key={index}>{renderFooterLink(link)}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <h4 className="text-xl font-semibold text-white border-b border-orange-600 pb-2 mb-6">
-              Contact Us
-            </h4>
-
-            <div className="space-y-6">
-              {offices.map((office, index) => (
-                <div key={index} className="space-y-2">
-                  <div className="flex items-start gap-3">
-                    <MapPin className="w-5 h-5 text-orange-500 mt-1 flex-shrink-0" />
-                    <div>
-                      <h5 className="font-semibold text-white text-sm mb-1">
-                        {office.location}:
-                      </h5>
-                      <p className="text-gray-300 text-sm leading-relaxed">
-                        {office.address}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="space-y-3 pt-4 border-t border-gray-800">
-              <div className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-orange-500" />
-                <a
-                  href={`tel:${contactInfo.phone.replace(/\s+/g, "")}`}
-                  className="text-gray-300 hover:text-orange-400 transition-colors duration-300"
-                >
-                  {contactInfo.phone}
-                </a>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-orange-500" />
-                <a
-                  href={`mailto:${contactInfo.email}`}
-                  className="text-gray-300 hover:text-orange-400 transition-colors duration-300"
-                >
-                  {contactInfo.email}
-                </a>
-              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="border-t border-gray-800 bg-black">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm">
-              {organizationInfo.copyright}
-            </p>
-
-            <div className="flex items-center gap-2 text-sm text-gray-400">
-              <span>Made with</span>
-              <Heart className="w-4 h-4 text-red-500 fill-current" />
-              <span>for Bharat</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
+      </footer>
+    </div>
   );
 };
 
