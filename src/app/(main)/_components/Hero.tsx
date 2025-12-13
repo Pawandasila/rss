@@ -26,8 +26,7 @@ const HERO_SLIDES = [
     titleHindi: "नर सेवा नारायण सेवा",
     description:
       "RSS Swayamsevaks are always at the forefront during natural calamities, providing relief and rehabilitation to the affected.",
-    image:
-      "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=800&auto=format&fit=crop",
+    image: "/hero/hero-01.png",
     ctaLink: "#",
   },
   {
@@ -36,8 +35,7 @@ const HERO_SLIDES = [
     titleHindi: "व्यक्ति निर्माण से राष्ट्र निर्माण",
     description:
       "Inculcating discipline, patriotism, and selfless service through daily Shakha to create dedicated citizens.",
-    image:
-      "https://images.unsplash.com/photo-1616766480749-060195c643b2?q=80&w=800&auto=format&fit=crop",
+    image: "/hero/hero-02.png",
     ctaLink: "#",
   },
   {
@@ -46,8 +44,7 @@ const HERO_SLIDES = [
     titleHindi: "संस्कृति रक्षण",
     description:
       "Protecting and promoting Bharatiya culture, traditions, and values for future generations.",
-    image:
-      "https://images.unsplash.com/photo-1623944890523-284c8c272bc7?q=80&w=800&auto=format&fit=crop",
+    image: "/hero/hero-03.png",
     ctaLink: "#",
   },
   {
@@ -56,8 +53,7 @@ const HERO_SLIDES = [
     titleHindi: "सामाजिक समरसता",
     description:
       "Working towards a casteless society united by the bond of brotherhood and equality.",
-    image:
-      "https://images.unsplash.com/photo-1573497620053-ea5300f94f21?q=80&w=800&auto=format&fit=crop",
+    image: "/hero/hero-04.png",
     ctaLink: "#",
   },
   {
@@ -66,8 +62,7 @@ const HERO_SLIDES = [
     titleHindi: "ग्राम विकास",
     description:
       "Empowering villages through organic farming, cow protection, and self-reliance initiatives.",
-    image:
-      "https://images.unsplash.com/photo-1625246333195-58197bd47d26?q=80&w=800&auto=format&fit=crop",
+    image: "/hero/hero-05.png",
     ctaLink: "#",
   },
 ];
@@ -76,9 +71,6 @@ const Hero = () => {
   const [activeTab, setActiveTab] = useState<"join" | "donate">("join");
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const heroRef = useRef(null);
-  const textRef = useRef(null);
-  const formRef = useRef(null);
   const sliderRef = useRef<HTMLDivElement>(null);
 
   // Auto-slide logic
@@ -89,10 +81,9 @@ const Hero = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Desktop slider sync
   useEffect(() => {
     if (sliderRef.current) {
-      const scrollAmount = currentSlide * 340; // Approx card width + gap
+      const scrollAmount = currentSlide * 340;
       sliderRef.current.scrollTo({
         left: scrollAmount,
         behavior: "smooth",
@@ -104,22 +95,20 @@ const Hero = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
-      className="relative font-sans overflow-hidden w-full max-w-[100vw]"
-      ref={heroRef}
+      transition={{ duration: 0.5 }}
+      className="relative font-sans overflow-hidden w-full "
     >
       <div className="bg-primary w-full text-white pb-16 sm:pb-24 lg:pb-48 relative overflow-hidden transition-colors duration-500">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-orange-400 to-transparent"></div>
 
-        <div className="container mx-auto px-4 pt-3 sm:pt-4 relative z-10">
+        <div className="w-full px-4 md:px-8 lg:px-16 pt-3 sm:pt-4 relative z-10">
           <div className="flex flex-col lg:flex-row items-center justify-between mt-4 sm:mt-6 lg:mt-12 gap-6 sm:gap-8 lg:gap-12">
             {/* Left Column: Text */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+              transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
               className="lg:w-1/2 text-center lg:text-left z-20"
-              ref={textRef}
             >
               <div className="inline-block bg-accent/20 border border-accent/30 backdrop-blur-md px-3 py-0.5 sm:px-4 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-2 sm:mb-3 text-orange-100">
                 For Dharma, For Nation, For Bharat!
@@ -127,7 +116,7 @@ const Hero = () => {
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
+                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-7xl font-bold mb-3 sm:mb-4 lg:mb-6 leading-tight drop-shadow-lg"
               >
                 RASHTRIYA SEVA{" "}
@@ -227,11 +216,10 @@ const Hero = () => {
       <motion.div
         initial={{ opacity: 0, y: 60 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="container mx-auto px-4 relative z-30 -mt-12 sm:-mt-16 lg:-mt-28 mb-8 sm:mb-12 lg:mb-16"
-        ref={formRef}
+        transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full px-4 md:px-8 lg:px-16 xl:px-24 relative z-30 -mt-12 sm:-mt-16 lg:-mt-28 mb-8 sm:mb-12 lg:mb-16"
       >
-        <div className="bg-white rounded-t-xl rounded-b-lg shadow-[0_20px_50px_rgba(0,0,0,0.15)] mx-auto border-t-4 border-accent max-w-7xl overflow-hidden relative">
+        <div className="bg-white rounded-t-xl rounded-b-lg shadow-[0_20px_50px_rgba(0,0,0,0.15)] mx-auto border-t-4 border-accent w-full overflow-hidden relative">
           <div className="flex text-xs sm:text-sm font-bold text-center border-b border-gray-100">
             <button
               onClick={() => setActiveTab("join")}

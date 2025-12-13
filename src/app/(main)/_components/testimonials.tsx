@@ -73,7 +73,7 @@ const Testimonials: React.FC = () => {
       className="py-24 bg-gray-50 relative overflow-hidden"
       ref={containerRef}
     >
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="w-full px-4 md:px-8 lg:px-16 xl:px-24 relative z-10">
         <SectionHeader
           badgeTitle="Impact"
           badgeIcon={MessageSquareQuote}
@@ -125,6 +125,7 @@ const Testimonials: React.FC = () => {
                         alt={item.author}
                         fill
                         className="object-cover"
+                        sizes="64px"
                       />
                     </div>
                     <div>

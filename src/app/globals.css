@@ -76,10 +76,11 @@
   --radius: 0.65rem;
   
   /* User Defined Brand Colors */
-  --primary: #E31E24;
-  --primary-dark: #bf1016;
-  --secondary: #333333;
-  --accent: #F97316;
+    --primary: oklch(70.09% 0.20117 44.755 / 0.849);
+  --primary-foreground: oklch(0.98 0.016 73.684);
+  --secondary: oklch(0.967 0.001 286.375);
+  --secondary-foreground: oklch(0.21 0.006 285.885);
+  --accent: oklch(0.646 0.222 41.116);
   
   /* Neutral Colors */
   --background-light: #f8f8f8;
@@ -146,10 +147,10 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.21 0.006 285.885);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.646 0.222 41.116);
+    --primary: oklch(0.705 0.213 47.604);
   --primary-foreground: oklch(0.98 0.016 73.684);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.967 0.001 286.375);
+  --secondary-foreground: oklch(0.21 0.006 285.885);
   --muted: oklch(0.274 0.006 286.033);
   --muted-foreground: oklch(0.705 0.015 286.067);
   --accent: oklch(0.274 0.006 286.033);
@@ -393,4 +394,18 @@ h1, h2, h3, h4, h5, h6 {
   100% {
     background-position: 0% 50%;
   }
+}
+
+
+@keyframes marqueeVertical {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+.animate-marquee-vertical {
+  animation: marqueeVertical 60s linear infinite;
+}
+
+.animate-marquee-vertical:hover {
+  animation-play-state: paused;
 }

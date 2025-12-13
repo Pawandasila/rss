@@ -66,12 +66,12 @@ const DivineMission: React.FC = () => {
       {/* Background Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="w-full px-4 md:px-8 lg:px-16 xl:px-24 relative z-10">
         <SectionHeader
           badgeTitle="Core Ideology"
           badgeIcon={Star}
           title="Our Divine Mission"
-          description="Dedicated to the goal of Man Making and Nation Building through various dimensions of social work."
+          // description="Dedicated to the goal of Man Making and Nation Building through various dimensions of social work."
           viewAll="View all missions"
           viewAllLink="#"
         />
@@ -104,6 +104,7 @@ const DivineMission: React.FC = () => {
                       alt={mission.title}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
                     />
                     <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500" />
                   </div>

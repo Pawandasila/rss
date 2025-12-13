@@ -24,7 +24,7 @@ const Supporters: React.FC = () => {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <div className="container mx-auto px-4 mb-8">
+      <div className="w-full px-4 md:px-8 lg:px-16 xl:px-24 mb-8">
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

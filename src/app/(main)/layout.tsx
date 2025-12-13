@@ -1,5 +1,6 @@
 import React from "react";
-import Navbar from "@/components/common/Navbar/Navbar";
+import Header from "@/components/common/Navbar/Navbar";
+
 import Footer from "@/components/common/Footer/Footer";
 
 export default function MainLayout({
@@ -9,6 +10,8 @@ export default function MainLayout({
 }>) {
   return (
     <div className="min-h-screen flex flex-col w-full overflow-x-hidden relative">
+      <Header />
+
       <main
         id="main-content"
         className="w-full font-hind"

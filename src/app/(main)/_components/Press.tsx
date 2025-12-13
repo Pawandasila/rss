@@ -49,7 +49,7 @@ const ARTICLES = [
 const PressSection: React.FC = () => {
   return (
     <section className="py-24 bg-background border-t border-border">
-      <div className="container mx-auto px-4">
+      <div className="w-full px-4 md:px-8 lg:px-16 xl:px-24">
         <SectionHeader
           badgeTitle="Press"
           badgeIcon={Newspaper}

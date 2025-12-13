@@ -1,4 +1,4 @@
-import Header from "@/components/common/Navbar/Navbar";
+"use client";
 import Hero from "./_components/Hero";
 import ServicesSection from "./_components/Service";
 import Blog from "./_components/blogs";
@@ -6,6 +6,11 @@ import DivineMission from "./_components/DivineMission";
 import PressSection from "./_components/Press";
 import Testimonials from "./_components/testimonials";
 import Supporters from "./_components/Supporters";
+import DonationList from "./_components/DonationList";
+import AboutSection from "./_components/About";
+import ShikayatSection from "./_components/Shikayat";
+import StickySidebar from "@/components/common/sticky-sidebar";
+import VyapariSection from "./_components/Vyapari";
 
 export default function Home() {
   return (
@@ -13,14 +18,18 @@ export default function Home() {
       className="min-h-screen w-full max-w-[100vw] bg-white text-gray-800 font-sans selection:bg-orange-100 selection:text-primary"
       role="main"
     >
-      <Header />
       <Hero />
       <Supporters />
+      <AboutSection />
       <ServicesSection />
       <DivineMission />
+      <DonationList />
+      <ShikayatSection />
+      <VyapariSection />
       <Blog />
       <PressSection />
       <Testimonials />
+      <StickySidebar />
     </main>
   );
 }

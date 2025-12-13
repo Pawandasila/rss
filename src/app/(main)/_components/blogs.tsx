@@ -18,28 +18,28 @@ const CARDS = [
     subtitle: "Join the RSS Movement",
     btn: "Join Now",
     icon: Users,
-    img: "https://images.unsplash.com/photo-1524601500432-1e1a4c71d692?q=80&w=800&auto=format&fit=crop",
+    img: "/hero/hero-01.png",
   },
   {
     title: "Support the Cause",
     subtitle: "Contribute to Nation Building",
     btn: "Donate",
     icon: Heart,
-    img: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800&auto=format&fit=crop",
+    img: "/hero/hero-02.png",
   },
   {
     title: "RSS Literature",
     subtitle: "Books, Articles & Thoughts",
     btn: "Read More",
     icon: BookOpen,
-    img: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?q=80&w=800&auto=format&fit=crop",
+    img: "/hero/hero-03.png",
   },
   {
     title: "Gallery & Events",
     subtitle: "Glimpses of recent events",
     btn: "View All",
     icon: ImageIcon,
-    img: "https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=800&auto=format&fit=crop",
+    img: "/hero/hero-04.png",
   },
 ];
 
@@ -52,7 +52,7 @@ const Blog: React.FC = () => {
       transition={{ duration: 0.6 }}
       className="py-20 bg-background relative overflow-hidden"
     >
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="w-full px-4 md:px-8 lg:px-16 xl:px-24 relative z-10">
         <SectionHeader
           badgeTitle="Take Action"
           badgeIcon={CircleDashed}
@@ -195,19 +195,20 @@ const Blog: React.FC = () => {
                   className="relative flex-shrink-0 w-64 aspect-video rounded-xl overflow-hidden shadow-md group cursor-pointer"
                 >
                   <Image
-                    src={`https://images.unsplash.com/photo-${
+                    src={`/live/divine-${
                       [
-                        "1506784983877-45594efa4cbe",
-                        "1542206395-9feb3edaa68d",
-                        "1491438590914-bc09fcaaf77a",
-                        "1506784983877-45594efa4cbe",
-                        "1542206395-9feb3edaa68d",
-                        "1491438590914-bc09fcaaf77a",
-                      ][i % 3]
-                    }?q=80&w=400&auto=format&fit=crop`}
+                        "01.webp",
+                        "02.webp",
+                        "03.webp",
+                        "04.webp",
+                        "05.webp",
+                        "06.webp",
+                      ][i % 7]
+                    }`}
                     alt="Event"
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="256px"
                   />
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
                 </div>

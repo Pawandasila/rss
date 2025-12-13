@@ -121,7 +121,7 @@ const ServicesSection: React.FC = () => {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
-        className="container mx-auto px-4 relative z-10"
+        className="w-full px-4 md:px-8 lg:px-16 xl:px-24 relative z-10"
       >
         <SectionHeader
           badgeTitle="Key Initiatives"
@@ -196,15 +196,21 @@ const ServicesSection: React.FC = () => {
                     exit={{ opacity: 0, scale: 0.95, x: 20 }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
                   >
-                    <motion.img
-                      src={activeService.image}
-                      alt={activeService.title}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                    <motion.div
+                      className="absolute inset-0 w-full h-full"
                       initial={{ scale: 1.1 }}
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.8 }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent"></div>
+                    >
+                      <Image
+                        src={activeService.image}
+                        alt={activeService.title}
+                        fill
+                        className="object-cover transition-transform duration-700 hover:scale-105"
+                        sizes="(max-width: 1024px) 100vw, 60vw"
+                      />
+                    </motion.div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent pointer-events-none"></div>
                   </motion.div>
 
                   {/* Content Card (Front) - Spans col 1 to 6 */}
@@ -271,12 +277,14 @@ const ServicesSection: React.FC = () => {
                   transition={{ duration: 0.5 }}
                 >
                   <div className="h-64 relative">
-                    <img
+                    <Image
                       src={activeService.image}
                       alt={activeService.title}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 50vw"
                     />
-                    <div className="absolute inset-0 bg-black/20"></div>
+                    <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
                   </div>
                   <div className="bg-apml-red text-white p-8">
                     <h3 className="text-2xl font-bold mb-4">
