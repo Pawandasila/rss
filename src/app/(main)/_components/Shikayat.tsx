@@ -110,9 +110,6 @@ const ShikayatSection: React.FC = () => {
                       We urge you to be genuine.
                     </p>
                   </div>
-                  <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-600 animate-pulse">
-                    <span className="w-3 h-3 bg-red-500 rounded-full"></span>
-                  </div>
                 </div>
 
                 <form

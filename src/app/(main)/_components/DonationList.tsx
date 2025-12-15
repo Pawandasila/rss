@@ -129,19 +129,6 @@ const RecentDonors: React.FC = () => {
         <div className="flex flex-col lg:flex-row gap-8 md:gap-16 items-center">
           {/* Left Content */}
           <div className="lg:w-5/12">
-            <div className="flex items-center gap-2 text-apml-red font-bold text-xs uppercase tracking-widest mb-4">
-              <span className="w-2 h-2 rounded-full bg-apml-red animate-pulse"></span>
-              Donors
-            </div>
-            <h3 className="text-3xl md:text-4xl font-black text-gray-900 mb-4 md:mb-6 leading-tight">
-              Join the Movement of <br />
-              <span className="text-apml-red">Nation Building</span>
-            </h3>
-            <p className="text-gray-500 text-sm md:text-lg leading-relaxed mb-6 md:mb-8">
-              Your contribution directly supports our Seva projects, tribal
-              welfare initiatives, and educational programs across Bharat.
-            </p>
-
             <div className="grid grid-cols-2 gap-3 md:gap-4 mb-6 md:mb-8">
               <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                 <div className="text-2xl md:text-3xl font-black text-gray-800 mb-1">
