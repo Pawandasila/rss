@@ -98,8 +98,8 @@ const Hero = () => {
       transition={{ duration: 0.5 }}
       className="relative font-sans overflow-hidden w-full "
     >
-      <div className="bg-primary w-full text-white pb-16 sm:pb-24 lg:pb-48 relative overflow-hidden transition-colors duration-500">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-orange-400 to-transparent"></div>
+      <div className="bg-[url('/hero/01.jpeg')] aspect-[16/9] md:bg-none bg-cover bg-center  bg-no-repeat md:bg-primary w-full text-white pb-[80vw] sm:pb-24 lg:pb-48 relative overflow-hidden transition-colors duration-500">
+        <div className="hidden md:block absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-orange-400 to-transparent"></div>
 
         <div className="w-full px-4 md:px-8 lg:px-16 pt-3 sm:pt-4 relative z-10">
           <div className="flex flex-col lg:flex-row items-center justify-between mt-4 sm:mt-6 lg:mt-12 gap-6 sm:gap-8 lg:gap-12">
@@ -108,7 +108,7 @@ const Hero = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
-              className="lg:w-1/2 text-center lg:text-left z-20"
+              className="hidden md:block lg:w-1/2 text-center lg:text-left z-20"
             >
               <div className="inline-block bg-accent/20 border border-accent/30 backdrop-blur-md px-3 py-0.5 sm:px-4 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-2 sm:mb-3 text-orange-100">
                 For Dharma, For Nation, For Bharat!
