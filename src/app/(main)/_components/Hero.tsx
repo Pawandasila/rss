@@ -99,10 +99,13 @@ const Hero = () => {
       className="relative font-sans overflow-hidden w-full "
     >
       <div className=" w-full text-white sm:pb-24 lg:pb-48 relative overflow-hidden transition-colors duration-500">
-        <img
+        <Image
           src="/hero/01.jpeg"
           alt="Rashtriya Seva Sangh"
+          width={800}
+          height={600}
           className="w-full h-auto md:hidden block"
+          priority
         />
         <div className="hidden md:block absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-orange-400 to-transparent"></div>
 
