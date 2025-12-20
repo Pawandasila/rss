@@ -1,4 +1,17 @@
-import { Facebook, Twitter, Linkedin, Instagram, Youtube } from "lucide-react";
+"use client";
+
+import {
+  Facebook,
+  Twitter,
+  Linkedin,
+  Instagram,
+  Youtube,
+  MapPin,
+  Phone,
+  ChevronUp,
+  Globe,
+} from "lucide-react";
+import Image from "next/image";
 
 const Footer = () => {
   const LOCATIONS = [
@@ -19,244 +32,230 @@ const Footer = () => {
     "RSS Punjab",
     "RSS Himachal",
   ];
+
+  const QUICK_LINKS = [
+    { name: "Vision & Mission", href: "#" },
+    { name: "History", href: "#" },
+    { name: "Founder", href: "#" },
+    { name: "Sarsanghchalaks", href: "#" },
+    { name: "Timeline", href: "#" },
+  ];
+
+  const RESOURCES = [
+    { name: "Downloads", href: "#" },
+    { name: "Literature", href: "#" },
+    { name: "Songs (Geet)", href: "#" },
+    { name: "Photo Gallery", href: "#" },
+    { name: "Archives", href: "#" },
+  ];
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
-    <div>
-      <section className="border-t border-gray-100 py-6 bg-gray-50">
-        <div className="container mx-auto flex flex-wrap justify-center md:justify-around gap-6 text-[10px] md:text-xs text-gray-500 font-medium uppercase tracking-wide">
-          <div className="flex items-center gap-2">
-            <span className="text-apml-red">✎</span> Feedback
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-apml-red">📷</span> Gallery
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-apml-red">🏆</span> History
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-apml-red">▶</span> Media
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-apml-red">?</span> FAQ's
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-apml-red">📋</span> Literature
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-apml-red">🎧</span> Helpline
-          </div>
-        </div>
-      </section>
-
-      <footer className="bg-white border-t border-gray-200 mt-12">
-        {/* Prants Location */}
-        <div className="container mx-auto px-4 py-8">
-          <h4 className="text-apml-red font-bold text-sm uppercase mb-4 border-b border-gray-200 pb-2">
-            RSS Prants (Regions)
-          </h4>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-            {LOCATIONS.map((loc, i) => (
-              <a
-                key={i}
-                href="#"
-                className="text-[10px] text-gray-500 hover:text-apml-red hover:underline block truncate"
-              >
-                {loc}
-              </a>
-            ))}
-          </div>
-        </div>
-
-        {/* Main Red Footer */}
-        <div className="bg-apml-darkRed text-white pt-12 pb-6">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 text-sm">
-              {/* About */}
-              <div className="space-y-3">
-                <h5 className="font-bold text-white text-base mb-4">
-                  About RSS
-                </h5>
-                <ul className="space-y-2 text-gray-300 text-xs">
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      Vision & Mission
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      History
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      Founder
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      Sarsanghchalaks
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      Timeline
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Resources */}
-              <div className="space-y-3">
-                <h5 className="font-bold text-white text-base mb-4">
-                  Resources
-                </h5>
-                <ul className="space-y-2 text-gray-300 text-xs">
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      Downloads
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      Literature
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      Songs (Geet)
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      Photo Gallery
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      Archives
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Activities */}
-              <div className="space-y-3">
-                <h5 className="font-bold text-white text-base mb-4">
-                  Activities
-                </h5>
-                <ul className="space-y-2 text-gray-300 text-xs">
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      Seva Projects
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      Rural Development
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      Cow Protection
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      Family Counseling
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      Environment
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Connect */}
-              <div className="space-y-3">
-                <h5 className="font-bold text-white text-base mb-4">Connect</h5>
-                <ul className="space-y-2 text-gray-300 text-xs">
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      Join RSS
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      Contact Us
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      Locate Shakha
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white">
-                      Sitemap
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Contact Box */}
-              <div className="bg-red-900/50 p-6 rounded-lg border border-red-800">
-                <h5 className="font-bold text-white text-base mb-4">
-                  Central Office
-                </h5>
-                <p className="text-xs text-gray-300 mb-2">
-                  Dr. Hedgewar Bhavan, Mahal, Nagpur - 440032
-                </p>
-                <p className="text-xl font-bold text-white mb-4">
-                  +91 712 272 3003
-                </p>
-                <button className="bg-white text-apml-red px-4 py-2 rounded text-xs font-bold w-full mb-4 hover:bg-gray-100 transition">
-                  Donate Online
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Copyright Bar */}
-        <div className="bg-[#4a0404] text-white/60 py-4 text-[10px]">
-          <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div>© 2024 Rashtriya Swayamsevak Sangh. All Rights Reserved</div>
+    <footer className="bg-[#0a0c10] text-gray-400 border-t border-gray-800 relative">
+      {/* Main Content Area */}
+      <div className="container mx-auto px-4 pt-20 pb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
+          {/* Brand Info */}
+          <div className="lg:col-span-4 space-y-8">
             <div className="flex items-center gap-4">
-              <a href="#" className="hover:text-white">
-                Privacy Policy
-              </a>
-              <span className="text-white/30">|</span>
-              <a href="#" className="hover:text-white">
-                Terms of Use
-              </a>
-              <div className="flex items-center gap-3 ml-4">
-                <Facebook
-                  size={14}
-                  className="hover:text-white cursor-pointer"
+              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center p-2 shadow-2xl">
+                <Image
+                  src="/logo/logo.png"
+                  alt="RSS"
+                  height={100}
+                  width={100}
+                  className="object-contain h-16 w-16"
                 />
-                <Twitter
-                  size={14}
-                  className="hover:text-white cursor-pointer"
-                />
-                <Linkedin
-                  size={14}
-                  className="hover:text-white cursor-pointer"
-                />
-                <Instagram
-                  size={14}
-                  className="hover:text-white cursor-pointer"
-                />
-                <Youtube
-                  size={14}
-                  className="hover:text-white cursor-pointer"
-                />
+              </div>
+              <div>
+                <h3 className="text-white text-xl font-black leading-none tracking-tighter">
+                  RASHTRIYA <br /> SEVA SANGH
+                </h3>
+                <p className="text-[10px] text-apml-red font-bold uppercase tracking-[0.3em] mt-1">
+                  Satyameva Jayate
+                </p>
+              </div>
+            </div>
+            <p className="text-sm leading-relaxed text-gray-500 max-w-sm">
+              Dedicated to the mission of national reconstruction and character
+              building. Founded in 1925, we are the world's largest voluntary
+              organization committed to Bharat's resurgence.
+            </p>
+            <div className="flex items-center gap-6">
+              <div className="flex flex-col">
+                <span className="text-white font-black text-xl">1925</span>
+                <span className="text-[10px] uppercase font-bold text-gray-600 tracking-widest">
+                  Foundation
+                </span>
+              </div>
+              <div className="w-px h-10 bg-gray-800"></div>
+              <div className="flex flex-col">
+                <span className="text-white font-black text-xl">1.5L+</span>
+                <span className="text-[10px] uppercase font-bold text-gray-600 tracking-widest">
+                  Seva Projects
+                </span>
+              </div>
+              <div className="w-px h-10 bg-gray-800"></div>
+              <div className="flex flex-col">
+                <span className="text-white font-black text-xl">50K+</span>
+                <span className="text-[10px] uppercase font-bold text-gray-600 tracking-widest">
+                  Shakhas
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Links */}
+          <div className="lg:col-span-2">
+            <h4 className="text-white font-black text-sm uppercase tracking-widest mb-8 flex items-center gap-2">
+              <div className="w-1.5 h-1.5 bg-apml-red rounded-full"></div>
+              About Sangh
+            </h4>
+            <ul className="space-y-4">
+              {QUICK_LINKS.map((link) => (
+                <li key={link.name}>
+                  <a
+                    href={link.href}
+                    className="text-sm hover:text-white transition-colors flex items-center gap-2 group"
+                  >
+                    <span className="w-0 h-0.5 bg-apml-red group-hover:w-3 transition-all"></span>
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Resources */}
+          <div className="lg:col-span-2">
+            <h4 className="text-white font-black text-sm uppercase tracking-widest mb-8 flex items-center gap-2">
+              <div className="w-1.5 h-1.5 bg-apml-red rounded-full"></div>
+              Resources
+            </h4>
+            <ul className="space-y-4">
+              {RESOURCES.map((link) => (
+                <li key={link.name}>
+                  <a
+                    href={link.href}
+                    className="text-sm hover:text-white transition-colors flex items-center gap-2 group"
+                  >
+                    <span className="w-0 h-0.5 bg-apml-red group-hover:w-3 transition-all"></span>
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Regional & Contact */}
+          <div className="lg:col-span-4 space-y-8">
+            <div className="bg-gray-800/30 rounded-2xl p-6 border border-gray-800/50 backdrop-blur-sm">
+              <h4 className="text-white font-black text-sm uppercase tracking-widest mb-4 flex items-center justify-between">
+                <span>Regional Centers</span>
+                <Globe size={14} className="text-apml-red" />
+              </h4>
+              <div className="h-40 overflow-y-auto pr-2 custom-scrollbar grid grid-cols-1 gap-2">
+                {LOCATIONS.map((loc, i) => (
+                  <a
+                    key={i}
+                    href="#"
+                    className="text-xs text-gray-500 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-lg transition-all border border-transparent hover:border-gray-700"
+                  >
+                    {loc}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 group cursor-pointer">
+                <div className="w-10 h-10 rounded-xl bg-apml-red/10 border border-apml-red/20 flex items-center justify-center text-apml-red group-hover:bg-apml-red group-hover:text-white transition-all">
+                  <Phone size={18} />
+                </div>
+                <div>
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-600">
+                    Central Helpline
+                  </span>
+                  <span className="text-white font-bold">+91 712 272 3003</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-4 group cursor-pointer">
+                <div className="w-10 h-10 rounded-xl bg-apml-red/10 border border-apml-red/20 flex items-center justify-center text-apml-red group-hover:bg-apml-red group-hover:text-white transition-all">
+                  <MapPin size={18} />
+                </div>
+                <div>
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-600">
+                    Headquarters
+                  </span>
+                  <span className="text-white font-bold">
+                    Nagpur, Maharashtra
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </footer>
-    </div>
+      </div>
+
+      {/* Social & Bottom Bar */}
+      <div className="bg-[#050608] border-t border-gray-800/50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+            {/* Social Icons */}
+            <div className="flex items-center gap-4">
+              {[
+                { Icon: Facebook, color: "hover:bg-blue-600" },
+                { Icon: Twitter, color: "hover:bg-sky-500" },
+                { Icon: Youtube, color: "hover:bg-red-600" },
+                { Icon: Instagram, color: "hover:bg-pink-600" },
+                { Icon: Linkedin, color: "hover:bg-blue-700" },
+              ].map(({ Icon, color }, i) => (
+                <a
+                  key={i}
+                  href="#"
+                  className={`w-10 h-10 rounded-xl bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-500 transition-all duration-300 ${color} hover:text-white hover:-translate-y-1 hover:shadow-lg`}
+                >
+                  <Icon size={18} />
+                </a>
+              ))}
+            </div>
+
+            {/* Copyright & Links */}
+            <div className="flex flex-col md:flex-row items-center gap-4 md:gap-10 text-xs text-gray-500 font-medium">
+              <p>© 2024 Rashtriya Swayamsevak Sangh. All Rights Reserved.</p>
+              <div className="flex items-center gap-6">
+                <a href="#" className="hover:text-white transition-colors">
+                  Privacy Policy
+                </a>
+                <a href="#" className="hover:text-white transition-colors">
+                  Terms of Use
+                </a>
+                <a href="#" className="hover:text-white transition-colors">
+                  Sitemap
+                </a>
+              </div>
+            </div>
+
+            {/* Back to top */}
+            <button
+              onClick={scrollToTop}
+              className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors"
+            >
+              Back to Top
+              <div className="w-10 h-10 rounded-full border border-gray-800 flex items-center justify-center group-hover:bg-apml-red group-hover:border-apml-red transition-all">
+                <ChevronUp size={18} />
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Final Bottom Branding */}
+      <div className="bg-apml-red h-1.5 w-full"></div>
+    </footer>
   );
 };
 

@@ -1,13 +1,6 @@
 import React from "react";
-import {
-  Heart,
-  MapPin,
-  Clock,
-  ArrowRight,
-  ShieldCheck,
-  Trophy,
-  CircleDashed,
-} from "lucide-react";
+import { MapPin, Clock, ArrowRight, CircleDashed } from "lucide-react";
+import Image from "next/image";
 import SectionHeader from "@/components/common/SectionHeader";
 
 const DONORS = [
@@ -126,10 +119,29 @@ const RecentDonors: React.FC = () => {
           viewAll="View All Donors"
           viewAllLink="#"
         />
-        <div className="flex flex-col lg:flex-row gap-8 md:gap-16 items-center">
-          {/* Left Content */}
-          <div className="lg:w-5/12">
-            <div className="grid grid-cols-2 gap-3 md:gap-4 mb-6 md:mb-8">
+        <div className="flex flex-col lg:flex-row gap-8 md:gap-16 items-start">
+          {/* Left Side: Stats & Call to Action */}
+          <div className="lg:w-5/12 flex flex-col gap-6">
+            <div className="relative rounded-2xl overflow-hidden h-64 md:h-80 w-full shadow-lg group">
+              <Image
+                src="https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=800&auto=format&fit=crop"
+                alt="Community Service"
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                sizes="(max-width: 768px) 100vw, 40vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6 md:p-8">
+                <h3 className="text-white font-bold text-2xl leading-tight mb-2">
+                  Every Contribution Counts
+                </h3>
+                <p className="text-gray-200 text-sm mb-0">
+                  Join thousands of others in building a stronger, more
+                  self-reliant nation.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 md:gap-4">
               <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                 <div className="text-2xl md:text-3xl font-black text-gray-800 mb-1">
                   12K+
@@ -148,25 +160,22 @@ const RecentDonors: React.FC = () => {
               </div>
             </div>
 
-            <button className="bg-apml-red text-white px-8 py-4 rounded-xl font-bold text-sm uppercase tracking-wide shadow-xl shadow-red-200 hover:bg-red-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto flex items-center justify-center gap-2">
+            <button className="bg-apml-red text-white px-8 py-4 rounded-xl font-bold text-sm uppercase tracking-wide shadow-xl shadow-red-200 hover:bg-red-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 w-full flex items-center justify-center gap-2">
               Donate Securely <ArrowRight size={18} />
             </button>
           </div>
 
-          {/* Right List - Vertical Marquee Table */}
+          {/* Right Side: Scrollable List */}
           <div className="lg:w-7/12 w-full">
-            <div className="bg-white rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden relative h-[400px] md:h-[500px] flex flex-col">
-              {/* Table Header */}
+            <div className="bg-white rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden relative h-[500px] md:h-[600px] flex flex-col">
               <div className="px-4 md:px-6 py-3 md:py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest z-10 relative shadow-sm">
                 <div className="w-1/2">Donor</div>
                 <div className="w-1/4 text-right">Amount</div>
                 <div className="w-1/4 text-right hidden sm:block">Location</div>
               </div>
 
-              {/* Gradient Overlay Top */}
               <div className="absolute top-[40px] md:top-[49px] left-0 right-0 h-12 bg-gradient-to-b from-white to-transparent z-10 pointer-events-none"></div>
 
-              {/* Scrolling Content */}
               <div className="overflow-hidden h-full relative">
                 <div className="animate-marquee-vertical hover:pause">
                   {displayList.map((donor, i) => (
@@ -205,7 +214,6 @@ const RecentDonors: React.FC = () => {
                 </div>
               </div>
 
-              {/* Gradient Overlay Bottom */}
               <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent z-10 pointer-events-none"></div>
             </div>
           </div>

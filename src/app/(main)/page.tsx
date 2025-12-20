@@ -11,6 +11,7 @@ import AboutSection from "./_components/About";
 import ShikayatSection from "./_components/Shikayat";
 import StickySidebar from "@/components/common/sticky-sidebar";
 import VyapariSection from "./_components/Vyapari";
+import GallerySection from "./_components/GallerySection";
 
 export default function Home() {
   return (
@@ -27,6 +28,7 @@ export default function Home() {
       <ShikayatSection />
       <VyapariSection />
       <Blog />
+      <GallerySection />
       <PressSection />
       <Testimonials />
       <StickySidebar />
