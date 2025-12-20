@@ -98,7 +98,12 @@ const Hero = () => {
       transition={{ duration: 0.5 }}
       className="relative font-sans overflow-hidden w-full "
     >
-      <div className="bg-[url('/hero/01.jpeg')] aspect-[16/9] md:bg-none bg-cover bg-center  bg-no-repeat md:bg-primary w-full text-white pb-[80vw] sm:pb-24 lg:pb-48 relative overflow-hidden transition-colors duration-500">
+      <div className=" w-full text-white sm:pb-24 lg:pb-48 relative overflow-hidden transition-colors duration-500">
+        <img
+          src="/hero/01.jpeg"
+          alt="Rashtriya Seva Sangh"
+          className="w-full h-auto md:hidden block"
+        />
         <div className="hidden md:block absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-orange-400 to-transparent"></div>
 
         <div className="w-full px-4 md:px-8 lg:px-16 pt-3 sm:pt-4 relative z-10">
@@ -217,7 +222,7 @@ const Hero = () => {
         initial={{ opacity: 0, y: 60 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full px-4 md:px-8 lg:px-16 xl:px-24 relative z-30 -mt-12 sm:-mt-16 lg:-mt-28 mb-8 sm:mb-12 lg:mb-16"
+        className="w-full px-4 md:px-8 lg:px-16 xl:px-24 relative z-30 -mt-12 sm:-mt-20 lg:-mt-30 mb-8 sm:mb-12 lg:mb-16"
       >
         <div className="bg-white rounded-t-xl rounded-b-lg shadow-[0_20px_50px_rgba(0,0,0,0.15)] mx-auto border-t-4 border-accent w-full overflow-hidden relative">
           <div className="flex text-xs sm:text-sm font-bold text-center border-b border-gray-100">
