@@ -98,7 +98,7 @@ const Hero = () => {
       transition={{ duration: 0.5 }}
       className="relative font-sans overflow-hidden w-full "
     >
-      <div className=" w-full text-white sm:pb-24 lg:pb-48 relative overflow-hidden transition-colors duration-500">
+      <div className=" w-full md:bg-primary  text-white sm:pb-24 lg:pb-48 relative overflow-hidden transition-colors duration-500">
         <Image
           src="/hero/01.jpeg"
           alt="Rashtriya Seva Sangh"
