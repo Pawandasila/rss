@@ -38,18 +38,18 @@ const Logo = () => {
         className="flex items-center space-x-3 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm"
         aria-label="Rashtriya Seva Sangh - Return to Homepage"
       >
-        <div className="relative h-14 w-14 flex-shrink-0">
+        <div className="relative h-14 w-14 flex-shrink-0 bg-transparent">
           <Image
             src="/logo/logo.png"
             alt="राष्ट्रीय स्वयंसेवक संघ Logo"
             fill
-            className="object-contain"
+            className="object-contain bg-transparent"
             priority
           />
         </div>
         <div className="block">
           <h1 className="font-lato font-bold text-xs md:text-sm lg:text-lg xl:text-lg leading-tight">
-            <span className="font-extrabold bg-clip-text text-white whitespace-nowrap bg-[length:300%_100%] drop-shadow-sm">
+            <span className="bg-gradient-to-r from-orange-600 to-green-600 font-extrabold bg-clip-text text-transparent whitespace-nowrap animate-tricolor-flow bg-[length:300%_100%] drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]">
               RASHTRIYA SEVA SANGH
             </span>
           </h1>
@@ -57,7 +57,7 @@ const Logo = () => {
             {LANGUAGES.map((lang, index) => (
               <p
                 key={index}
-                className={`font-nunito text-[9px] sm:text-xs text-white/80 sm:text-muted-foreground lg:text-muted-foreground absolute inset-0 transition-all duration-700 transform tracking-tighter ${
+                className={`font-nunito text-[9px] sm:text-xs text-primary absolute inset-0 transition-all duration-700 transform tracking-tighter ${
                   currentLanguage === index
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-full"

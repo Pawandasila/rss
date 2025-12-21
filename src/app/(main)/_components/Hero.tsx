@@ -107,7 +107,6 @@ const Hero = () => {
           className="w-full h-auto md:hidden block"
           priority
         />
-        <div className="hidden md:block absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-orange-400 to-transparent"></div>
 
         <div className="w-full px-4 md:px-8 lg:px-16 pt-3 sm:pt-4 relative z-10">
           <div className="flex flex-col lg:flex-row items-center justify-between mt-4 sm:mt-6 lg:mt-12 gap-6 sm:gap-8 lg:gap-12">
@@ -152,16 +151,12 @@ const Hero = () => {
               </div>
             </motion.div>
 
-            {/* Right Column: Automated Slider (Restored) */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
               className="hidden lg:block relative h-[500px] lg:w-1/2 w-full"
             >
-              {/* Fade Overlay */}
-              <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-primary to-transparent z-20 pointer-events-none" />
-
               <div
                 ref={sliderRef}
                 className="flex gap-6 overflow-x-hidden h-full items-center pl-4 py-8"

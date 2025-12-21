@@ -11,11 +11,114 @@ import {
   Twitter,
   Instagram,
   Youtube,
+  ChevronDown,
 } from "lucide-react";
 
 import gsap from "gsap";
 import Logo from "./Logo";
 import { navigationItems } from "./Navitems";
+import Link from "next/link";
+
+const MobileNavItem = ({ item }: { item: any }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const hasSubmenu = item.submenu && item.submenu.length > 0;
+
+  // Desktop view should always show expanded lists (as per original design)
+  // Mobile view should use accordion.
+  // We can use CSS media queries to control visibility, OR simple state that defaults to true on desktop.
+  // Actually, the previous design was a Grid of lists on both.
+
+  // Requirement: "in phone view for now keep navigation Item and a icon for dropdown on click..."
+  // This implies separate behavior for mobile vs desktop.
+
+  return (
+    <div className="menu-item-stagger">
+      {/* Desktop Layout: Always expanded list */}
+      <div className="hidden lg:block space-y-4">
+        <h5 className="text-gray-400 font-bold uppercase tracking-widest text-xs border-b border-gray-100 pb-2">
+          {item.title}
+        </h5>
+        <ul className="space-y-2 text-sm font-medium text-gray-600">
+          {hasSubmenu ? (
+            item.submenu.map((subItem: any) => (
+              <li key={subItem.id}>
+                <a
+                  href={subItem.href}
+                  className="hover:text-primary transition-colors block py-1 hover:translate-x-1 duration-200"
+                >
+                  {subItem.title}
+                </a>
+              </li>
+            ))
+          ) : (
+            <li>
+              <a
+                href={item.href}
+                className="hover:text-primary transition-colors block py-1 hover:translate-x-1 duration-200"
+              >
+                {item.title}
+              </a>
+            </li>
+          )}
+        </ul>
+      </div>
+
+      {/* Mobile Layout: Accordion */}
+      <div className="block lg:hidden border-b border-gray-50 last:border-0">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full flex justify-between items-center py-4 text-left group"
+        >
+          <span
+            className={`font-bold text-lg ${
+              isOpen ? "text-primary" : "text-gray-800"
+            }`}
+          >
+            {item.title}
+          </span>
+          {hasSubmenu && (
+            <ChevronDown
+              size={20}
+              className={`text-gray-400 transition-transform duration-300 ${
+                isOpen ? "rotate-180 text-primary" : ""
+              }`}
+            />
+          )}
+        </button>
+
+        <div
+          className={`overflow-hidden transition-all duration-300 ${
+            isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <ul className="pb-4 space-y-3 pl-2">
+            {hasSubmenu ? (
+              item.submenu.map((subItem: any) => (
+                <li key={subItem.id}>
+                  <Link
+                    href={subItem.href}
+                    className="text-gray-600 font-medium block text-sm hover:text-primary"
+                  >
+                    {subItem.title}
+                  </Link>
+                </li>
+              ))
+            ) : (
+              <li>
+                <Link
+                  href={item.href}
+                  className="text-gray-600 font-medium block text-sm hover:text-primary"
+                >
+                  {item.title}
+                </Link>
+              </li>
+            )}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -45,10 +148,7 @@ const Header: React.FC = () => {
   }, [isMenuOpen]);
 
   return (
-    <header
-      className="sticky top-0 z-[50] font-sans bg-primary shadow-lg"
-      ref={headerRef}
-    >
+    <header className="sticky top-0 z-[50] font-sans shadow-lg" ref={headerRef}>
       {isMenuOpen && (
         <div className="fixed inset-0 z-[100] bg-white overflow-y-auto animate-in fade-in duration-200">
           <div className="container mx-auto px-4 py-6 relative min-h-screen">
@@ -61,20 +161,40 @@ const Header: React.FC = () => {
             </button>
 
             <div
-              className="flex flex-col lg:flex-row mt-12 gap-10 lg:gap-16"
+              className="grid grid-cols-1 lg:grid-cols-4 gap-10 lg:gap-16 mt-12"
               ref={menuRef}
               role="dialog"
               aria-modal="true"
               aria-label="Mobile Navigation"
               id="mobile-menu"
             >
-              <nav
-                className="lg:w-1/4 lg:border-r border-gray-100 lg:pr-12 text-center lg:text-left space-y-10 menu-item-stagger"
-                aria-label="Contact and Social"
-              >
-                <div className="flex flex-col items-center lg:items-start group cursor-pointer w-fit mx-auto lg:mx-0">
+              {/* Logo Section - Order 1 on Mobile */}
+              <div className="lg:col-span-1 order-1 lg:order-none flex flex-col items-center lg:items-start menu-item-stagger">
+                <div
+                  className="w-fit cursor-pointer"
+                  onClick={() => setIsMenuOpen(false)}
+                >
                   <Logo />
                 </div>
+              </div>
+
+              {/* Navigation Section - Order 2 on Mobile */}
+              <nav
+                className="lg:col-span-3 lg:row-span-2 order-2 lg:order-none"
+                aria-label="Main Site Navigation"
+              >
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-8 gap-y-4 lg:gap-y-10">
+                  {navigationItems.map((item, idx) => (
+                    <MobileNavItem key={item.id} item={item} />
+                  ))}
+                </div>
+              </nav>
+
+              {/* Contact Section - Order 3 on Mobile */}
+              <div
+                className="lg:col-span-1 order-3 lg:order-none text-center lg:text-left space-y-10 menu-item-stagger pb-12 lg:pb-0"
+                aria-label="Contact and Social"
+              >
                 <div>
                   <h4 className="text-primary font-bold text-lg mb-1">
                     Contact
@@ -129,52 +249,14 @@ const Header: React.FC = () => {
                     />
                   </div>
                 </div>
-              </nav>
-
-              <nav
-                className="lg:w-3/4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10 pb-12 px-4 sm:px-0"
-                aria-label="Main Site Navigation"
-              >
-                {navigationItems.map((item) => (
-                  <div key={item.id} className="space-y-4 menu-item-stagger">
-                    <h5 className="text-gray-400 font-bold uppercase tracking-widest text-xs border-b border-gray-100 pb-2">
-                      {item.title}
-                    </h5>
-                    {item.submenu && item.submenu.length > 0 ? (
-                      <ul className="space-y-2 text-sm font-medium text-gray-600">
-                        {item.submenu.map((subItem) => (
-                          <li key={subItem.id}>
-                            <a
-                              href={subItem.href}
-                              className="hover:text-primary transition-colors block py-1 hover:translate-x-1 duration-200"
-                            >
-                              {subItem.title}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <ul className="space-y-2 text-sm font-medium text-gray-600">
-                        <li>
-                          <a
-                            href={item.href}
-                            className="hover:text-primary transition-colors block py-1 hover:translate-x-1 duration-200"
-                          >
-                            {item.title}
-                          </a>
-                        </li>
-                      </ul>
-                    )}
-                  </div>
-                ))}
-              </nav>
+              </div>
             </div>
           </div>
         </div>
       )}
 
       {/* Top Navigation Bar Container */}
-      <div className="container mx-auto px-4 py-3 relative z-10 text-white">
+      <div className="container mx-auto px-4 py-3 relative z-10 text-gray-800">
         <div className="flex flex-row justify-between items-center w-full">
           {/* Animated Logo */}
           <div className="flex items-center gap-4 group cursor-pointer flex-shrink-0">
@@ -183,7 +265,7 @@ const Header: React.FC = () => {
 
           {/* Mobile Menu Toggle */}
           <button
-            className="lg:hidden text-white hover:text-white/80 transition-colors p-2 -mr-2"
+            className="lg:hidden text-gray-800 hover:text-primary transition-colors p-2 -mr-2"
             onClick={() => setIsMenuOpen(true)}
             aria-label="Open mobile menu"
             aria-expanded={isMenuOpen}
@@ -198,18 +280,18 @@ const Header: React.FC = () => {
           </button>
 
           <div className="hidden lg:flex items-center gap-6 text-sm font-medium">
-            <span className="flex items-center gap-2 cursor-pointer hover:text-orange-200 transition-colors bg-white/10 px-3 py-1.5 rounded-full whitespace-nowrap">
+            <span className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors bg-gray-100 px-3 py-1.5 rounded-full whitespace-nowrap text-gray-700">
               <Phone size={16} /> {+1101001}
             </span>
-            <span className="flex items-center gap-2 cursor-pointer hover:text-orange-200 transition-colors whitespace-nowrap">
+            <span className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors whitespace-nowrap">
               <Flag size={16} /> Locate Shakha
             </span>
-            <span className="flex items-center gap-2 cursor-pointer hover:text-orange-200 transition-colors whitespace-nowrap">
+            <span className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors whitespace-nowrap">
               <Search size={16} /> Search
             </span>
             <Menu
               size={28}
-              className="cursor-pointer hover:text-orange-200 ml-2"
+              className="cursor-pointer hover:text-primary ml-2"
               onClick={() => setIsMenuOpen(true)}
               aria-hidden="true"
             />
