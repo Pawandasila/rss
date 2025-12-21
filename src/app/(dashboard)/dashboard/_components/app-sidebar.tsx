@@ -28,6 +28,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import logo from "@/assets/logo/logo.png";
 
 import {
   DASHBOARD_NAV_ITEMS,
@@ -88,7 +89,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <a href="/dashboard">
                 <div className=" text-white flex aspect-square size-10 items-center justify-center rounded-lg p-0">
                   <Image
-                    src="/logo/logo.png"
+                    src={logo}
                     alt="RSS Logo"
                     width={100}
                     height={100}

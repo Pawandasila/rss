@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import logo from "@/assets/logo/logo.png";
 
 interface ReceiptProps {
   donatedBy?: string;
@@ -27,7 +28,7 @@ const Receipt: React.FC<ReceiptProps> = ({
       <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden">
         <div className="relative w-[600px] h-[600px]">
           <Image
-            src="/logo/logo.png"
+            src={logo}
             alt="RSS Watermark"
             fill
             className="object-contain"
@@ -59,7 +60,7 @@ const Receipt: React.FC<ReceiptProps> = ({
           <div className="absolute top-0 right-0">
             <div className="relative w-28 h-28">
               <Image
-                src="/logo/logo.png"
+                src={logo}
                 alt="RSS Logo"
                 fill
                 className="object-contain"

@@ -1,6 +1,7 @@
 import React from "react";
 import { Metadata } from "next";
 import Image from "next/image";
+import logo from "@/assets/logo/logo.png";
 
 export const metadata: Metadata = {
   title: "Authentication - RSS Rashtriya Swayamsevak Sangh",
@@ -24,7 +25,7 @@ export default function AuthLayout({
               <div className="w-12 h-12 bg-primary-foreground/20 rounded-lg flex items-center justify-center">
                 <div className="relative h-14 w-14">
                   <Image
-                    src="/logo/logo.png"
+                    src={logo}
                     alt="राष्ट्रीय सेवा संघ Logo"
                     fill
                     className="object-contain"
@@ -81,11 +82,8 @@ export default function AuthLayout({
         </div>
       </div>
 
-      
       <div className="flex-1 lg:w-1/2 flex items-center justify-center p-4 lg:p-6 min-h-screen">
-        <div className="w-full max-w-2xl mx-auto">
-          {children}
-        </div>
+        <div className="w-full max-w-2xl mx-auto">{children}</div>
       </div>
     </div>
   );

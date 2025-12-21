@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import html2canvas from "html2canvas";
+import logo from "@/assets/logo/logo.png";
 import { toast } from "sonner";
 
 const IDCardManagement = () => {
@@ -13,7 +15,7 @@ const IDCardManagement = () => {
     phone: "",
     gender: "",
     role: "VOLUNTEER",
-    image: "/logo/logo.png",
+    image: logo.src,
     memberId: "",
     address: "",
   });
@@ -29,20 +31,20 @@ const IDCardManagement = () => {
       if (storedUserData) {
         try {
           const userData = JSON.parse(storedUserData);
-          
+
           setMemberData({
             name: userData.name?.toUpperCase() || "",
             email: userData.email || "",
             phone: userData.phone || "",
             gender: userData.gender?.toUpperCase() || "",
             role: "VOLUNTEER",
-            image: userData.image || "/logo/logo.png",
+            image: userData.image || logo.src,
             memberId: userData.member_id || userData.id || "N/A",
             address: [
               userData.city,
               userData.district,
               userData.state,
-              userData.postal_code
+              userData.postal_code,
             ]
               .filter(Boolean)
               .join(", "),
@@ -169,7 +171,10 @@ const IDCardManagement = () => {
     `);
 
     printWindow.document.close();
-    toast.success("Print/Download window opened. You can save as PDF or print.", { duration: 4000 });
+    toast.success(
+      "Print/Download window opened. You can save as PDF or print.",
+      { duration: 4000 }
+    );
   };
 
   if (!storageHydrated) {
@@ -186,15 +191,29 @@ const IDCardManagement = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-sm">
-        <div ref={cardRef} data-card className="overflow-hidden rounded-xl shadow-2xl" style={{ backgroundColor: '#ffffff' }}>
-          <div className="px-6 py-5 text-center" style={{ backgroundColor: '#2d2d2d' }}>
-            <h1 className="text-sm font-bold uppercase tracking-wider" style={{ color: '#ffffff' }}>
+        <div
+          ref={cardRef}
+          data-card
+          className="overflow-hidden rounded-xl shadow-2xl"
+          style={{ backgroundColor: "#ffffff" }}
+        >
+          <div
+            className="px-6 py-5 text-center"
+            style={{ backgroundColor: "#2d2d2d" }}
+          >
+            <h1
+              className="text-sm font-bold uppercase tracking-wider"
+              style={{ color: "#ffffff" }}
+            >
               RSS - Rashtriya Swayamsevak Sangh
             </h1>
           </div>
 
-          <div className="px-8 py-8" style={{ backgroundColor: '#ffffff' }}>
-            <div className="mx-auto mb-6 flex h-36 w-36 items-center justify-center overflow-hidden rounded-full border-4" style={{ borderColor: '#1f2937', backgroundColor: '#f3f4f6' }}>
+          <div className="px-8 py-8" style={{ backgroundColor: "#ffffff" }}>
+            <div
+              className="mx-auto mb-6 flex h-36 w-36 items-center justify-center overflow-hidden rounded-full border-4"
+              style={{ borderColor: "#1f2937", backgroundColor: "#f3f4f6" }}
+            >
               <Image
                 src={memberData.image}
                 alt={memberData.name}
@@ -205,81 +224,128 @@ const IDCardManagement = () => {
             </div>
 
             <div className="mb-6 text-center">
-              <h2 className="text-xl font-bold uppercase tracking-wide" style={{ color: '#111827' }}>
+              <h2
+                className="text-xl font-bold uppercase tracking-wide"
+                style={{ color: "#111827" }}
+              >
                 {memberData.name}
               </h2>
-              <p className="mt-1 text-sm font-medium uppercase tracking-wider" style={{ color: '#4b5563' }}>
+              <p
+                className="mt-1 text-sm font-medium uppercase tracking-wider"
+                style={{ color: "#4b5563" }}
+              >
                 {memberData.role}
               </p>
             </div>
 
             <div className="space-y-3 text-xs">
-              <div className="flex justify-between border-b pb-2" style={{ borderColor: '#e5e7eb' }}>
-                <span className="font-semibold uppercase" style={{ color: '#4b5563' }}>
+              <div
+                className="flex justify-between border-b pb-2"
+                style={{ borderColor: "#e5e7eb" }}
+              >
+                <span
+                  className="font-semibold uppercase"
+                  style={{ color: "#4b5563" }}
+                >
                   ID No
                 </span>
-                <span className="font-mono" style={{ color: '#111827' }}>
+                <span className="font-mono" style={{ color: "#111827" }}>
                   {memberData.memberId || "N/A"}
                 </span>
               </div>
 
-              <div className="flex justify-between border-b pb-2" style={{ borderColor: '#e5e7eb' }}>
-                <span className="font-semibold uppercase" style={{ color: '#4b5563' }}>
+              <div
+                className="flex justify-between border-b pb-2"
+                style={{ borderColor: "#e5e7eb" }}
+              >
+                <span
+                  className="font-semibold uppercase"
+                  style={{ color: "#4b5563" }}
+                >
                   Gender
                 </span>
-                <span style={{ color: '#111827' }}>
+                <span style={{ color: "#111827" }}>
                   {memberData.gender || "N/A"}
                 </span>
               </div>
 
-              <div className="flex justify-between border-b pb-2" style={{ borderColor: '#e5e7eb' }}>
-                <span className="font-semibold uppercase" style={{ color: '#4b5563' }}>
+              <div
+                className="flex justify-between border-b pb-2"
+                style={{ borderColor: "#e5e7eb" }}
+              >
+                <span
+                  className="font-semibold uppercase"
+                  style={{ color: "#4b5563" }}
+                >
                   Email
                 </span>
-                <span className="text-right" style={{ color: '#111827' }}>
+                <span className="text-right" style={{ color: "#111827" }}>
                   {memberData.email || "N/A"}
                 </span>
               </div>
 
-              <div className="flex justify-between border-b pb-2" style={{ borderColor: '#e5e7eb' }}>
-                <span className="font-semibold uppercase" style={{ color: '#4b5563' }}>
+              <div
+                className="flex justify-between border-b pb-2"
+                style={{ borderColor: "#e5e7eb" }}
+              >
+                <span
+                  className="font-semibold uppercase"
+                  style={{ color: "#4b5563" }}
+                >
                   Phone
                 </span>
-                <span style={{ color: '#111827' }}>
+                <span style={{ color: "#111827" }}>
                   {memberData.phone || "N/A"}
                 </span>
               </div>
 
               <div className="flex justify-between pb-2">
-                <span className="font-semibold uppercase" style={{ color: '#4b5563' }}>
+                <span
+                  className="font-semibold uppercase"
+                  style={{ color: "#4b5563" }}
+                >
                   Address
                 </span>
-                <span className="max-w-[180px] text-right" style={{ color: '#111827' }}>
+                <span
+                  className="max-w-[180px] text-right"
+                  style={{ color: "#111827" }}
+                >
                   {memberData.address || "N/A"}
                 </span>
               </div>
             </div>
 
-            <div className="mt-6 rounded-md border px-4 py-3 text-center" style={{ borderColor: '#e5e7eb', backgroundColor: '#f9fafb' }}>
-              <p className="text-sm font-semibold italic" style={{ color: '#374151' }}>
+            <div
+              className="mt-6 rounded-md border px-4 py-3 text-center"
+              style={{ borderColor: "#e5e7eb", backgroundColor: "#f9fafb" }}
+            >
+              <p
+                className="text-sm font-semibold italic"
+                style={{ color: "#374151" }}
+              >
                 &quot;{quote}&quot;
               </p>
             </div>
           </div>
 
-          <div className="px-6 py-3 text-center" style={{ backgroundColor: '#2d2d2d' }}>
-            <p className="text-xs font-medium" style={{ color: '#d1d5db' }}>www.rss.org</p>
+          <div
+            className="px-6 py-3 text-center"
+            style={{ backgroundColor: "#2d2d2d" }}
+          >
+            <p className="text-xs font-medium" style={{ color: "#d1d5db" }}>
+              www.rss.org
+            </p>
           </div>
         </div>
 
         <div className="mt-6 flex justify-center gap-3">
-          <button 
+          <button
             onClick={handleDownload}
             className="rounded-lg bg-gray-800 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-700"
           >
             Download as PDF
           </button>
-          <button 
+          <button
             onClick={handlePrint}
             className="rounded-lg border-2 border-gray-800 bg-white px-6 py-2.5 text-sm font-medium text-gray-800 transition-colors hover:bg-gray-50"
           >

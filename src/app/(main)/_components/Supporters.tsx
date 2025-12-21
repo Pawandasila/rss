@@ -4,16 +4,25 @@ import React from "react";
 import Image from "next/image";
 import { motion } from "motion/react";
 
+import gov01 from "@/assets/logo/gov-01.png";
+import gov02 from "@/assets/logo/gov-02.jpg";
+import gov03 from "@/assets/logo/gov-03.png";
+import gov04 from "@/assets/logo/gov-04.png";
+import gov05 from "@/assets/logo/gov-05.jpeg";
+import gov06 from "@/assets/logo/gov-06.jpeg";
+import gov07 from "@/assets/logo/gov-07.jpeg";
+import gov08 from "@/assets/logo/gov-08.png";
+
 // Official Supporters Data
 const SUPPORTERS = [
-  { id: 1, name: "Ministry of MSME", logo: "/logo/gov-01.png" },
-  { id: 2, name: "Government of India", logo: "/logo/gov-02.jpg" },
-  { id: 3, name: "NITI Aayog", logo: "/logo/gov-03.png" },
-  { id: 4, name: "Income Tax Department", logo: "/logo/gov-04.png" },
-  { id: 5, name: "Uttarakhand Government", logo: "/logo/gov-05.jpeg" },
-  { id: 6, name: "Make In India", logo: "/logo/gov-06.jpeg" },
-  { id: 7, name: "Digital India", logo: "/logo/gov-07.jpeg" },
-  { id: 8, name: "Intellectual Property India", logo: "/logo/gov-08.png" },
+  { id: 1, name: "Ministry of MSME", logo: gov01 },
+  { id: 2, name: "Government of India", logo: gov02 },
+  { id: 3, name: "NITI Aayog", logo: gov03 },
+  { id: 4, name: "Income Tax Department", logo: gov04 },
+  { id: 5, name: "Uttarakhand Government", logo: gov05 },
+  { id: 6, name: "Make In India", logo: gov06 },
+  { id: 7, name: "Digital India", logo: gov07 },
+  { id: 8, name: "Intellectual Property India", logo: gov08 },
 ];
 
 const Supporters: React.FC = () => {

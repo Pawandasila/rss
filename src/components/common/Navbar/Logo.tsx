@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import logo from "@/assets/logo/logo.png";
 
 const LANGUAGES = [
   "राष्ट्रीय सेवा संघ",
@@ -40,7 +41,7 @@ const Logo = () => {
       >
         <div className="relative h-14 w-14 flex-shrink-0 bg-transparent">
           <Image
-            src="/logo/logo.png"
+            src={logo}
             alt="राष्ट्रीय स्वयंसेवक संघ Logo"
             fill
             className="object-contain bg-transparent"

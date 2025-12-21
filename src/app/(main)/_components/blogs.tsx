@@ -12,34 +12,56 @@ import {
 import { motion } from "motion/react";
 import SectionHeader from "@/components/common/SectionHeader";
 
+import hero01 from "@/assets/hero/hero-01.png";
+import hero02 from "@/assets/hero/hero-02.png";
+import hero03 from "@/assets/hero/hero-03.png";
+import hero04 from "@/assets/hero/hero-04.png";
+
+// Import divine images
+import divine01 from "@/assets/live/divine-01.webp";
+import divine02 from "@/assets/live/divine-02.webp";
+import divine03 from "@/assets/live/divine-03.webp";
+import divine04 from "@/assets/live/divine-04.webp";
+import divine05 from "@/assets/live/divine-05.webp";
+import divine06 from "@/assets/live/divine-06.webp";
+
+const divineImages = [
+  divine01,
+  divine02,
+  divine03,
+  divine04,
+  divine05,
+  divine06,
+];
+
 const CARDS = [
   {
     title: "Want to Serve Nation?",
     subtitle: "Join the RSS Movement",
     btn: "Join Now",
     icon: Users,
-    img: "/hero/hero-01.png",
+    img: hero01,
   },
   {
     title: "Support the Cause",
     subtitle: "Contribute to Nation Building",
     btn: "Donate",
     icon: Heart,
-    img: "/hero/hero-02.png",
+    img: hero02,
   },
   {
     title: "RSS Literature",
     subtitle: "Books, Articles & Thoughts",
     btn: "Read More",
     icon: BookOpen,
-    img: "/hero/hero-03.png",
+    img: hero03,
   },
   {
     title: "Gallery & Events",
     subtitle: "Glimpses of recent events",
     btn: "View All",
     icon: ImageIcon,
-    img: "/hero/hero-04.png",
+    img: hero04,
   },
 ];
 
@@ -195,16 +217,7 @@ const Blog: React.FC = () => {
                   className="relative flex-shrink-0 w-64 aspect-video rounded-xl overflow-hidden shadow-md group cursor-pointer"
                 >
                   <Image
-                    src={`/live/divine-${
-                      [
-                        "01.webp",
-                        "02.webp",
-                        "03.webp",
-                        "04.webp",
-                        "05.webp",
-                        "06.webp",
-                      ][i % 7]
-                    }`}
+                    src={divineImages[i % 6]}
                     alt="Event"
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"

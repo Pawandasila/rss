@@ -16,6 +16,11 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import heroImage from "@/assets/hero/01.jpeg";
+import hero01 from "@/assets/hero/hero-01.png";
+import hero02 from "@/assets/hero/hero-02.png";
+import hero03 from "@/assets/hero/hero-03.png";
+import hero04 from "@/assets/hero/hero-04.png";
+import hero05 from "@/assets/hero/hero-05.png";
 
 const HERO_SLIDES = [
   {
@@ -24,7 +29,7 @@ const HERO_SLIDES = [
     titleHindi: "नर सेवा नारायण सेवा",
     description:
       "RSS Swayamsevaks are always at the forefront during natural calamities, providing relief and rehabilitation to the affected.",
-    image: "/hero/hero-01.png",
+    image: hero01,
     ctaLink: "#",
   },
   {
@@ -33,7 +38,7 @@ const HERO_SLIDES = [
     titleHindi: "व्यक्ति निर्माण से राष्ट्र निर्माण",
     description:
       "Inculcating discipline, patriotism, and selfless service through daily Shakha to create dedicated citizens.",
-    image: "/hero/hero-02.png",
+    image: hero02,
     ctaLink: "#",
   },
   {
@@ -42,7 +47,7 @@ const HERO_SLIDES = [
     titleHindi: "संस्कृति रक्षण",
     description:
       "Protecting and promoting Bharatiya culture, traditions, and values for future generations.",
-    image: "/hero/hero-03.png",
+    image: hero03,
     ctaLink: "#",
   },
   {
@@ -51,7 +56,7 @@ const HERO_SLIDES = [
     titleHindi: "सामाजिक समरसता",
     description:
       "Working towards a casteless society united by the bond of brotherhood and equality.",
-    image: "/hero/hero-04.png",
+    image: hero04,
     ctaLink: "#",
   },
   {
@@ -60,7 +65,7 @@ const HERO_SLIDES = [
     titleHindi: "ग्राम विकास",
     description:
       "Empowering villages through organic farming, cow protection, and self-reliance initiatives.",
-    image: "/hero/hero-05.png",
+    image: hero05,
     ctaLink: "#",
   },
 ];
@@ -112,12 +117,7 @@ const Hero = () => {
               <div className="inline-block bg-accent/20 border border-accent/30 backdrop-blur-md px-3 py-0.5 sm:px-4 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-2 sm:mb-3 text-orange-100">
                 For Dharma, For Nation, For Bharat!
               </div>
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-7xl font-bold mb-3 sm:mb-4 lg:mb-6 leading-tight drop-shadow-lg"
-              >
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-7xl font-bold mb-3 sm:mb-4 lg:mb-6 leading-tight drop-shadow-lg">
                 RASHTRIYA SEVA{" "}
                 <span className="bg-white text-primary px-1.5 sm:px-2 mx-0.5 sm:mx-1 transform -skew-x-12 inline-block shadow-lg text-xl sm:text-2xl md:text-3xl lg:text-7xl">
                   SANGH
@@ -126,7 +126,7 @@ const Hero = () => {
                 <span className="text-base sm:text-lg md:text-2xl lg:text-5xl mt-1 sm:mt-2 block font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-orange-100 opacity-90">
                   Organization for Nation
                 </span>
-              </motion.h1>
+              </h1>
               <p className="hidden lg:block text-orange-50 text-lg max-w-xl font-medium leading-relaxed mb-8">
                 Uniting Hindu society for the protection of Dharma and national
                 reconstruction. Join the world's largest voluntary movement

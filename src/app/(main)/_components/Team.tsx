@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef } from "react";
+import Image from "next/image";
 import {
   Quote,
   Linkedin,
@@ -16,48 +17,56 @@ import { Navigation, Pagination, Autoplay } from "swiper/modules";
 
 gsap.registerPlugin(ScrollTrigger);
 
+import yogiJi from "@/assets/people/yogi_ji.jpg";
+import darshanJi from "@/assets/people/darshan.jpg";
+import himanshuJi from "@/assets/people/himanshu_joshi.jpg";
+import pawanJi from "@/assets/people/pawan_joshi.jpg";
+import sunilJi from "@/assets/people/sunil_datt.jpg";
+import vedmaniJi from "@/assets/people/vedmani.jpg";
+import prashadJi from "@/assets/people/prashad.jpg";
+
 const TEAM_MEMBERS = [
   {
     id: 1,
     name: "पू. योगी श्री आदित्यनाथ जी",
     role: "मुख्य प्रेरणा स्रोत",
-    image: "/people/yogi_ji.jpg",
+    image: yogiJi,
   },
   {
     id: 2,
     name: "पू. स्वामी श्री दर्शन भारती जी",
     role: "मुख्य संरक्षक",
-    image: "/people/darshan.jpg",
+    image: darshanJi,
   },
   {
     id: 3,
     name: "श्री हिमांशु जोशी",
     role: "संस्थापक एवं राष्ट्रीय अध्यक्ष",
-    image: "/people/himanshu_joshi.jpg",
+    image: himanshuJi,
   },
   {
     id: 4,
     name: "श्री पवन जोशी",
     role: "रा. वरिष्ठ उपाध्यक्ष",
-    image: "/people/pawan_joshi.jpg",
+    image: pawanJi,
   },
   {
     id: 5,
     name: "श्री सुनील दत्त पंत",
     role: "रा. संगठन मंत्री",
-    image: "/people/sunil_datt.jpg",
+    image: sunilJi,
   },
   {
     id: 6,
     name: "श्री वेदमणि शुक्ला",
     role: "रा. महामंत्री",
-    image: "/people/vedmani.jpg",
+    image: vedmaniJi,
   },
   {
     id: 7,
     name: "श्री बी. प्रसाद जोशी",
     role: "रा. सचिव",
-    image: "/people/prashad.jpg",
+    image: prashadJi,
   },
 ];
 
@@ -151,10 +160,12 @@ const TeamSection: React.FC = () => {
               <SwiperSlide key={member.id}>
                 <div className="group relative bg-white rounded-[2.5rem] overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100 h-full flex flex-col">
                   <div className="h-[280px] relative overflow-hidden shrink-0">
-                    <img
+                    <Image
                       src={member.image}
                       alt={member.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
 

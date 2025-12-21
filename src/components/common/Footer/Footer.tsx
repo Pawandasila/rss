@@ -12,6 +12,7 @@ import {
   Globe,
 } from "lucide-react";
 import Image from "next/image";
+import logo from "@/assets/logo/logo.png";
 
 const Footer = () => {
   const LOCATIONS = [
@@ -63,7 +64,7 @@ const Footer = () => {
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center p-2 shadow-2xl">
                 <Image
-                  src="/logo/logo.png"
+                  src={logo}
                   alt="RSS"
                   height={100}
                   width={100}

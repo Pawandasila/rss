@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { Shield, Heart, Users, UserCircle, Play } from "lucide-react";
 import { motion } from "motion/react";
+import hero01 from "@/assets/hero/hero-01.png";
 import SectionHeader from "@/components/common/SectionHeader";
 import Model from "@/components/common/Model";
 
@@ -33,7 +34,7 @@ const AboutSection: React.FC = () => {
             >
               <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px]">
                 <Image
-                  src="/hero/hero-01.png"
+                  src={hero01}
                   alt="RSS Swayamsevaks"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700"

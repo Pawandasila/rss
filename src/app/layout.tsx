@@ -4,6 +4,7 @@ import "./globals.css";
 import Link from "next/link";
 import Provider from "./Provider";
 import { Toaster } from "@/components/ui/sonner";
+import logo from "@/assets/logo/logo.png";
 
 const lato = Lato({
   variable: "--font-lato",
@@ -72,7 +73,7 @@ export const metadata: Metadata = {
       "अब समय केवल देखने का नहीं, कुछ करने का है। सेवा ही धर्म है — और यही राष्ट्र का भाग्य बदल सकता है। राष्ट्रीय सेवा संघ से जुड़िए, राष्ट्र आपकी प्रतीक्षा कर रहा है।",
     images: [
       {
-        url: "/logo/logo.png",
+        url: logo.src,
         width: 1200,
         height: 630,
         alt: "राष्ट्रीय सेवा संघ - RASHTRIYA SEVA SANGH",
@@ -86,7 +87,7 @@ export const metadata: Metadata = {
     title: "राष्ट्रीय सेवा संघ - RASHTRIYA SEVA SANGH",
     description:
       "अब समय केवल देखने का नहीं, कुछ करने का है। सेवा ही धर्म है — और यही राष्ट्र का भाग्य बदल सकता है। राष्ट्रीय सेवा संघ से जुड़िए, राष्ट्र आपकी प्रतीक्षा कर रहा है।",
-    images: ["/logo/logo.png"],
+    images: [logo.src],
   },
   verification: {
     google: "your-google-verification-code",
@@ -97,26 +98,26 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "32x32", type: "image/png" },
-      { url: "/logo/logo.png", type: "image/png" },
-      { url: "/logo/logo.png", sizes: "192x192", type: "image/png" },
-      { url: "/logo/logo.png", sizes: "512x512", type: "image/png" },
+      { url: logo.src, type: "image/png" },
+      { url: logo.src, sizes: "192x192", type: "image/png" },
+      { url: logo.src, sizes: "512x512", type: "image/png" },
     ],
     shortcut: "/favicon.ico",
     apple: [
-      { url: "/logo/logo.png", sizes: "180x180", type: "image/png" },
-      { url: "/logo/logo.png", sizes: "152x152", type: "image/png" },
-      { url: "/logo/logo.png", sizes: "144x144", type: "image/png" },
-      { url: "/logo/logo.png", sizes: "120x120", type: "image/png" },
-      { url: "/logo/logo.png", sizes: "114x114", type: "image/png" },
-      { url: "/logo/logo.png", sizes: "76x76", type: "image/png" },
-      { url: "/logo/logo.png", sizes: "72x72", type: "image/png" },
-      { url: "/logo/logo.png", sizes: "60x60", type: "image/png" },
-      { url: "/logo/logo.png", sizes: "57x57", type: "image/png" },
+      { url: logo.src, sizes: "180x180", type: "image/png" },
+      { url: logo.src, sizes: "152x152", type: "image/png" },
+      { url: logo.src, sizes: "144x144", type: "image/png" },
+      { url: logo.src, sizes: "120x120", type: "image/png" },
+      { url: logo.src, sizes: "114x114", type: "image/png" },
+      { url: logo.src, sizes: "76x76", type: "image/png" },
+      { url: logo.src, sizes: "72x72", type: "image/png" },
+      { url: logo.src, sizes: "60x60", type: "image/png" },
+      { url: logo.src, sizes: "57x57", type: "image/png" },
     ],
     other: [
       {
         rel: "mask-icon",
-        url: "/logo/logo.png",
+        url: logo.src,
         color: "#fd9800",
       },
     ],
@@ -128,17 +129,17 @@ export const metadata: Metadata = {
     title: "RSS",
     startupImage: [
       {
-        url: "/logo/logo.png",
+        url: logo.src,
         media:
           "(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)",
       },
       {
-        url: "/logo/logo.png",
+        url: logo.src,
         media:
           "(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)",
       },
       {
-        url: "/logo/logo.png",
+        url: logo.src,
         media:
           "(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)",
       },
@@ -154,7 +155,7 @@ export const metadata: Metadata = {
     "apple-mobile-web-app-title": "RSS",
     "application-name": "राष्ट्रीय सेवा संघ",
     "msapplication-TileColor": "#fd9800",
-    "msapplication-TileImage": "/logo/logo.png",
+    "msapplication-TileImage": logo.src,
     "msapplication-config": "none",
   },
 };
@@ -167,8 +168,8 @@ export default function RootLayout({
   return (
     <html lang="hi" dir="ltr">
       <head>
-        <link rel="icon" href="/logo/logo.png" type="image/png" />
-        <link rel="shortcut icon" href="/logo/logo.png" type="image/png" />
+        <link rel="icon" href={logo.src} type="image/png" />
+        <link rel="shortcut icon" href={logo.src} type="image/png" />
 
         <meta name="theme-color" content="#fd9800" />
         <meta name="msapplication-TileColor" content="#fd9800" />
@@ -196,7 +197,7 @@ export default function RootLayout({
                   knowsLanguage: ["hi", "en"],
                   logo: {
                     "@type": "ImageObject",
-                    url: "https://joinrss.org.in/logo/logo.png",
+                    url: `https://joinrss.org.in${logo.src}`,
                     width: 300,
                     height: 300,
                     caption: "राष्ट्रीय सेवा संघ Logo",

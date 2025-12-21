@@ -1,14 +1,19 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import {
-  Users,
-  Anchor,
+  ArrowRight,
   Eye,
   Heart,
-  ArrowRight,
   CheckCircle2,
   UserCircle,
+  Users,
+  Anchor,
 } from "lucide-react";
+import Image from "next/image";
+import hero01 from "@/assets/hero/hero-01.png";
+import hero02 from "@/assets/hero/hero-02.png";
+import hero03 from "@/assets/hero/hero-03.png";
+import hero04 from "@/assets/hero/hero-04.png";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SectionHeader from "@/components/common/SectionHeader";
@@ -21,7 +26,7 @@ const MISSIONS = [
     title: "Constructive Work",
     description:
       "The Sangh believes that the organized power of the society is the guarantee of national security and prosperity. Through its unique methodology of 'Man Making', RSS moulds individuals who are dedicated to the service of the nation.",
-    image: "/hero/hero-01.png",
+    image: hero01,
     icon: Users,
     cta: "Read Our Constitution",
     tags: ["Cultural Nationalism", "Integral Humanism", "Unity in Diversity"],
@@ -31,7 +36,7 @@ const MISSIONS = [
     title: "Man Making",
     description:
       "Shakha is the crucible where swayamsevaks are forged. It is not just physical exercise but a holistic development of personality, instilling discipline, patriotism, and a sense of duty towards society.",
-    image: "/hero/hero-02.png",
+    image: hero02,
     icon: Anchor,
     cta: "Join Shakha",
     tags: ["Character Building", "Discipline", "Physical Fitness"],
@@ -41,7 +46,7 @@ const MISSIONS = [
     title: "Cultural Nationalism",
     description:
       "We believe that Bharat is not just a political entity but a cultural nation with a continuous history of thousands of years. Our identity is rooted in the values of Dharma and universal brotherhood.",
-    image: "/hero/hero-03.png",
+    image: hero03,
     icon: Eye,
     cta: "Explore Vision",
     tags: ["One Nation", "One People", "One Culture"],
@@ -51,7 +56,7 @@ const MISSIONS = [
     title: "Samajik Samarasata",
     description:
       "Eradicating caste distinctions and untouchability is a core mission. We strive for a harmonious society where every individual is treated with equal dignity and respect, irrespective of birth or occupation.",
-    image: "/hero/hero-04.png",
+    image: hero04,
     icon: Heart,
     cta: "Seva Activities",
     tags: ["Equality", "Brotherhood", "Justice"],
@@ -171,10 +176,12 @@ const FeaturesSection: React.FC = () => {
 
                       {/* Mobile Image (Visible only on small/medium screens) */}
                       <div className="lg:hidden mb-5 rounded-lg overflow-hidden h-40 sm:h-56 w-full shadow-md">
-                        <img
+                        <Image
                           src={mission.image}
                           alt={mission.title}
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover group-hover:scale-110 transition-transform duration-700"
+                          sizes="(max-width: 768px) 100vw, 50vw"
                         />
                       </div>
 
@@ -211,11 +218,13 @@ const FeaturesSection: React.FC = () => {
                 {/* Background abstract decoration */}
                 <div className="absolute inset-0 bg-gray-900/10 z-0"></div>
 
-                <img
+                <Image
                   ref={imageRef}
                   src={MISSIONS[activeIndex].image}
                   alt={MISSIONS[activeIndex].title}
-                  className="absolute inset-0 w-full h-full object-cover z-10"
+                  fill
+                  className="absolute inset-0 object-cover z-10"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                 />
 
                 {/* Overlay Card - "Story Behind It" Style */}

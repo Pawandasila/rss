@@ -16,6 +16,12 @@ import {
   Users,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import hero01 from "@/assets/hero/hero-01.png";
+import hero02 from "@/assets/hero/hero-02.png";
+import hero03 from "@/assets/hero/hero-03.png";
+import hero04 from "@/assets/hero/hero-04.png";
+import hero05 from "@/assets/hero/hero-05.png";
+import hero06 from "@/assets/hero/hero-01.png"; // Fallback using hero01
 import SectionHeader from "@/components/common/SectionHeader";
 
 export const SERVICES = [
@@ -23,7 +29,7 @@ export const SERVICES = [
     id: "Vision",
     title: "Vision",
     icon: Flower,
-    image: "/hero/hero-01.png",
+    image: hero01,
     description:
       "राष्ट्रीय सेवा संघ का लक्ष्य धर्म और राष्ट्र के प्रति समर्पित नागरिक जीवन के माध्यम से एक सशक्त, समरस और अखंड भारत का निर्माण करना है। हम सनातन संस्कृति को शाश्वत जीवन पद्धति मानते हैं और शिक्षा, सेवा तथा सहयोग के बल पर एक जाति-मुक्त, आत्मनिर्भर समाज के निर्माण के लिए संकल्पित हैं।",
     features: [
@@ -37,7 +43,7 @@ export const SERVICES = [
     id: "Mission",
     title: "Mission",
     icon: Flag,
-    image: "/hero/hero-02.png",
+    image: hero02,
     description:
       "राष्ट्रीय सेवा संघ का मिशन भारत को एक सशक्त, संगठित और समरस राष्ट्र के रूप में विकसित करना है, जहाँ नागरिक सत्य, धर्म, सेवा, त्याग और सहयोग जैसे सनातन सिद्धांतों को आत्मसात करें। हमारा उद्देश्य समाज के हर वर्ग को जोड़कर एक राष्ट्रीय चेतना का निर्माण करना है।",
     features: [
@@ -50,7 +56,7 @@ export const SERVICES = [
     id: "Value",
     title: "Value",
     icon: Leaf,
-    image: "/hero/hero-03.png",
+    image: hero03,
     description:
       "राष्ट्रीय सेवा संघ के मूल्य सनातन धर्म और राष्ट्र निर्माण की उच्चतम भावना से पोषित हैं। हम धर्मनिष्ठा को आधार, और राष्ट्र सर्वोपरि को सर्वोच्च ध्येय मानते हैं। हमारे लिए सामाजिक समरसता जीवन की अनिवार्यता है, जहाँ हर भारतीय समान है।",
     features: [
@@ -63,7 +69,7 @@ export const SERVICES = [
     id: "Kutumb",
     title: "Kutumb Prabodhan",
     icon: Home,
-    image: "/hero/hero-04.png",
+    image: hero04,
     description:
       "Strengthening the family system to preserve values and culture. Regular family gatherings to discuss social and national.",
     features: [
@@ -77,7 +83,7 @@ export const SERVICES = [
     id: "Samajik",
     title: "Samajik Sadbhav",
     icon: HeartHandshake,
-    image: "/hero/hero-05.png",
+    image: hero05,
     description:
       "Working towards eradicating caste-based discrimination and fostering a spirit of brotherhood and unity among all sections..",
     features: [
@@ -91,7 +97,7 @@ export const SERVICES = [
     id: "Paryavaran",
     title: "Environment",
     icon: Sun,
-    image: "/hero/hero-06.png",
+    image: hero06,
     description:
       "Protecting nature is part of Bharatiya culture. Initiatives for tree plantation, water conservation, and reducing plastic usage.",
     features: [
@@ -276,15 +282,15 @@ const ServicesSection: React.FC = () => {
                   exit={{ opacity: 0, y: 20 }}
                   transition={{ duration: 0.5 }}
                 >
-                  <div className="h-64 relative">
+                  <div className="relative h-64 overflow-hidden">
                     <Image
                       src={activeService.image}
                       alt={activeService.title}
                       fill
-                      className="object-cover"
+                      className="object-cover group-hover:scale-110 transition-transform duration-700"
                       sizes="(max-width: 768px) 100vw, 50vw"
                     />
-                    <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 to-transparent"></div>
                   </div>
                   <div className="bg-apml-red text-white p-8">
                     <h3 className="text-2xl font-bold mb-4">

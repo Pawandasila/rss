@@ -4,34 +4,75 @@ import { useState, useCallback, use } from "react";
 import useAxios from "@/hooks/use-axios";
 import { useAuth } from "@/hooks/use-auth";
 import type { DonationFormData, ManualPaymentFormData } from "../types";
+import logo from "@/assets/logo/logo.png";
 
 function convertNumberToWords(num: number): string {
   if (num === 0) return "Zero Rupees Only";
-  
-  const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
-  const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
-  const teens = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
-  
+
+  const ones = [
+    "",
+    "One",
+    "Two",
+    "Three",
+    "Four",
+    "Five",
+    "Six",
+    "Seven",
+    "Eight",
+    "Nine",
+  ];
+  const tens = [
+    "",
+    "",
+    "Twenty",
+    "Thirty",
+    "Forty",
+    "Fifty",
+    "Sixty",
+    "Seventy",
+    "Eighty",
+    "Ninety",
+  ];
+  const teens = [
+    "Ten",
+    "Eleven",
+    "Twelve",
+    "Thirteen",
+    "Fourteen",
+    "Fifteen",
+    "Sixteen",
+    "Seventeen",
+    "Eighteen",
+    "Nineteen",
+  ];
+
   function convertLessThanThousand(n: number): string {
     if (n === 0) return "";
     if (n < 10) return ones[n];
     if (n < 20) return teens[n - 10];
-    if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? " " + ones[n % 10] : "");
-    return ones[Math.floor(n / 100)] + " Hundred" + (n % 100 !== 0 ? " " + convertLessThanThousand(n % 100) : "");
+    if (n < 100)
+      return (
+        tens[Math.floor(n / 10)] + (n % 10 !== 0 ? " " + ones[n % 10] : "")
+      );
+    return (
+      ones[Math.floor(n / 100)] +
+      " Hundred" +
+      (n % 100 !== 0 ? " " + convertLessThanThousand(n % 100) : "")
+    );
   }
-  
+
   const crore = Math.floor(num / 10000000);
   const lakh = Math.floor((num % 10000000) / 100000);
   const thousand = Math.floor((num % 100000) / 1000);
   const remainder = Math.floor(num % 1000);
-  
+
   let result = "";
-  
+
   if (crore > 0) result += convertLessThanThousand(crore) + " Crore ";
   if (lakh > 0) result += convertLessThanThousand(lakh) + " Lakh ";
   if (thousand > 0) result += convertLessThanThousand(thousand) + " Thousand ";
   if (remainder > 0) result += convertLessThanThousand(remainder);
-  
+
   return result.trim() + " Rupees Only";
 }
 
@@ -221,7 +262,7 @@ export function useDonationPayment() {
 
         const orderResponse = await createOrder(formData);
 
-        if(orderResponse.error?.includes("already a member")) {
+        if (orderResponse.error?.includes("already a member")) {
           setError(orderResponse.error);
           setIsProcessing(false);
           setCurrentStep("idle");
@@ -251,7 +292,7 @@ export function useDonationPayment() {
           currency: orderResponse.currency || "INR",
           name: "RSS - Rashtriya Swayamsevak Sangh",
           description: `Donation - ${formData.payment_for}`,
-          image: "/logo/logo.png",
+          image: logo.src,
           order_id: orderResponse.order_id,
           handler: async (response: PaymentResponse) => {
             try {
@@ -275,23 +316,26 @@ export function useDonationPayment() {
                 // Navigate to receipt page instead of opening popup
                 setTimeout(() => {
                   const receiptParams = new URLSearchParams({
-                    name: formData.name || '',
-                    phone: formData.phone || '',
-                    date: new Date().toLocaleDateString('en-IN'),
-                    mode: 'Online payment',
+                    name: formData.name || "",
+                    phone: formData.phone || "",
+                    date: new Date().toLocaleDateString("en-IN"),
+                    mode: "Online payment",
                     amount: String(formData.amount / 100),
                     amountWords: convertNumberToWords(formData.amount / 100),
-                    receiptNumber: verificationResponse.payment_id || verificationResponse.order_id || 'N/A',
-                    location: 'state'
+                    receiptNumber:
+                      verificationResponse.payment_id ||
+                      verificationResponse.order_id ||
+                      "N/A",
+                    location: "state",
                   });
 
                   const receiptUrl = `/receipt?${receiptParams.toString()}`;
-                  
+
                   // Create a temporary link and click it (works without popup blocker)
-                  const link = document.createElement('a');
+                  const link = document.createElement("a");
                   link.href = receiptUrl;
-                  link.target = '_blank';
-                  link.rel = 'noopener noreferrer';
+                  link.target = "_blank";
+                  link.rel = "noopener noreferrer";
                   document.body.appendChild(link);
                   link.click();
                   document.body.removeChild(link);
