@@ -15,6 +15,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import heroImage from "@/assets/hero/01.jpeg";
 
 const HERO_SLIDES = [
   {
@@ -92,16 +93,13 @@ const Hero = () => {
     <div className="relative font-sans overflow-hidden w-full ">
       <div className=" w-full md:bg-primary  text-white sm:pb-24 lg:pb-48 relative overflow-hidden transition-colors duration-500">
         <Image
-          src="/hero/01.jpeg"
+          src={heroImage}
           alt="Rashtriya Seva Sangh"
-          width={800}
-          height={600}
           className="w-full h-auto md:hidden block"
           priority
-          loading="eager"
           sizes="100vw"
+          placeholder="blur"
         />
-
         <div className="w-full px-4 md:px-8 lg:px-16 pt-3 sm:pt-4 relative z-10">
           <div className="flex flex-col lg:flex-row items-center justify-between mt-4 sm:mt-6 lg:mt-12 gap-6 sm:gap-8 lg:gap-12">
             {/* Left Column: Text */}
