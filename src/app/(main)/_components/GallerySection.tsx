@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import { Play, Image as ImageIcon, Maximize2, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";

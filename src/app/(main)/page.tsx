@@ -1,19 +1,22 @@
-"use client";
+import dynamic from "next/dynamic";
 import Hero from "./_components/Hero";
-import ServicesSection from "./_components/Service";
-import Blog from "./_components/blogs";
-import DivineMission from "./_components/DivineMission";
-import PressSection from "./_components/Press";
-import Testimonials from "./_components/testimonials";
-import Supporters from "./_components/Supporters";
-import DonationList from "./_components/DonationList";
-import AboutSection from "./_components/About";
-import ShikayatSection from "./_components/Shikayat";
-import StickySidebar from "@/components/common/sticky-sidebar";
-import VyapariSection from "./_components/Vyapari";
-import GallerySection from "./_components/GallerySection";
-import Team from "./_components/Team";
-import BirthdaySection from "./_components/Birthday";
+
+const ServicesSection = dynamic(() => import("./_components/Service"));
+const Blog = dynamic(() => import("./_components/blogs"));
+const DivineMission = dynamic(() => import("./_components/DivineMission"));
+const PressSection = dynamic(() => import("./_components/Press"));
+const Testimonials = dynamic(() => import("./_components/testimonials"));
+const Supporters = dynamic(() => import("./_components/Supporters"));
+const DonationList = dynamic(() => import("./_components/DonationList"));
+const AboutSection = dynamic(() => import("./_components/About"));
+const ShikayatSection = dynamic(() => import("./_components/Shikayat"));
+const StickySidebar = dynamic(
+  () => import("@/components/common/sticky-sidebar")
+);
+const VyapariSection = dynamic(() => import("./_components/Vyapari"));
+const GallerySection = dynamic(() => import("./_components/GallerySection"));
+const Team = dynamic(() => import("./_components/Team"));
+const BirthdaySection = dynamic(() => import("./_components/Birthday"));
 
 export default function Home() {
   return (

@@ -106,6 +106,7 @@ const Hero = () => {
           height={600}
           className="w-full h-auto md:hidden block"
           priority
+          loading="eager"
         />
 
         <div className="w-full px-4 md:px-8 lg:px-16 pt-3 sm:pt-4 relative z-10">
@@ -185,6 +186,7 @@ const Hero = () => {
                             fill
                             className="object-cover transition-transform duration-700 hover:scale-110"
                             sizes="320px"
+                            priority={index === 0}
                           />
                         </div>
                         <div className="p-6 flex flex-col flex-grow bg-white text-gray-800">

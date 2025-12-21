@@ -5,7 +5,6 @@ import Link from "next/link";
 import Provider from "./Provider";
 import { Toaster } from "@/components/ui/sonner";
 
-
 const lato = Lato({
   variable: "--font-lato",
   subsets: ["latin"],
@@ -236,15 +235,6 @@ export default function RootLayout({
             }),
           }}
         />
-
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin=""
-        />
-
-        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
       </head>
       <body
         className={`${lato.variable} ${poppins.variable} ${hind.variable} antialiased m-0 p-0 w-full overflow-x-hidden`}
@@ -256,7 +246,7 @@ export default function RootLayout({
           Skip to main content
         </Link>
         <Provider>{children}</Provider>
-        <Toaster richColors/>
+        <Toaster richColors />
       </body>
     </html>
   );

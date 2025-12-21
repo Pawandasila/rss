@@ -1,4 +1,5 @@
-import React, { ReactNode, useEffect } from "react";
+"use client";
+import { ReactNode, useEffect } from "react";
 import { X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 

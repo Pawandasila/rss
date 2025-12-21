@@ -2,12 +2,7 @@
 
 import React, { useRef } from "react";
 import Image from "next/image";
-import {
-  MessageSquareQuote,
-  ChevronLeft,
-  ChevronRight,
-  Quote,
-} from "lucide-react";
+import { MessageSquareQuote, Quote } from "lucide-react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";

@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { MapPin, Clock, ArrowRight, CircleDashed } from "lucide-react";
 import Image from "next/image";
