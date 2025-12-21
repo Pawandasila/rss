@@ -1,9 +1,8 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import {
   Phone,
-  Search,
   MapPin,
   Flag,
   UserPlus,
@@ -14,8 +13,6 @@ import {
   FileText,
   ChevronDown,
   ArrowRight,
-  Award,
-  Users,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -92,12 +89,7 @@ const Hero = () => {
   }, [currentSlide]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="relative font-sans overflow-hidden w-full "
-    >
+    <div className="relative font-sans overflow-hidden w-full ">
       <div className=" w-full md:bg-primary  text-white sm:pb-24 lg:pb-48 relative overflow-hidden transition-colors duration-500">
         <Image
           src="/hero/01.jpeg"
@@ -107,6 +99,7 @@ const Hero = () => {
           className="w-full h-auto md:hidden block"
           priority
           loading="eager"
+          sizes="100vw"
         />
 
         <div className="w-full px-4 md:px-8 lg:px-16 pt-3 sm:pt-4 relative z-10">
@@ -283,6 +276,7 @@ const Hero = () => {
                       <div className="w-px h-5 sm:h-6 bg-gray-200 mx-2 sm:mx-3"></div>
                       <input
                         type="text"
+                        aria-label="Full Name"
                         placeholder="Enter Full Name"
                         className="bg-transparent border-none text-gray-800 text-xs sm:text-sm w-full focus:outline-none placeholder-gray-400 font-medium"
                       />
@@ -301,6 +295,7 @@ const Hero = () => {
                       <div className="w-px h-5 sm:h-6 bg-gray-200 mx-2 sm:mx-3"></div>
                       <input
                         type="text"
+                        aria-label="City"
                         placeholder="Enter City"
                         className="bg-transparent border-none text-gray-800 text-xs sm:text-sm w-full focus:outline-none placeholder-gray-400 font-medium"
                       />
@@ -319,6 +314,7 @@ const Hero = () => {
                       <div className="w-px h-5 sm:h-6 bg-gray-200 mx-2 sm:mx-3"></div>
                       <input
                         type="tel"
+                        aria-label="Mobile Number"
                         placeholder="+91"
                         className="bg-transparent border-none text-gray-800 text-xs sm:text-sm w-full focus:outline-none placeholder-gray-400 font-medium"
                       />
@@ -351,6 +347,7 @@ const Hero = () => {
                         <div className="w-px h-5 sm:h-6 bg-gray-200 mx-2 sm:mx-3"></div>
                         <input
                           type="text"
+                          aria-label="Full Name"
                           placeholder="Enter Full Name"
                           className="bg-transparent border-none text-gray-800 text-xs sm:text-sm w-full focus:outline-none placeholder-gray-400 font-medium"
                         />
@@ -369,6 +366,7 @@ const Hero = () => {
                         <div className="w-px h-5 sm:h-6 bg-gray-200 mx-2 sm:mx-3"></div>
                         <input
                           type="tel"
+                          aria-label="Phone Number"
                           placeholder="+91"
                           className="bg-transparent border-none text-gray-800 text-xs sm:text-sm w-full focus:outline-none placeholder-gray-400 font-medium"
                         />
@@ -387,6 +385,7 @@ const Hero = () => {
                         <div className="w-px h-6 bg-gray-200 mx-3"></div>
                         <input
                           type="email"
+                          aria-label="Email Address"
                           placeholder="example@mail.com"
                           className="bg-transparent border-none text-gray-800 text-sm w-full focus:outline-none placeholder-gray-400 font-medium"
                         />
@@ -405,6 +404,7 @@ const Hero = () => {
                         <div className="w-px h-6 bg-gray-200 mx-3"></div>
                         <input
                           type="number"
+                          aria-label="Donation Amount"
                           placeholder="Enter Amount"
                           className="bg-transparent border-none text-gray-800 text-sm w-full focus:outline-none placeholder-gray-400 font-medium"
                         />
@@ -422,7 +422,10 @@ const Hero = () => {
                         />
                         <div className="w-px h-6 bg-gray-200 mx-3"></div>
                         <div className="relative w-full">
-                          <select className="bg-transparent border-none text-gray-800 text-sm w-full focus:outline-none font-medium appearance-none cursor-pointer relative z-10">
+                          <select
+                            aria-label="Select State"
+                            className="bg-transparent border-none text-gray-800 text-sm w-full focus:outline-none font-medium appearance-none cursor-pointer relative z-10"
+                          >
                             <option value="">Select State</option>
                             <option value="MH">Maharashtra</option>
                             <option value="DL">Delhi</option>
@@ -448,7 +451,10 @@ const Hero = () => {
                         />
                         <div className="w-px h-5 sm:h-6 bg-gray-200 mx-2 sm:mx-3"></div>
                         <div className="relative w-full">
-                          <select className="bg-transparent border-none text-gray-800 text-xs sm:text-sm w-full focus:outline-none font-medium appearance-none cursor-pointer relative z-10">
+                          <select
+                            aria-label="Select District"
+                            className="bg-transparent border-none text-gray-800 text-xs sm:text-sm w-full focus:outline-none font-medium appearance-none cursor-pointer relative z-10"
+                          >
                             <option value="">Select District</option>
                             <option value="NGP">Nagpur</option>
                             <option value="PUN">Pune</option>
@@ -474,6 +480,7 @@ const Hero = () => {
                       />
                       <div className="w-px h-10 sm:h-12 bg-gray-200 mx-2 sm:mx-3"></div>
                       <textarea
+                        aria-label="Notes"
                         placeholder="Any specific instructions or comments..."
                         className="bg-transparent border-none text-gray-800 text-xs sm:text-sm w-full focus:outline-none placeholder-gray-400 font-medium resize-none h-10 sm:h-12 py-1"
                       ></textarea>
@@ -498,7 +505,7 @@ const Hero = () => {
           </div>
         </div>
       </motion.div>
-    </motion.div>
+    </div>
   );
 };
 
