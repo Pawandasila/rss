@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import useAxios from "@/hooks/use-axios";
 import { useAuth } from "@/hooks/use-auth";
 import type { DonationFormData, ManualPaymentFormData } from "../types";
+import logo from "@/assets/logo/logo.png";
 
 declare global {
   interface Window {
@@ -355,7 +356,7 @@ export function useDonationPayment() {
           currency: orderResponse.currency || "INR",
           name: "राष्ट्रीय सेवा संघ",
           description: `दान - ${formData.payment_for}`,
-          image: `${window.location.origin}/logo/logo.png`,
+          image: `${window.location.origin}${logo.src}`,
           order_id: orderResponse.order_id,
           handler: async (response: PaymentResponse) => {
             try {

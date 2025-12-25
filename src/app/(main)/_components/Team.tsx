@@ -208,15 +208,6 @@ const TeamSection: React.FC = () => {
 
           <div className="team-pagination flex justify-center mt-12 gap-2"></div>
         </div>
-
-        <div className="mt-16 text-center">
-          <button className="inline-flex items-center gap-3 text-gray-400 hover:text-apml-red font-bold uppercase tracking-widest text-xs transition-all group">
-            Explore Full Leadership Council
-            <div className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center group-hover:bg-apml-red group-hover:text-white group-hover:border-apml-red transition-all">
-              <Plus size={16} />
-            </div>
-          </button>
-        </div>
       </div>
       <style>{`
         .team-pagination .swiper-pagination-bullet {

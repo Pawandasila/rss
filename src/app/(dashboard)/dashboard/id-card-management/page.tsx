@@ -205,7 +205,7 @@ const IDCardManagement = () => {
               className="text-sm font-bold uppercase tracking-wider"
               style={{ color: "#ffffff" }}
             >
-              RSS - Rashtriya Swayamsevak Sangh
+              RSS - Rashtriya Seva Sangh
             </h1>
           </div>
 

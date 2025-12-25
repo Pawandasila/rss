@@ -10,6 +10,12 @@ import {
   Image as ImageIcon,
   Loader2,
   Calendar as CalendarIcon,
+  Heart,
+  IndianRupee,
+  Gift,
+  Shield,
+  Lock,
+  User,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { toast } from "sonner";
@@ -27,6 +33,18 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import {
+  useDonationPayment,
+  useCurrency,
+  type DonationFormData,
+} from "@/module/donation";
+import { useCountryApi } from "@/module/country/hooks";
+import {
+  StateSelect,
+  DistrictSelect,
+} from "@/module/country/components/country-select";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 interface DisplaySlide {
   id: number | string;
@@ -35,15 +53,24 @@ interface DisplaySlide {
   image: string;
 }
 
+const impactAmounts = [
+  { amount: 151, label: "₹151", desc: "भोजन दान" },
+  { amount: 501, label: "₹501", desc: "सुरक्षा दान" },
+  { amount: 1100, label: "₹1,100", desc: "यज्ञ सहयोग" },
+  { amount: 5100, label: "₹5,100", desc: "विवाह सहयोग" },
+];
+
 const Hero = () => {
   const router = useRouter();
   const { register: registerUser } = useAuth();
   const { banners, loading } = useBanners();
 
+  // Tab state
+  const [activeTab, setActiveTab] = useState<"join" | "donate">("join");
+
   const displaySlides: DisplaySlide[] = useMemo(() => {
     if (!banners || banners.length === 0) return [];
 
-    // Only show active banners
     return banners
       .filter((b) => b.is_active)
       .map((b) => ({
@@ -56,7 +83,7 @@ const Hero = () => {
 
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Join form state - using the same fields as RegisterForm
+  // Join form state
   const [joinForm, setJoinForm] = useState({
     name: "",
     email: "",
@@ -65,9 +92,34 @@ const Hero = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Donation form state
+  const [isCustomAmount, setIsCustomAmount] = useState(false);
+  const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
+  const [donationForm, setDonationForm] = useState<DonationFormData>({
+    name: "",
+    email: "",
+    phone: "",
+    amount: 0,
+    payment_for: "donation",
+    notes: "",
+    state: "",
+    district: "",
+    address: "",
+  });
+
+  const {
+    processPayment,
+    isProcessing,
+    error: donationError,
+    success: donationSuccess,
+    currentStep,
+    reset: resetDonation,
+  } = useDonationPayment();
+  const { formatCurrency } = useCurrency();
+  const { states, fetchDistricts } = useCountryApi();
+
   const sliderRef = useRef<HTMLDivElement>(null);
 
-  // Auto-slide logic
   useEffect(() => {
     if (displaySlides.length === 0) return;
 
@@ -87,13 +139,35 @@ const Hero = () => {
     }
   }, [currentSlide]);
 
+  // Reset donation on success
+  useEffect(() => {
+    if (donationSuccess) {
+      toast.success("दान सफल! आपका धन्यवाद!");
+      setTimeout(() => {
+        resetDonation();
+        setDonationForm({
+          name: "",
+          email: "",
+          phone: "",
+          amount: 0,
+          payment_for: "donation",
+          notes: "",
+          state: "",
+          district: "",
+          address: "",
+        });
+        setSelectedAmount(null);
+        setIsCustomAmount(false);
+      }, 3000);
+    }
+  }, [donationSuccess, resetDonation]);
+
   const formatPhoneNumber = (value: string) => {
-    // Only allow digits and limit to 10
     return value.replace(/\D/g, "").slice(0, 10);
   };
 
+  // Join form submit handler
   const handleJoinSubmit = async () => {
-    // Validate form
     if (!joinForm.name.trim()) {
       toast.error("कृपया अपना नाम दर्ज करें");
       return;
@@ -163,6 +237,53 @@ const Hero = () => {
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Donation amount selection
+  const handleAmountSelect = (amount: number) => {
+    if (amount === -1) {
+      setIsCustomAmount(true);
+      setSelectedAmount(null);
+      setDonationForm((prev) => ({ ...prev, amount: 0 }));
+    } else {
+      setIsCustomAmount(false);
+      setSelectedAmount(amount);
+      setDonationForm((prev) => ({ ...prev, amount }));
+    }
+  };
+
+  // Donation form submit handler
+  const handleDonationSubmit = async () => {
+    if (!donationForm.name.trim()) {
+      toast.error("कृपया अपना नाम दर्ज करें");
+      return;
+    }
+    if (
+      !donationForm.email.trim() ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(donationForm.email)
+    ) {
+      toast.error("कृपया वैध ईमेल दर्ज करें");
+      return;
+    }
+    if (!donationForm.phone.trim() || donationForm.phone.length < 10) {
+      toast.error("कृपया 10 अंकों का मोबाइल नंबर दर्ज करें");
+      return;
+    }
+    if (!donationForm.amount || donationForm.amount < 1) {
+      toast.error("कृपया दान राशि चुनें");
+      return;
+    }
+
+    try {
+      await processPayment({
+        ...donationForm,
+        amount: donationForm.amount * 100,
+        address: `${donationForm.district}, ${donationForm.state}`,
+      });
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.error("भुगतान में त्रुटि हुई। कृपया पुनः प्रयास करें।");
     }
   };
 
@@ -332,164 +453,421 @@ const Hero = () => {
         className="w-full px-4 md:px-8 lg:px-16 xl:px-24 relative z-30 -mt-12 sm:-mt-20 lg:-mt-30 mb-8 sm:mb-12 lg:mb-16"
       >
         <div className="bg-white rounded-t-xl rounded-b-lg shadow-[0_20px_50px_rgba(0,0,0,0.15)] mx-auto border-t-4 border-accent w-full overflow-hidden relative">
+          {/* Tabs */}
           <div className="flex text-xs sm:text-sm font-bold text-center border-b border-gray-100">
-            <div className="py-3 px-4 sm:py-4 sm:px-8 flex-1 lg:flex-none uppercase tracking-wide flex items-center justify-center gap-1.5 sm:gap-2 text-white relative overflow-hidden">
-              <div className="absolute inset-0 bg-primary z-0"></div>
-              <div className="relative z-10 flex items-center gap-1.5 sm:gap-2">
-                <UserPlus size={16} className="sm:w-[18px] sm:h-[18px]" />
-                <span className="text-[11px] sm:text-sm">Join Now</span>
-              </div>
-            </div>
+            <button
+              onClick={() => setActiveTab("join")}
+              className={`py-3 px-4 sm:py-4 sm:px-8 flex-1 lg:flex-none lg:min-w-[180px] uppercase tracking-wide flex items-center justify-center gap-1.5 sm:gap-2 relative overflow-hidden transition-all ${
+                activeTab === "join"
+                  ? "text-white bg-primary"
+                  : "text-gray-500 hover:text-primary hover:bg-gray-50"
+              }`}
+            >
+              <UserPlus size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <span className="text-[11px] sm:text-sm">Join Now</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("donate")}
+              className={`py-3 px-4 sm:py-4 sm:px-8 flex-1 lg:flex-none lg:min-w-[180px] uppercase tracking-wide flex items-center justify-center gap-1.5 sm:gap-2 relative overflow-hidden transition-all ${
+                activeTab === "donate"
+                  ? "text-white bg-primary"
+                  : "text-gray-500 hover:text-primary hover:bg-gray-50"
+              }`}
+            >
+              <Heart size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <span className="text-[11px] sm:text-sm">Donate Now</span>
+            </button>
           </div>
 
           <div className="p-4 sm:p-5 lg:p-8 bg-white min-h-[100px] sm:min-h-[120px] transition-all">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2 }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6"
-            >
-              {/* Name Field */}
-              <div className="space-y-1.5 sm:space-y-2">
-                <label className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">
-                  पूरा नाम
-                </label>
-                <div className="flex items-center bg-white border border-gray-300 rounded-lg p-2 sm:p-2.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-red-100 transition-all shadow-sm hover:border-gray-400 group">
-                  <UserPlus
-                    size={18}
-                    className="text-gray-400 group-focus-within:text-primary transition-colors flex-shrink-0"
-                  />
-                  <div className="w-px h-5 sm:h-6 bg-gray-200 mx-2 sm:mx-3"></div>
-                  <input
-                    type="text"
-                    aria-label="Full Name"
-                    placeholder="Enter Full Name"
-                    value={joinForm.name}
-                    onChange={(e) =>
-                      setJoinForm((prev) => ({ ...prev, name: e.target.value }))
-                    }
-                    className="bg-transparent border-none text-gray-800 text-xs sm:text-sm w-full focus:outline-none placeholder-gray-400 font-medium"
-                  />
-                </div>
-              </div>
-
-              {/* Email Field */}
-              <div className="space-y-1.5 sm:space-y-2">
-                <label className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">
-                  ईमेल
-                </label>
-                <div className="flex items-center bg-white border border-gray-300 rounded-lg p-2 sm:p-2.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-red-100 transition-all shadow-sm hover:border-gray-400 group">
-                  <Mail
-                    size={18}
-                    className="text-gray-400 group-focus-within:text-primary transition-colors flex-shrink-0"
-                  />
-                  <div className="w-px h-5 sm:h-6 bg-gray-200 mx-2 sm:mx-3"></div>
-                  <input
-                    type="email"
-                    aria-label="Email"
-                    placeholder="example@mail.com"
-                    value={joinForm.email}
-                    onChange={(e) =>
-                      setJoinForm((prev) => ({
-                        ...prev,
-                        email: e.target.value,
-                      }))
-                    }
-                    className="bg-transparent border-none text-gray-800 text-xs sm:text-sm w-full focus:outline-none placeholder-gray-400 font-medium"
-                  />
-                </div>
-              </div>
-
-              {/* Phone Field */}
-              <div className="space-y-1.5 sm:space-y-2">
-                <label className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">
-                  मोबाइल नं.
-                </label>
-                <div className="flex items-center bg-white border border-gray-300 rounded-lg p-2 sm:p-2.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-red-100 transition-all shadow-sm hover:border-gray-400 group">
-                  <Phone
-                    size={18}
-                    className="text-gray-400 group-focus-within:text-primary transition-colors flex-shrink-0"
-                  />
-                  <div className="w-px h-5 sm:h-6 bg-gray-200 mx-2 sm:mx-3"></div>
-                  <input
-                    type="tel"
-                    aria-label="Mobile Number"
-                    placeholder="9876543210"
-                    maxLength={10}
-                    value={joinForm.phone}
-                    onChange={(e) =>
-                      setJoinForm((prev) => ({
-                        ...prev,
-                        phone: formatPhoneNumber(e.target.value),
-                      }))
-                    }
-                    className="bg-transparent border-none text-gray-800 text-xs sm:text-sm w-full focus:outline-none placeholder-gray-400 font-medium"
-                  />
-                </div>
-              </div>
-
-              {/* Date of Birth Field */}
-              <div className="space-y-1.5 sm:space-y-2">
-                <label className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">
-                  जन्म तिथि
-                </label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full h-9 sm:h-10 justify-start text-left font-medium text-xs sm:text-sm border-gray-300 hover:border-gray-400",
-                        !joinForm.dateOfBirth && "text-gray-400"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4 text-gray-400" />
-                      {joinForm.dateOfBirth ? (
-                        format(joinForm.dateOfBirth, "dd/MM/yyyy")
-                      ) : (
-                        <span>तारीख चुनें</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      captionLayout="dropdown"
-                      selected={joinForm.dateOfBirth}
-                      onSelect={(date) =>
-                        setJoinForm((prev) => ({ ...prev, dateOfBirth: date }))
-                      }
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </motion.div>
-
-            {/* Submit Button */}
-            <div className="mt-4 flex justify-center lg:justify-end">
-              <button
-                onClick={handleJoinSubmit}
-                disabled={isSubmitting}
-                className="bg-primary text-white font-bold py-3 sm:py-3.5 px-8 sm:px-12 rounded-lg hover:bg-red-700 transition w-full lg:w-auto shadow-lg uppercase text-xs sm:text-sm tracking-wide transform hover:-translate-y-0.5 active:translate-y-0 whitespace-nowrap lg:min-w-[200px] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            {/* JOIN FORM */}
+            {activeTab === "join" && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
               >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" />
-                    पंजीकरण हो रहा है...
-                  </>
-                ) : (
-                  <>
-                    <UserPlus size={16} />
-                    पंजीकरण करें
-                  </>
-                )}
-              </button>
-            </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+                  {/* Name Field */}
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <label className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">
+                      पूरा नाम
+                    </label>
+                    <div className="flex items-center bg-white border border-gray-300 rounded-lg p-2 sm:p-2.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-red-100 transition-all shadow-sm hover:border-gray-400 group">
+                      <UserPlus
+                        size={18}
+                        className="text-gray-400 group-focus-within:text-primary transition-colors flex-shrink-0"
+                      />
+                      <div className="w-px h-5 sm:h-6 bg-gray-200 mx-2 sm:mx-3"></div>
+                      <input
+                        type="text"
+                        aria-label="Full Name"
+                        placeholder="Enter Full Name"
+                        value={joinForm.name}
+                        onChange={(e) =>
+                          setJoinForm((prev) => ({
+                            ...prev,
+                            name: e.target.value,
+                          }))
+                        }
+                        className="bg-transparent border-none text-gray-800 text-xs sm:text-sm w-full focus:outline-none placeholder-gray-400 font-medium"
+                      />
+                    </div>
+                  </div>
 
-            {/* Password Info */}
-            <p className="text-[10px] sm:text-xs text-gray-400 text-center mt-3">
-              पंजीकरण के बाद आपका पासवर्ड आपकी जन्म तिथि होगी (DDMMYYYY format
-              में)
-            </p>
+                  {/* Email Field */}
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <label className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">
+                      ईमेल
+                    </label>
+                    <div className="flex items-center bg-white border border-gray-300 rounded-lg p-2 sm:p-2.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-red-100 transition-all shadow-sm hover:border-gray-400 group">
+                      <Mail
+                        size={18}
+                        className="text-gray-400 group-focus-within:text-primary transition-colors flex-shrink-0"
+                      />
+                      <div className="w-px h-5 sm:h-6 bg-gray-200 mx-2 sm:mx-3"></div>
+                      <input
+                        type="email"
+                        aria-label="Email"
+                        placeholder="example@mail.com"
+                        value={joinForm.email}
+                        onChange={(e) =>
+                          setJoinForm((prev) => ({
+                            ...prev,
+                            email: e.target.value,
+                          }))
+                        }
+                        className="bg-transparent border-none text-gray-800 text-xs sm:text-sm w-full focus:outline-none placeholder-gray-400 font-medium"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Phone Field */}
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <label className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">
+                      मोबाइल नं.
+                    </label>
+                    <div className="flex items-center bg-white border border-gray-300 rounded-lg p-2 sm:p-2.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-red-100 transition-all shadow-sm hover:border-gray-400 group">
+                      <Phone
+                        size={18}
+                        className="text-gray-400 group-focus-within:text-primary transition-colors flex-shrink-0"
+                      />
+                      <div className="w-px h-5 sm:h-6 bg-gray-200 mx-2 sm:mx-3"></div>
+                      <input
+                        type="tel"
+                        aria-label="Mobile Number"
+                        placeholder="9876543210"
+                        maxLength={10}
+                        value={joinForm.phone}
+                        onChange={(e) =>
+                          setJoinForm((prev) => ({
+                            ...prev,
+                            phone: formatPhoneNumber(e.target.value),
+                          }))
+                        }
+                        className="bg-transparent border-none text-gray-800 text-xs sm:text-sm w-full focus:outline-none placeholder-gray-400 font-medium"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Date of Birth Field */}
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <label className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">
+                      जन्म तिथि
+                    </label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full h-9 sm:h-10 justify-start text-left font-medium text-xs sm:text-sm border-gray-300 hover:border-gray-400",
+                            !joinForm.dateOfBirth && "text-gray-400"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4 text-gray-400" />
+                          {joinForm.dateOfBirth ? (
+                            format(joinForm.dateOfBirth, "dd/MM/yyyy")
+                          ) : (
+                            <span>तारीख चुनें</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          captionLayout="dropdown"
+                          selected={joinForm.dateOfBirth}
+                          onSelect={(date) =>
+                            setJoinForm((prev) => ({
+                              ...prev,
+                              dateOfBirth: date,
+                            }))
+                          }
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <div className="mt-4 flex justify-center lg:justify-end">
+                  <button
+                    onClick={handleJoinSubmit}
+                    disabled={isSubmitting}
+                    className="bg-primary text-white font-bold py-3 sm:py-3.5 px-8 sm:px-12 rounded-lg hover:bg-red-700 transition w-full lg:w-auto shadow-lg uppercase text-xs sm:text-sm tracking-wide transform hover:-translate-y-0.5 active:translate-y-0 whitespace-nowrap lg:min-w-[200px] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        पंजीकरण हो रहा है...
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus size={16} />
+                        पंजीकरण करें
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Password Info */}
+                <p className="text-[10px] sm:text-xs text-gray-400 text-center mt-3">
+                  पंजीकरण के बाद आपका पासवर्ड आपकी जन्म तिथि होगी (DDMMYYYY
+                  format में)
+                </p>
+              </motion.div>
+            )}
+
+            {/* DONATE FORM */}
+            {activeTab === "donate" && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-4 sm:space-y-5"
+              >
+                {/* Amount Selection */}
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 sm:p-4">
+                  <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-3 text-center">
+                    दान राशि चुनें
+                  </h3>
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                    {impactAmounts.map((item, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => handleAmountSelect(item.amount)}
+                        className={`p-2 sm:p-3 rounded-lg border transition-all text-center ${
+                          selectedAmount === item.amount
+                            ? "border-primary bg-primary/10 shadow-md"
+                            : "border-orange-300 bg-white hover:border-primary hover:shadow-sm"
+                        }`}
+                      >
+                        <p className="text-sm sm:text-lg font-black text-primary">
+                          {item.label}
+                        </p>
+                        <p className="text-[8px] sm:text-[10px] text-gray-500 leading-tight hidden sm:block">
+                          {item.desc}
+                        </p>
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => handleAmountSelect(-1)}
+                      className={`p-2 sm:p-3 rounded-lg border transition-all flex flex-col items-center justify-center ${
+                        isCustomAmount
+                          ? "border-primary bg-primary/10 shadow-md"
+                          : "border-orange-300 bg-white hover:border-primary hover:shadow-sm"
+                      }`}
+                    >
+                      <Gift className="h-4 w-4 sm:h-5 sm:w-5 text-primary mb-1" />
+                      <p className="text-xs sm:text-sm font-bold text-primary">
+                        Custom
+                      </p>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Custom Amount Input */}
+                {isCustomAmount && (
+                  <div className="flex justify-center">
+                    <div className="relative w-full max-w-xs">
+                      <IndianRupee className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        className="pl-10 h-11 text-center text-lg font-semibold border-2 focus-ring rounded-lg"
+                        type="number"
+                        placeholder="राशि दर्ज करें"
+                        min={1}
+                        max={500000}
+                        value={donationForm.amount || ""}
+                        onChange={(e) =>
+                          setDonationForm((prev) => ({
+                            ...prev,
+                            amount: parseInt(e.target.value) || 0,
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Form Fields */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                  {/* Name */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">
+                      पूरा नाम *
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        className="pl-10 h-10 text-sm"
+                        placeholder="Enter your name"
+                        value={donationForm.name}
+                        onChange={(e) =>
+                          setDonationForm((prev) => ({
+                            ...prev,
+                            name: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  {/* Phone */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">
+                      मोबाइल नं. *
+                    </label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        className="pl-10 h-10 text-sm"
+                        placeholder="9876543210"
+                        maxLength={10}
+                        value={donationForm.phone}
+                        onChange={(e) =>
+                          setDonationForm((prev) => ({
+                            ...prev,
+                            phone: formatPhoneNumber(e.target.value),
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  {/* Email */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">
+                      ईमेल *
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        className="pl-10 h-10 text-sm"
+                        type="email"
+                        placeholder="example@mail.com"
+                        value={donationForm.email}
+                        onChange={(e) =>
+                          setDonationForm((prev) => ({
+                            ...prev,
+                            email: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* State & District */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <StateSelect
+                    label="राज्य"
+                    placeholder="राज्य चुनें"
+                    value={donationForm.state}
+                    onStateChange={(stateName, stateId) => {
+                      setDonationForm((prev) => ({
+                        ...prev,
+                        state: stateName,
+                        district: "",
+                      }));
+                      if (stateId) {
+                        fetchDistricts(stateId);
+                      }
+                    }}
+                    className="w-full"
+                  />
+                  <DistrictSelect
+                    label="जिला"
+                    placeholder="जिला चुनें"
+                    value={donationForm.district}
+                    onValueChange={(value) =>
+                      setDonationForm((prev) => ({ ...prev, district: value }))
+                    }
+                    stateSelected={!!donationForm.state}
+                    selectedStateId={
+                      states.find((s) => s.name === donationForm.state)?.id
+                    }
+                    selectedStateName={donationForm.state}
+                    className="w-full"
+                  />
+                </div>
+
+                {/* Security Badge */}
+                <div className="bg-gray-50 p-2.5 rounded-lg border flex items-center justify-center gap-2">
+                  <Shield className="h-3.5 w-3.5 text-primary" />
+                  <span className="text-[10px] sm:text-xs font-medium text-gray-600">
+                    100% Secure Payment
+                  </span>
+                  <Badge
+                    variant="secondary"
+                    className="bg-primary/10 text-primary text-[10px]"
+                  >
+                    SSL
+                  </Badge>
+                  <Lock className="h-3 w-3 text-gray-400" />
+                </div>
+
+                {/* Submit Button */}
+                <div className="flex justify-center">
+                  <Button
+                    onClick={handleDonationSubmit}
+                    disabled={isProcessing}
+                    className="w-full lg:w-auto lg:min-w-[250px] h-11 sm:h-12 text-sm sm:text-base font-semibold"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                        <span className="text-xs sm:text-sm">
+                          {currentStep === "creating-order" &&
+                            "Creating Order..."}
+                          {currentStep === "waiting-payment" &&
+                            "Opening Payment..."}
+                          {currentStep === "verifying" && "Verifying..."}
+                          {!currentStep && "Processing..."}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <Heart className="h-5 w-5 mr-2" />
+                        <span>
+                          Donate{" "}
+                          {donationForm.amount > 0
+                            ? formatCurrency(donationForm.amount)
+                            : "Now"}
+                        </span>
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                {donationError && (
+                  <p className="text-xs text-red-500 text-center">
+                    {donationError}
+                  </p>
+                )}
+              </motion.div>
+            )}
           </div>
 
           <div className="lg:hidden bg-orange-50 p-3 text-center text-xs text-gray-600 border-t border-gray-200">

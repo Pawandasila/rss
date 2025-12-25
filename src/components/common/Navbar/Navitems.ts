@@ -100,13 +100,6 @@ export const navigationItems: NavItem[] = [
         icon: Users,
         description: "स्वयंसेवक बनें",
       },
-      {
-        id: "get-id-card",
-        title: "Get ID Card",
-        href: "https://app.joinrss.org.in/member_card_download",
-        icon: IdCard,
-        description: "सदस्य पहचान पत्र डाउनलोड करें",
-      },
     ],
   },
   {
@@ -126,7 +119,7 @@ export const navigationItems: NavItem[] = [
       {
         id: "press-release",
         title: "Press Release",
-        href: "/#press-release",
+        href: "/press",
         icon: BookOpen,
         description: "प्रेस विज्ञप्ति",
       },

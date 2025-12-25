@@ -16,18 +16,7 @@ import logo from "@/assets/logo/logo.png";
 import Link from "next/link";
 
 const Footer = () => {
-  const LOCATIONS = [
-    "RSS Uttarakhand",
-    "RSS Uttar Pradesh East",
-    "RSS Rajasthan Jaipur",
-    "RSS Gujarat Prant",
-    "RSS Delhi",
-    "RSS Vidarbha",
-    "RSS Tamil Nadu North",
-    "RSS Telangana",
-    "RSS Punjab",
-    "RSS Himachal",
-  ];
+  const LOCATIONS = ["RSS Uttarakhand", "RSS Delhi"];
 
   const QUICK_LINKS = [
     { name: "Vision & Mission", href: "/divine-mission" },
@@ -49,18 +38,18 @@ const Footer = () => {
           {/* Brand Info */}
           <div className="lg:col-span-4 space-y-8">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center p-2 shadow-2xl">
+              <div className="w-16 h-16 bg-transparent rounded-2xl flex items-center justify-center p-2 shadow-2xl">
                 <Image
                   src={logo}
                   alt="RSS"
                   height={100}
                   width={100}
-                  className="object-contain h-16 w-16"
+                  className="object-contain bg-transparent h-16 w-16"
                 />
               </div>
               <div>
                 <h3 className="text-white text-xl font-black leading-none tracking-tighter">
-                  RASHTRIYA <br /> SEVA SANGH
+                  RASHTRIYA SEVA SANGH
                 </h3>
                 <p className="text-[10px] text-apml-red font-bold uppercase tracking-[0.3em] mt-1">
                   Satyameva Jayate
@@ -81,16 +70,16 @@ const Footer = () => {
               </div>
               <div className="w-px h-10 bg-gray-800"></div>
               <div className="flex flex-col">
-                <span className="text-white font-black text-xl">1.5L+</span>
+                <span className="text-white font-black text-xl">50+</span>
                 <span className="text-[10px] uppercase font-bold text-gray-600 tracking-widest">
-                  Seva Projects
+                  Projects
                 </span>
               </div>
               <div className="w-px h-10 bg-gray-800"></div>
               <div className="flex flex-col">
                 <span className="text-white font-black text-xl">50K+</span>
                 <span className="text-[10px] uppercase font-bold text-gray-600 tracking-widest">
-                  Shakhas
+                  Members
                 </span>
               </div>
             </div>
@@ -173,7 +162,7 @@ const Footer = () => {
                 <span>Regional Centers</span>
                 <Globe size={14} className="text-apml-red" />
               </h4>
-              <div className="h-48 overflow-y-auto pr-2 custom-scrollbar grid grid-cols-1 gap-2">
+              <div className="h-auto overflow-y-auto pr-2 custom-scrollbar grid grid-cols-1 gap-2">
                 {LOCATIONS.map((loc, i) => (
                   <Link
                     key={i}

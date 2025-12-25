@@ -7,13 +7,16 @@ import {
   Plus,
   Film,
   Images,
+  ChevronLeft,
+  ChevronRight,
+  X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
-import SectionHeader from "@/components/common/SectionHeader";
 
 import { useImageGallery, useVideoGallery } from "@/module/crm/gallery/hooks";
 import { buildMediaUrl } from "@/lib/media";
+import Model from "@/components/common/Model";
 
 type TabType = "images" | "videos";
 
@@ -31,6 +34,10 @@ const GallerySection: React.FC = () => {
   const { videos, loading: loadingVideos } = useVideoGallery();
 
   const [activeTab, setActiveTab] = useState<TabType>("images");
+  const [selectedItem, setSelectedItem] = useState<DisplayGalleryItem | null>(
+    null
+  );
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
   const sizes = [
     "tall",
@@ -70,6 +77,43 @@ const GallerySection: React.FC = () => {
 
   const currentItems = activeTab === "images" ? displayImages : displayVideos;
   const isLoading = activeTab === "images" ? loadingImages : loadingVideos;
+
+  const openModal = (item: DisplayGalleryItem, index: number) => {
+    setSelectedItem(item);
+    setSelectedIndex(index);
+  };
+
+  const closeModal = () => {
+    setSelectedItem(null);
+  };
+
+  const goToPrevious = () => {
+    if (currentItems.length === 0) return;
+    const newIndex =
+      selectedIndex === 0 ? currentItems.length - 1 : selectedIndex - 1;
+    setSelectedIndex(newIndex);
+    setSelectedItem(currentItems[newIndex]);
+  };
+
+  const goToNext = () => {
+    if (currentItems.length === 0) return;
+    const newIndex =
+      selectedIndex === currentItems.length - 1 ? 0 : selectedIndex + 1;
+    setSelectedIndex(newIndex);
+    setSelectedItem(currentItems[newIndex]);
+  };
+
+  // Handle keyboard navigation
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!selectedItem) return;
+      if (e.key === "ArrowLeft") goToPrevious();
+      if (e.key === "ArrowRight") goToNext();
+      if (e.key === "Escape") closeModal();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedItem, selectedIndex, currentItems]);
 
   return (
     <section className="py-24 bg-white overflow-hidden">
@@ -139,14 +183,13 @@ const GallerySection: React.FC = () => {
           </div>
         )}
 
-        {/* Gallery Grid */}
         {!isLoading && currentItems.length > 0 && (
           <motion.div
             layout
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[250px]"
           >
             <AnimatePresence mode="popLayout">
-              {currentItems.map((item) => (
+              {currentItems.map((item, index) => (
                 <motion.div
                   layout
                   key={item.id}
@@ -154,6 +197,7 @@ const GallerySection: React.FC = () => {
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9, y: 20 }}
                   transition={{ duration: 0.5 }}
+                  onClick={() => openModal(item, index)}
                   className={`relative rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500 ${
                     item.size === "tall"
                       ? "row-span-2"
@@ -245,6 +289,66 @@ const GallerySection: React.FC = () => {
           </p>
         </motion.div>
       </div>
+
+      {/* Modal for Image/Video Preview */}
+      <Model
+        title={selectedItem?.title || "Preview"}
+        isOpen={!!selectedItem}
+        onClose={closeModal}
+        actionButtons={
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-500">
+              {selectedIndex + 1} / {currentItems.length}
+            </span>
+          </div>
+        }
+      >
+        <div className="relative w-full min-h-[400px] md:min-h-[500px] flex items-center justify-center bg-black">
+          {selectedItem?.type === "video" ? (
+            <video
+              src={buildMediaUrl(selectedItem.videoSrc) || ""}
+              className="max-w-full max-h-[70vh] object-contain"
+              controls
+              autoPlay
+            />
+          ) : (
+            selectedItem && (
+              <Image
+                src={buildMediaUrl(selectedItem.thumb) || ""}
+                alt={selectedItem.title}
+                fill
+                className="object-contain"
+                sizes="100vw"
+                priority
+              />
+            )
+          )}
+
+          {/* Navigation Arrows */}
+          {currentItems.length > 1 && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goToPrevious();
+                }}
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-white/40 transition-all z-10"
+              >
+                <ChevronLeft size={24} />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goToNext();
+                }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-white/40 transition-all z-10"
+              >
+                <ChevronRight size={24} />
+              </button>
+            </>
+          )}
+        </div>
+      </Model>
     </section>
   );
 };

@@ -161,7 +161,7 @@ const AboutSection: React.FC = () => {
       <Model
         isOpen={isVideoOpen}
         onClose={() => setIsVideoOpen(false)}
-        title="Rashtriya Swayamsevak Sangh - Introduction"
+        title=" Rashtriya Seva Sangh - Introduction"
       >
         <div className="w-full aspect-video bg-black flex items-center justify-center">
           <video

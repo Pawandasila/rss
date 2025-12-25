@@ -29,6 +29,17 @@ const formatDate = (dateString: string) => {
   }).format(date);
 };
 
+const stripHtml = (html: string): string => {
+  if (!html) return "";
+  return html
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .trim();
+};
+
 const getCategoryIcon = (category: string) => {
   switch (category) {
     case "Newspaper":
@@ -322,9 +333,12 @@ export default function PressPage() {
                       {latestItem.title}
                     </h3>
 
-                    <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-6">
-                      {latestItem.description}
-                    </p>
+                    <div
+                      className="text-base md:text-lg text-gray-600 leading-relaxed mb-6 line-clamp-4 prose prose-sm"
+                      dangerouslySetInnerHTML={{
+                        __html: latestItem.description,
+                      }}
+                    />
 
                     <div className="flex flex-wrap items-center gap-6 mb-6 pb-6 border-b border-gray-200">
                       <div className="flex items-center gap-2 text-gray-600">
@@ -409,7 +423,7 @@ export default function PressPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-max">
-            {filteredItems.map((item, index) => (
+            {filteredItems.map((item) => (
               <Link
                 key={item.id}
                 href={`/press/${item.slug}`}
@@ -456,9 +470,10 @@ export default function PressPage() {
                       {item.title}
                     </h3>
 
-                    <p className="text-sm text-gray-600 leading-relaxed mb-4 line-clamp-3">
-                      {item.description}
-                    </p>
+                    <div
+                      className="text-sm text-gray-600 leading-relaxed mb-4 line-clamp-3 prose prose-sm"
+                      dangerouslySetInnerHTML={{ __html: item.description }}
+                    />
 
                     <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
                       <span className="text-xs font-semibold text-orange-600 group-hover:translate-x-1 transition-transform inline-flex items-center">
