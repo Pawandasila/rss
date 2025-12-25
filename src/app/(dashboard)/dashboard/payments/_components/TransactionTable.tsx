@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, forwardRef, useImperativeHandle } from "react";
 import {
   Table,
   TableBody,
@@ -11,14 +11,14 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// import { Input } from "@/components/ui/input";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import {
   Pagination,
   PaginationContent,
@@ -28,15 +28,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import {
-  Search,
-  Download,
-  Eye,
-  ArrowUpDown,
-  Loader2,
-  Building2,
-  Wallet,
-} from "lucide-react";
+import { Eye, ArrowUpDown, Loader2, Pencil, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -47,44 +39,64 @@ import {
 } from "@/components/ui/tooltip";
 import { ViewPaymentModal } from "@/module/dashboard/Payments/components/view-payment-model";
 import { usePayments, type Payment } from "@/module/dashboard/Payments/hooks";
+import { EditPaymentModal } from "@/module/dashboard/Payments/components/edit-payment-modal";
+import { DeletePaymentDialog } from "@/module/dashboard/Payments/components/delete-payment-dialog";
+import useAuth from "@/hooks/use-auth";
 
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { IMAGE_BLUR_DATA_URL } from "@/lib/image-placeholder";
 
-const STATUS_FILTER_MAP: Record<string, string | undefined> = {
+const STATUS_FILTER_MAP = {
   all: undefined,
   success: "COMPLETED",
   failed: "FAILED",
   pending: "PENDING",
   refunded: "REFUNDED",
-};
+} as const;
 
-const TYPE_FILTER_MAP: Record<string, string | undefined> = {
+const TYPE_FILTER_MAP = {
   all: undefined,
   donation: "donation",
   subscription: "subscription",
   membership: "membership",
   general: "general",
-};
+} as const;
+
+type FilterStatus = keyof typeof STATUS_FILTER_MAP;
+type FilterType = keyof typeof TYPE_FILTER_MAP;
+
+export interface PaymentsFilters {
+  search: string;
+  status: FilterStatus;
+  type: FilterType;
+  date: "all" | "today";
+}
 
 interface TransactionTableProps {
   page: number;
   pageSize: number;
   onPageChange: (page: number) => void;
+  filters?: PaymentsFilters;
 }
 
-export function TransactionTable({
+export type TransactionTableHandle = {
+  exportToCSV: () => void;
+};
+
+export const TransactionTable = forwardRef<TransactionTableHandle, TransactionTableProps>(function TransactionTable({
   page,
   pageSize,
   onPageChange,
-}: TransactionTableProps) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<string>("all");
-  const [filterType, setFilterType] = useState<string>("all");
+  filters,
+}: TransactionTableProps, ref) {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loadingPaymentId, setLoadingPaymentId] = useState<number | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [activePayment, setActivePayment] = useState<Payment | null>(null);
 
   const {
     payments,
@@ -94,19 +106,13 @@ export function TransactionTable({
     getPaymentById,
     updateFilters,
     resetFilters,
+    updatePayment,
+    deletePayment,
   } = usePayments(page, pageSize);
 
-  const handleStatusFilterChange = (value: string) => {
-    setFilterStatus(value);
-    onPageChange(1);
-    updateFilters({ status: STATUS_FILTER_MAP[value] });
-  };
+  const { isAdmin } = useAuth();
 
-  const handleTypeFilterChange = (value: string) => {
-    setFilterType(value);
-    onPageChange(1);
-    updateFilters({ payment_for: TYPE_FILTER_MAP[value] });
-  };
+  const isControlled = Boolean(filters);
 
   useEffect(() => {
     return () => {
@@ -115,14 +121,16 @@ export function TransactionTable({
   }, [resetFilters]);
 
   useEffect(() => {
-    const handler = setTimeout(() => {
-      const trimmed = searchTerm.trim();
-      onPageChange(1);
-      updateFilters({ search: trimmed || undefined });
-    }, 400);
-
-    return () => clearTimeout(handler);
-  }, [searchTerm, updateFilters, onPageChange]);
+    if (!isControlled || !filters) return;
+    updateFilters({
+      search: filters.search?.trim() || undefined,
+      status: STATUS_FILTER_MAP[filters.status],
+      payment_for: TYPE_FILTER_MAP[filters.type],
+      date: filters.date === "today"
+        ? new Date().toISOString().slice(0, 10)
+        : undefined,
+    });
+  }, [isControlled, filters, updateFilters]);
 
   const currentPage = pagination.current_page ?? page;
   const totalPages = Math.max(1, pagination.total_pages ?? 1);
@@ -199,17 +207,29 @@ export function TransactionTable({
           description: "Unable to fetch payment information. Please try again.",
         });
       }
-    } catch (error: any) {
-      console.error("Error fetching payment details:", error);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error fetching payment details:", error);
 
-      toast.error("Failed to load payment details", {
-        description:
-          error.message ||
-          "An error occurred while fetching payment information.",
-      });
+        toast.error("Failed to load payment details", {
+          description:
+            error.message ||
+            "An error occurred while fetching payment information.",
+        });
+      }
     } finally {
       setLoadingPaymentId(null);
     }
+  };
+
+  const handleEditClick = (payment: Payment) => {
+    setActivePayment(payment);
+    setEditOpen(true);
+  };
+
+  const handleDeleteClick = (payment: Payment) => {
+    setActivePayment(payment);
+    setDeleteOpen(true);
   };
 
   const getStatusBadge = (status: Payment["status"]) => {
@@ -287,7 +307,7 @@ export function TransactionTable({
       "Customer Name",
       "Email",
       "Phone",
-      "Amount",
+      "Amount (INR)",
       "Status",
       "Payment Method",
       "Method Details",
@@ -300,19 +320,15 @@ export function TransactionTable({
       const method = payment.payment_details?.method || payment.method || "N/A";
       let methodDetail = "";
 
-      if (payment.payment_details?.method_details) {
-        const details = payment.payment_details.method_details;
-        if (details.card && details.card.network) {
-          methodDetail = `${details.card.network} ${
-            details.card.type || ""
-          } ****${details.card.last4 || ""}`.trim();
-        } else if (details.upi && details.upi.vpa) {
-          methodDetail = details.upi.vpa;
-        } else if (details.netbanking && details.netbanking.bank) {
-          methodDetail = details.netbanking.bank;
-        } else if (details.wallet && details.wallet.wallet) {
-          methodDetail = details.wallet.wallet;
-        }
+      const details = payment.payment_details?.method_details;
+      if (details?.card?.network) {
+        methodDetail = `${details.card.network} ${details.card.type || ""} ****${details.card.last4 || ""}`.trim();
+      } else if (details?.upi?.vpa) {
+        methodDetail = details.upi.vpa;
+      } else if (details?.netbanking?.bank) {
+        methodDetail = details.netbanking.bank;
+      } else if (details?.wallet?.wallet) {
+        methodDetail = details.wallet.wallet;
       }
 
       return [
@@ -321,7 +337,7 @@ export function TransactionTable({
         payment.name,
         payment.email,
         payment.phone,
-        payment.amount,
+        (payment.amount / 100).toFixed(2),
         payment.status,
         method,
         methodDetail,
@@ -342,13 +358,9 @@ export function TransactionTable({
       ...rows.map((row) =>
         row
           .map((cell) => {
-            const cellStr = String(cell);
-            if (
-              cellStr.includes(",") ||
-              cellStr.includes('"') ||
-              cellStr.includes("\n")
-            ) {
-              return `"${cellStr.replace(/"/g, '""')}"`;
+            const cellStr = String(cell ?? "");
+            if (cellStr.includes(",") || cellStr.includes('"') || cellStr.includes("\n")) {
+              return '"' + cellStr.replace(/"/g, '""') + '"';
             }
             return cellStr;
           })
@@ -359,11 +371,7 @@ export function TransactionTable({
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
-
-    const fileName = `transactions_${
-      new Date().toISOString().split("T")[0]
-    }.csv`;
-
+    const fileName = `transactions_${new Date().toISOString().split("T")[0]}.csv`;
     link.setAttribute("href", url);
     link.setAttribute("download", fileName);
     link.style.visibility = "hidden";
@@ -371,6 +379,10 @@ export function TransactionTable({
     link.click();
     document.body.removeChild(link);
   };
+
+  useImperativeHandle(ref, () => ({
+    exportToCSV,
+  }));
 
   const getPaymentMethodIcon = (payment: Payment) => {
     const method = payment.payment_details?.method || payment.method;
@@ -392,6 +404,8 @@ export function TransactionTable({
               width={24}
               height={24}
               className="object-contain"
+              placeholder="blur"
+              blurDataURL={IMAGE_BLUR_DATA_URL}
             />
           </div>
           <div className="flex flex-col">
@@ -420,6 +434,8 @@ export function TransactionTable({
               width={24}
               height={24}
               className="object-contain"
+              placeholder="blur"
+              blurDataURL={IMAGE_BLUR_DATA_URL}
             />
           </div>
           <div className="flex flex-col">
@@ -445,6 +461,8 @@ export function TransactionTable({
               width={24}
               height={24}
               className="object-contain"
+              placeholder="blur"
+              blurDataURL={IMAGE_BLUR_DATA_URL}
             />
           </div>
           <div className="flex flex-col">
@@ -471,6 +489,8 @@ export function TransactionTable({
               width={24}
               height={24}
               className="object-contain"
+              placeholder="blur"
+              blurDataURL={IMAGE_BLUR_DATA_URL}
             />
           </div>
           <div className="flex flex-col">
@@ -495,6 +515,8 @@ export function TransactionTable({
               width={24}
               height={24}
               className="object-contain"
+              placeholder="blur"
+              blurDataURL={IMAGE_BLUR_DATA_URL}
             />
           </div>
           <span className="text-sm font-medium">CASH</span>
@@ -506,60 +528,7 @@ export function TransactionTable({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by order ID, payment ID, name, or email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-10"
-            autoComplete="off"
-            type="text"
-            disabled={loading}
-          />
-          {loading && (
-            <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin" />
-          )}
-        </div>
-
-        <Select value={filterStatus} onValueChange={handleStatusFilterChange}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="success">Success</SelectItem>
-            <SelectItem value="failed">Failed</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="refunded">Refunded</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select value={filterType} onValueChange={handleTypeFilterChange}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Filter by type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            <SelectItem value="donation">Donation</SelectItem>
-            <SelectItem value="subscription">Subscription</SelectItem>
-            <SelectItem value="membership">Member</SelectItem>
-            <SelectItem value="general">General</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Button
-          variant="outline"
-          className="gap-2"
-          onClick={exportToCSV}
-          disabled={sortedPayments.length === 0}
-        >
-          <Download className="h-4 w-4" />
-          Export CSV
-        </Button>
-      </div>
+    <div className="space-y-4 p-4 sm:p-0">
 
       {error && (
         <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
@@ -567,41 +536,51 @@ export function TransactionTable({
         </div>
       )}
 
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Transaction ID</TableHead>
-              <TableHead>User</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Payment Method</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>
+              <TableHead className="text-xs sm:text-sm">
+                Transaction ID
+              </TableHead>
+              <TableHead className="text-xs sm:text-sm">User</TableHead>
+              <TableHead className="text-xs sm:text-sm">Amount</TableHead>
+              <TableHead className="hidden md:table-cell text-xs sm:text-sm">
+                Type
+              </TableHead>
+              <TableHead className="hidden lg:table-cell text-xs sm:text-sm">
+                Payment Method
+              </TableHead>
+              <TableHead className="hidden sm:table-cell text-xs sm:text-sm">
+                Status
+              </TableHead>
+              <TableHead className="hidden md:table-cell text-xs sm:text-sm">
                 <Button
                   variant="ghost"
                   onClick={toggleSortOrder}
-                  className="h-8 p-0 hover:bg-transparent"
+                  className="h-8 p-0 hover:bg-transparent text-xs sm:text-sm"
                 >
                   Date
-                  <ArrowUpDown className="ml-2 h-4 w-4" />
+                  <ArrowUpDown className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-right text-xs sm:text-sm">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+                <TableCell colSpan={8} className="text-center py-6 sm:py-8">
+                  <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin mx-auto" />
                 </TableCell>
               </TableRow>
             ) : sortedPayments.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={8}
-                  className="text-center py-8 text-muted-foreground"
+                  className="text-center py-6 sm:py-8 text-muted-foreground text-xs sm:text-sm"
                 >
                   No payments found
                 </TableCell>
@@ -610,30 +589,48 @@ export function TransactionTable({
               sortedPayments.map((payment) => (
                 <TableRow key={payment.id}>
                   <TableCell className="font-medium font-mono text-xs">
-                    {payment.order_id}
+                    <span className="flex flex-col truncate md:max-w-[150px] max-w-[160px]">
+                      {payment.payment_id}
+                      {payment.is_manual && (
+                        <Badge
+                          variant="destructive"
+                          className="ml-2 text-[10px] py-0.5 px-1.5"
+                        >
+                          Manual
+                        </Badge>
+                      )}
+                    </span>
                   </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8">
+                  <TableCell className="text-xs sm:text-sm">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <Avatar className="h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0">
                         <AvatarFallback>
                           {getInitials(payment.name)}
                         </AvatarFallback>
                       </Avatar>
-                      <div>
-                        <div className="font-medium">{payment.name}</div>
-                        <div className="text-xs text-muted-foreground">
+                      <div className="min-w-0">
+                        <div className="font-medium truncate md:max-w-[100px] max-w-[160px]">
+                          {payment.name}
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate md:max-w-[180px] max-w-[160px]">
                           {payment.email}
                         </div>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="font-semibold">
-                    {formatCurrency(payment.amount, "INR")}
+                  <TableCell className="font-semibold text-xs sm:text-sm">
+                    {formatCurrency(payment.amount / 100, "INR")}
                   </TableCell>
-                  <TableCell>{getTypeBadge(payment.payment_for)}</TableCell>
-                  <TableCell>{getPaymentMethodIcon(payment)}</TableCell>
-                  <TableCell>{getStatusBadge(payment.status)}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
+                  <TableCell className="hidden md:table-cell">
+                    {getTypeBadge(payment.payment_for)}
+                  </TableCell>
+                  <TableCell className="hidden lg:table-cell truncate md:max-w-[100px] max-w-[160px]">
+                    {getPaymentMethodIcon(payment)}
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell">
+                    {getStatusBadge(payment.status)}
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell text-xs sm:text-sm text-muted-foreground">
                     {formatDate(payment.timestamp)}
                   </TableCell>
                   <TableCell className="text-right">
@@ -650,9 +647,9 @@ export function TransactionTable({
                             }
                           >
                             {loadingPaymentId === payment.id ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
+                              <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
                             ) : (
-                              <Eye className="h-4 w-4" />
+                              <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
                             )}
                           </Button>
                         </TooltipTrigger>
@@ -660,6 +657,42 @@ export function TransactionTable({
                           <p>View Details</p>
                         </TooltipContent>
                       </Tooltip>
+                      {(isAdmin()) && (
+                        <>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => handleEditClick(payment)}
+                                disabled={loading}
+                              >
+                                <Pencil className="h-3 w-3 sm:h-4 sm:w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Edit</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-destructive"
+                                onClick={() => handleDeleteClick(payment)}
+                                disabled={loading}
+                              >
+                                <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Delete</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </>
+                      )}
                     </TooltipProvider>
                   </TableCell>
                 </TableRow>
@@ -669,8 +702,8 @@ export function TransactionTable({
         </Table>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-muted-foreground whitespace-nowrap">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-4 sm:px-0">
+        <p className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
           {totalCount > 0
             ? `Showing ${startItem.toLocaleString()} - ${endItem.toLocaleString()} of ${totalCount.toLocaleString()} results`
             : "No results to display"}
@@ -759,6 +792,42 @@ export function TransactionTable({
         }}
         payment={selectedPayment}
       />
+
+      <EditPaymentModal
+        open={editOpen}
+        onOpenChange={(o) => {
+          setEditOpen(o);
+          if (!o) setActivePayment(null);
+        }}
+        payment={activePayment}
+        onSave={async (id, data) => {
+          const result = await updatePayment(id, data);
+          if (result.success) {
+            toast.success("Payment updated", { description: "Changes saved successfully" });
+          } else {
+            toast.error("Update failed", { description: result.message || "Unable to update right now" });
+          }
+          return result;
+        }}
+      />
+
+      <DeletePaymentDialog
+        open={deleteOpen}
+        onOpenChange={(o) => {
+          setDeleteOpen(o);
+          if (!o) setActivePayment(null);
+        }}
+        payment={activePayment}
+        onConfirm={async (id) => {
+          const result = await deletePayment(id);
+          if (result.success) {
+            toast.success("Payment deleted", { description: "The transaction was removed" });
+          } else {
+            toast.error("Delete failed", { description: result.message || "Unable to delete right now" });
+          }
+          return result;
+        }}
+      />
     </div>
   );
-}
+});

@@ -43,7 +43,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
         <div className="w-16 h-1 bg-primary mt-3 rounded-full"></div>
       </div>
 
-      {viewAll && (
+      {(viewAll as string) && (
         <Link
           href={viewAllLink}
           className="flex items-center gap-2 text-xs md:text-sm font-bold text-muted-foreground hover:text-primary transition-colors group px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-primary/5 whitespace-nowrap self-start md:self-auto"

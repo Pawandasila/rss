@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Building2, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import useAxios from "@/hooks/use-axios";
 import { Ads } from "../_components/search";
+import { IMAGE_BLUR_DATA_URL } from "@/lib/image-placeholder";
 
 interface Vyapari {
   id: number;
@@ -86,25 +87,16 @@ const BusinessesPageContent = () => {
     "West Bengal",
   ];
 
-  useEffect(() => {
-    fetchCategories();
-    fetchBusinesses();
-  }, []);
-
-  useEffect(() => {
-    fetchBusinesses();
-  }, [searchQuery, selectedCategory, selectedState]);
-
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const response = await axios.get("/vyapari/category/");
       setCategories(response.data.results || response.data || []);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
-  };
+  }, [axios]);
 
-  const fetchBusinesses = async () => {
+  const fetchBusinesses = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
@@ -130,7 +122,12 @@ const BusinessesPageContent = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [axios, searchQuery, selectedCategory, selectedState]);
+
+  useEffect(() => {
+    fetchCategories();
+    fetchBusinesses();
+  }, [fetchCategories, fetchBusinesses]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -300,6 +297,8 @@ const BusinessesPageContent = () => {
                             alt={business.name}
                             fill
                             className="object-cover"
+                            placeholder="blur"
+                            blurDataURL={IMAGE_BLUR_DATA_URL}
                           />
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-center">
@@ -344,18 +343,16 @@ const BusinessesPageContent = () => {
 
 export default function BusinessesPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white py-8 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-              <p className="mt-4 text-muted-foreground">Loading businesses...</p>
-            </div>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+            <p className="mt-4 text-muted-foreground">Loading...</p>
           </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <BusinessesPageContent />
     </Suspense>
   );

@@ -49,7 +49,7 @@ const VyapariSection: React.FC = () => {
           badgeIcon={CircleDashed}
           title="Swadeshi Vyapari Network"
           viewAll="View All Blog"
-          viewAllLink="#"
+          // viewAllLink="#"
         />
 
         <div className="flex flex-col lg:flex-row gap-6 md:gap-8 items-stretch">

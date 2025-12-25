@@ -13,6 +13,8 @@ import { Badge } from '@/components/ui/badge';
 import { useDonationPayment } from '@/module/donation/hooks';
 import { ArrowLeft, CheckCircle, AlertCircle, Wallet, CreditCard, Building, Smartphone } from 'lucide-react';
 
+type PaymentMethod = 'CASH' | 'CHEQUE' | 'BANK_TRANSFER' | 'UPI';
+
 interface ManualPaymentFormData {
   name: string;
   email: string;
@@ -20,8 +22,17 @@ interface ManualPaymentFormData {
   amount: number;
   payment_for: string;
   notes: string;
-  method: 'CASH' | 'CHEQUE' | 'BANK_TRANSFER' | 'UPI';
-  payment_details: Record<string, any>;
+  method: PaymentMethod;
+  payment_details?: Record<string, unknown>;
+}
+
+interface AllPaymentDetails {
+  cheque_number: string;
+  cheque_date: string;
+  bank_name: string;
+  account_number: string;
+  upi_transaction_id: string;
+  reference_number: string;
 }
 
 const ManualPaymentPage = () => {
@@ -39,7 +50,7 @@ const ManualPaymentPage = () => {
     payment_details: {}
   });
 
-  const [paymentDetails, setPaymentDetails] = useState({
+  const [paymentDetails, setPaymentDetails] = useState<AllPaymentDetails>({
     cheque_number: '',
     cheque_date: '',
     bank_name: '',
@@ -48,15 +59,15 @@ const ManualPaymentPage = () => {
     reference_number: ''
   });
 
-  const handleInputChange = (field: keyof ManualPaymentFormData, value: any) => {
+  const handleInputChange = (field: keyof ManualPaymentFormData, value: string | number | PaymentMethod) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handlePaymentDetailChange = (field: string, value: string) => {
+  const handlePaymentDetailChange = (field: keyof AllPaymentDetails, value: string) => {
     setPaymentDetails(prev => ({ ...prev, [field]: value }));
   };
 
-  const getPaymentMethodIcon = (method: string) => {
+  const getPaymentMethodIcon = (method: PaymentMethod) => {
     switch (method) {
       case 'CASH': return <Wallet className="w-4 h-4" />;
       case 'CHEQUE': return <CreditCard className="w-4 h-4" />;
@@ -179,27 +190,23 @@ const ManualPaymentPage = () => {
     }
 
     // Filter payment details based on method
-    let relevantDetails: Record<string, any> = {};
+    const relevantDetails: Record<string, unknown> = {};
     switch (formData.method) {
       case 'CHEQUE':
-        relevantDetails = {
-          cheque_number: paymentDetails.cheque_number,
-          cheque_date: paymentDetails.cheque_date,
-          bank_name: paymentDetails.bank_name
-        };
+        relevantDetails.cheque_number = paymentDetails.cheque_number;
+        relevantDetails.cheque_date = paymentDetails.cheque_date;
+        relevantDetails.bank_name = paymentDetails.bank_name;
         break;
       case 'BANK_TRANSFER':
-        relevantDetails = {
-          account_number: paymentDetails.account_number,
-          reference_number: paymentDetails.reference_number,
-          bank_name: paymentDetails.bank_name
-        };
+        relevantDetails.account_number = paymentDetails.account_number;
+        relevantDetails.reference_number = paymentDetails.reference_number;
+        relevantDetails.bank_name = paymentDetails.bank_name;
         break;
       case 'UPI':
-        relevantDetails = {
-          upi_transaction_id: paymentDetails.upi_transaction_id,
-          reference_number: paymentDetails.reference_number
-        };
+        relevantDetails.upi_transaction_id = paymentDetails.upi_transaction_id;
+        relevantDetails.reference_number = paymentDetails.reference_number;
+        break;
+      case 'CASH':
         break;
     }
 
@@ -211,27 +218,27 @@ const ManualPaymentPage = () => {
 
   if (success) {
     return (
-      <div className="space-y-6 p-6">
-        <div className="flex items-center gap-4">
+      <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+        <div className="flex items-center gap-3 sm:gap-4">
           <Button variant="ghost" size="sm" onClick={() => router.back()}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
+            <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+            <span className="text-xs sm:text-sm">Back</span>
           </Button>
-          <h1 className="text-3xl font-bold tracking-tight">Manual Payment Entry</h1>
+          <h1 className="text-xl sm:text-3xl font-bold tracking-tight">Manual Payment Entry</h1>
         </div>
 
         <Card className="max-w-2xl mx-auto">
-          <CardContent className="p-8 text-center">
-            <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-green-700 mb-2">Payment Entry Successful!</h2>
-            <p className="text-muted-foreground mb-6">
+          <CardContent className="p-4 sm:p-8 text-center">
+            <CheckCircle className="w-12 h-12 sm:w-16 sm:h-16 text-green-600 mx-auto mb-3 sm:mb-4" />
+            <h2 className="text-xl sm:text-2xl font-bold text-green-700 mb-2">Payment Entry Successful!</h2>
+            <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">
               Manual payment entry has been recorded successfully.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button onClick={() => { reset(); router.push('/dashboard/payments'); }}>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+              <Button onClick={() => { reset(); router.push('/dashboard/payments'); }} className="text-xs sm:text-sm">
                 View All Payments
               </Button>
-              <Button variant="outline" onClick={reset}>
+              <Button variant="outline" onClick={reset} className="text-xs sm:text-sm">
                 Add Another Payment
               </Button>
             </div>
@@ -242,15 +249,15 @@ const ManualPaymentPage = () => {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex items-center gap-4">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+      <div className="flex items-center gap-3 sm:gap-4">
         <Button variant="ghost" size="sm" onClick={() => router.back()}>
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
+          <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+          <span className="text-xs sm:text-sm">Back</span>
         </Button>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Manual Payment Entry</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-xl sm:text-3xl font-bold tracking-tight">Manual Payment Entry</h1>
+          <p className="text-xs sm:text-base text-muted-foreground">
             Record cash, cheque, and other manual payments
           </p>
         </div>
@@ -258,35 +265,35 @@ const ManualPaymentPage = () => {
 
       {error && (
         <Alert className="max-w-6xl">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
+          <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+          <AlertDescription className="text-xs sm:text-sm">{error}</AlertDescription>
         </Alert>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl">
         {/* Main Form - Takes 2/3 of the space */}
         <div className="lg:col-span-2">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {/* Basic Information */}
             <Card>
-              <CardHeader>
-                <CardTitle>Donor Information</CardTitle>
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-lg sm:text-xl">Donor Information</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
+                    <Label htmlFor="name" className="text-xs sm:text-sm">Full Name</Label>
                     <Input
                       id="name"
                       required
                       value={formData.name}
                       onChange={(e) => handleInputChange('name', e.target.value)}
                       placeholder="Enter full name"
-                      className="h-10"
+                      className="h-9 sm:h-10 text-sm"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email" className="text-xs sm:text-sm">Email</Label>
                     <Input
                       id="email"
                       type="email"
@@ -294,22 +301,22 @@ const ManualPaymentPage = () => {
                       value={formData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
                       placeholder="Enter email address"
-                      className="h-10"
+                      className="h-9 sm:h-10 text-sm"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
+                    <Label htmlFor="phone" className="text-xs sm:text-sm">Phone Number</Label>
                     <Input
                       id="phone"
                       required
                       value={formData.phone}
                       onChange={(e) => handleInputChange('phone', e.target.value)}
                       placeholder="Enter phone number"
-                      className="h-10"
+                      className="h-9 sm:h-10 text-sm"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="amount">Amount (₹)</Label>
+                    <Label htmlFor="amount" className="text-xs sm:text-sm">Amount (₹)</Label>
                     <Input
                       id="amount"
                       type="number"
@@ -325,30 +332,33 @@ const ManualPaymentPage = () => {
                         }
                       }}
                       placeholder="Enter amount (max: ₹99,999,999.99)"
-                      className="h-10"
+                      className="h-9 sm:h-10 text-sm"
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="payment_for">Payment For</Label>
-                  <Input
-                    id="payment_for"
-                    required
-                    value={formData.payment_for}
-                    onChange={(e) => handleInputChange('payment_for', e.target.value)}
-                    placeholder="e.g., General Donation, Temple Fund, etc."
-                    className="h-10"
-                  />
+                  <Label htmlFor="payment_for" className="text-xs sm:text-sm">Payment For</Label>
+                  <Select value={formData.payment_for} onValueChange={(value) => handleInputChange('payment_for', value)}>
+                    <SelectTrigger className="h-9 sm:h-10 text-sm">
+                      <SelectValue placeholder="Select payment category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="member">Member</SelectItem>
+                      <SelectItem value="donation">Donation</SelectItem>
+                      <SelectItem value="volunteer">Volunteer</SelectItem>
+                      <SelectItem value="vyapari">Vyapari</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="notes">Notes (Optional)</Label>
+                  <Label htmlFor="notes" className="text-xs sm:text-sm">Notes (Optional)</Label>
                   <Textarea
                     id="notes"
                     value={formData.notes}
                     onChange={(e) => handleInputChange('notes', e.target.value)}
                     placeholder="Any additional notes"
                     rows={3}
-                    className="resize-none"
+                    className="resize-none text-sm"
                   />
                 </div>
               </CardContent>
@@ -356,14 +366,14 @@ const ManualPaymentPage = () => {
 
             {/* Payment Method */}
             <Card>
-              <CardHeader>
-                <CardTitle>Payment Method</CardTitle>
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-lg sm:text-xl">Payment Method</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
                 <div className="space-y-2">
-                  <Label htmlFor="method">Payment Method</Label>
+                  <Label htmlFor="method" className="text-xs sm:text-sm">Payment Method</Label>
                   <Select value={formData.method} onValueChange={(value) => handleInputChange('method', value)}>
-                    <SelectTrigger className="h-10">
+                    <SelectTrigger className="h-9 sm:h-10 text-sm">
                       <SelectValue placeholder="Select payment method" />
                     </SelectTrigger>
                     <SelectContent>
@@ -410,7 +420,7 @@ const ManualPaymentPage = () => {
 
             {/* Submit Button */}
             <div className="flex justify-end">
-              <Button type="submit" disabled={isProcessing} className="px-8 h-10">
+              <Button type="submit" disabled={isProcessing} className="px-6 sm:px-8 h-9 sm:h-10 w-full sm:w-auto text-xs sm:text-sm">
                 {isProcessing ? 'Recording...' : 'Record Payment'}
               </Button>
             </div>
@@ -420,13 +430,13 @@ const ManualPaymentPage = () => {
         {/* Payment Method Info Sidebar - Takes 1/3 of the space */}
         <div className="lg:col-span-1">
           <Card className="sticky top-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
                 {getPaymentMethodIcon(formData.method)}
                 Payment Method Info
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 sm:p-6">
               {formData.method === 'CASH' && (
                 <div className="space-y-4">
                   <div className="p-4 bg-green-50 rounded-lg border border-green-200">

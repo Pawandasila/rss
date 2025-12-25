@@ -11,8 +11,16 @@ import {
   ShowReferralModal,
 } from "./_components";
 import { User, ReferralItem } from "./referal";
+import { RoleGuard } from "@/components/auth/RoleGuard";
+import { AxiosError } from "axios";
 
-export default function ReferralsPage() {
+interface ApiErrorResponse {
+  message?: string;
+  error?: string;
+  detail?: string;
+}
+
+function ReferralsPageContent() {
   const axios = useAxios();
   const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(false);
@@ -73,11 +81,13 @@ export default function ReferralsPage() {
       } else {
         toast.success(`${referralsList.length} रेफरल मिले`);
       }
-    } catch (err: any) {
+    } catch (err) {
+      const axiosError = err as AxiosError<ApiErrorResponse>;
+    
       console.error("Search error:", err);
       const errorMsg =
-        err.response?.data?.message ||
-        err.response?.data?.error ||
+        axiosError.response?.data?.message ||
+        axiosError.response?.data?.error ||
         "उपयोगकर्ता खोजने में त्रुटि हुई";
       setError(errorMsg);
       toast.error(errorMsg);
@@ -92,7 +102,10 @@ export default function ReferralsPage() {
     }
   };
 
-  const handleReferralClick = (referralUserId: string, referralName: string) => {
+  const handleReferralClick = (
+    referralUserId: string,
+    referralName: string
+  ) => {
     setSelectedUserId(referralUserId);
     setSelectedUserName(referralName);
     setModalOpen(true);
@@ -113,19 +126,18 @@ export default function ReferralsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-          <UserSearch className="h-8 w-8" />
+    <div className="space-y-3 sm:space-y-4 lg:space-y-6 px-3 py-4 sm:p-6">
+      <div className="space-y-1 sm:space-y-2">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight flex items-center gap-2">
+          <UserSearch className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8" />
           Referral Lookup
         </h1>
-        <p className="text-muted-foreground">
-          किसी भी उपयोगकर्ता की रेफरल जानकारी देखने के लिए उनकी User ID दर्ज करें
+        <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
+          किसी भी उपयोगकर्ता की रेफ़रल जानकारी देखने के लिए उनकी User ID दर्ज
+          करें
         </p>
       </div>
 
-      {/* Search Bar Component */}
       <SearchBar
         userId={userId}
         loading={loading}
@@ -134,10 +146,8 @@ export default function ReferralsPage() {
         onKeyPress={handleKeyPress}
       />
 
-      {/* Main Content Grid */}
       {(loading || userData) && (
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-          {/* Left side - Referrals Table Component */}
+        <div className="grid gap-3 sm:gap-4 lg:gap-6 grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px]">
           <ReferralsTable
             referrals={referrals}
             loading={loading}
@@ -145,7 +155,6 @@ export default function ReferralsPage() {
             onReferralClick={handleReferralClick}
           />
 
-          {/* Right side - User Profile Card Component */}
           <UserProfileCard
             userData={userData}
             loading={loading}
@@ -154,7 +163,6 @@ export default function ReferralsPage() {
         </div>
       )}
 
-      {/* Referral Modal Component */}
       <ShowReferralModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -163,5 +171,13 @@ export default function ReferralsPage() {
         onUserClick={handleModalUserClick}
       />
     </div>
+  );
+}
+
+export default function ReferralsPage() {
+  return (
+    <RoleGuard allowedRoles="auto" showUnauthorized={true}>
+      <ReferralsPageContent />
+    </RoleGuard>
   );
 }

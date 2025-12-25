@@ -1,0 +1,138 @@
+import React from "react";
+import { Badge } from "@/components/ui/badge";
+import {
+  Shield,
+  BookOpen,
+  TrendingUp,
+  Home,
+  Wheat,
+  Building2,
+  Ambulance,
+} from "lucide-react";
+import { motion } from "motion/react";
+
+const impactItems = [
+  {
+    icon: <Shield className="w-8 h-8 text-red-500" />,
+    title: "बहन बेटियों की सुरक्षा",
+    description: "महिला सुरक्षा और सशक्तिकरण के लिए विशेष कार्यक्रम एवं संसाधन",
+    stats: "हजारों परिवार सुरक्षित",
+    color: "from-red-500/10 to-pink-500/10",
+  },
+  {
+    icon: <BookOpen className="w-8 h-8 text-blue-500" />,
+    title: "गुरुकुल और शिक्षा",
+    description:
+      "धार्मिक संस्कारों के साथ निःशुल्क शिक्षा, पुस्तकें, वस्त्र और भोजन सामग्री",
+    stats: "25,000+ छात्र लाभान्वित",
+    color: "from-blue-500/10 to-cyan-500/10",
+  },
+  {
+    icon: <Wheat className="w-8 h-8 text-green-500" />,
+    title: "गौशाला संरक्षण",
+    description: "गौमाता की सुरक्षा एवं जीवन यापन हेतु चारा और अन्य सुविधाएं",
+    stats: "1,000+ गौमाता संरक्षित",
+    color: "from-green-500/10 to-emerald-500/10",
+  },
+  {
+    icon: <Home className="w-8 h-8 text-purple-500" />,
+    title: "मठ मंदिर संरक्षण",
+    description:
+      "सनातन धर्म के मठ मंदिरों का संरक्षण और धार्मिक स्थलों का विकास",
+    stats: "100+ मंदिर संरक्षित",
+    color: "from-purple-500/10 to-violet-500/10",
+  },
+  {
+    icon: <Ambulance className="w-8 h-8 text-orange-500" />,
+    title: "निःशुल्क स्वास्थ्य सेवा",
+    description: "वंचितों के लिए एम्बुलेंस सेवा और मुफ्त चिकित्सा सहायता",
+    stats: "50,000+ सेवाएं प्रदान",
+    color: "from-orange-500/10 to-amber-500/10",
+  },
+  {
+    icon: <Building2 className="w-8 h-8 text-indigo-500" />,
+    title: "बुनियादी ढांचा विकास",
+    description: "गुरुकुल निर्माण, स्थाई भवन और अन्य मूलभूत सुविधाओं का विकास",
+    stats: "20+ प्रोजेक्ट पूर्ण",
+    color: "from-indigo-500/10 to-blue-500/10",
+  },
+];
+
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemAnim = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0 },
+};
+
+const ImpactSection = () => {
+  return (
+    <section className="py-6 sm:py-12 mb-6 sm:mb-8 max-w-7xl mx-auto px-2 sm:px-0">
+      <div className="text-center mb-4 sm:mb-6 px-2">
+        <Badge
+          variant="outline"
+          className="mb-2 sm:mb-3 px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm"
+        >
+          <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-primary" />
+          हमारा प्रभाव
+        </Badge>
+        <h2 className="text-lg sm:text-2xl md:text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-orange-600 bg-clip-text text-transparent px-2">
+          आपका दान कैसे उपयोग होता है
+        </h2>
+      </div>
+
+      <motion.div
+        variants={container}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
+      >
+        {impactItems.map((item, index) => (
+          <motion.div
+            variants={itemAnim}
+            key={index}
+            className="group bg-card border border-border rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+          >
+            {/* Header */}
+            <motion.div variants={itemAnim} className="p-3 sm:p-6 pb-2">
+              <div className="flex items-start justify-between mb-3 sm:mb-4">
+                <div className="p-1.5 sm:p-2.5 bg-muted rounded-lg flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                  <div className="[&_svg]:w-5 [&_svg]:h-5 sm:[&_svg]:w-8 sm:[&_svg]:h-8">
+                    {item.icon}
+                  </div>
+                </div>
+                <Badge
+                  variant="secondary"
+                  className="text-[10px] sm:text-xs bg-primary/10 text-primary px-1.5 sm:px-2 py-0.5 sm:py-1"
+                >
+                  {item.stats}
+                </Badge>
+              </div>
+              <h3 className="text-sm sm:text-base lg:text-lg font-bold text-foreground mb-2">
+                {item.title}
+              </h3>
+            </motion.div>
+
+            {/* Content */}
+            <div className="px-3 sm:px-6 pb-3 sm:pb-6">
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                {item.description}
+              </p>
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
+    </section>
+  );
+};
+
+export default ImpactSection;

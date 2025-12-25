@@ -13,7 +13,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -26,6 +25,8 @@ import { Copy, Users2, UserCheck2, UserPlus2, Check, X } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { getUserImageUrl as resolveUserImageUrl } from "@/lib/media";
+import Cookies from "js-cookie";
 
 import type { User } from "@/types/auth.types";
 import type { ReferralData } from "@/module/dashboard/referrals/hooks";
@@ -55,7 +56,12 @@ const StatCard: React.FC<StatCardProps> = ({
   loading,
   error,
 }) => {
-  const [copyState, setCopyState] = useState<'idle' | 'success' | 'error'>('idle');
+  const [copyState, setCopyState] = useState<"idle" | "success" | "error">(
+    "idle"
+  );
+  const [memberCopyState, setMemberCopyState] = useState<
+    "idle" | "success" | "error"
+  >("idle");
 
   const referrals: ReferralItem[] = useMemo(
     () => referralData?.referrals || [],
@@ -64,8 +70,9 @@ const StatCard: React.FC<StatCardProps> = ({
 
   const totalReferrals = referralData?.total_referrals || referrals.length || 0;
   const verifiedReferrals = referrals.filter((item) => item.is_verified).length;
-  const memberReferrals = referrals.filter((item) => item.is_member_account)
-    .length;
+  const memberReferrals = referrals.filter(
+    (item) => item.is_member_account
+  ).length;
 
   const stats: { label: string; value: number; icon: LucideIcon }[] = [
     {
@@ -94,17 +101,46 @@ const StatCard: React.FC<StatCardProps> = ({
     return origin ? `${origin}/auth/register?ref=${user.user_id}` : "";
   }, [user?.user_id]);
 
+  const memberReferralLink = useMemo(() => {
+    if (!user?.user_id) return "";
+    const origin =
+      typeof window !== "undefined"
+        ? window.location.origin
+        : process.env.NEXT_PUBLIC_APP_URL || "";
+    return origin ? `${origin}/become-member?ref=${user.user_id}` : "";
+  }, [user?.user_id]);
+
   const handleCopy = async () => {
     if (!referralLink) return;
     try {
       await navigator.clipboard.writeText(referralLink);
-      setCopyState('success');
+      setCopyState("success");
       toast.success("Referral link copied to clipboard");
-      setTimeout(() => setCopyState('idle'), 2000);
+      setTimeout(() => setCopyState("idle"), 2000);
     } catch (copyError) {
-      setCopyState('error');
+      if (copyError instanceof Error) {
+        console.error("Copy error:", copyError);
+      }
+      setCopyState("error");
       toast.error("Unable to copy referral link");
-      setTimeout(() => setCopyState('idle'), 2000);
+      setTimeout(() => setCopyState("idle"), 2000);
+    }
+  };
+
+  const handleMemberCopy = async () => {
+    if (!memberReferralLink) return;
+    try {
+      await navigator.clipboard.writeText(memberReferralLink);
+      setMemberCopyState("success");
+      toast.success("Member referral link copied to clipboard");
+      setTimeout(() => setMemberCopyState("idle"), 2000);
+    } catch (copyError) {
+      if (copyError instanceof Error) {
+        console.error("Copy error:", copyError);
+      }
+      setMemberCopyState("error");
+      toast.error("Unable to copy member referral link");
+      setTimeout(() => setMemberCopyState("idle"), 2000);
     }
   };
 
@@ -118,34 +154,192 @@ const StatCard: React.FC<StatCardProps> = ({
       .slice(0, 2);
   }, [user?.name]);
 
-  const getUserImageUrl = useMemo(() => {
-    if (!user?.image) return undefined;
-    
-    if (user.image.startsWith('http://') || user.image.startsWith('https://')) {
-      return user.image;
+  const userImageUrl = useMemo(
+    () => resolveUserImageUrl(user?.image),
+    [user?.image]
+  );
+
+  async function getpdf() {
+    const accessToken = Cookies.get("access_token");
+
+    if (!accessToken) {
+      toast.error("Authentication required", {
+        description: "Please login again to download your ID card",
+      });
+      return;
     }
-    
-    const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
-    return `${baseURL}${user.image}`;
-  }, [user?.image]);
+
+    toast.loading("Generating ID card PDF...", { id: "pdf-download" });
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/dashboard/documents/generate/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ document_type: "idcard" }),
+        }
+      );
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        let errorMessage = "Failed to generate ID card";
+
+        switch (res.status) {
+          case 400:
+            errorMessage =
+              "Invalid request. Please check your account details.";
+            break;
+          case 401:
+            errorMessage = "Session expired. Please login again.";
+            break;
+          case 403:
+            errorMessage = "You don't have permission to download ID card.";
+            break;
+          case 404:
+            errorMessage = "ID card service not found.";
+            break;
+          case 500:
+            errorMessage = "Server error. Please try again later.";
+            break;
+          default:
+            errorMessage = `Error: ${res.status} - ${res.statusText}`;
+        }
+
+        toast.error(errorMessage, {
+          id: "pdf-download",
+          description:
+            errorText || "Please contact support if the issue persists.",
+        });
+        return;
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "idcard.pdf";
+      link.click();
+
+      setTimeout(() => window.URL.revokeObjectURL(url), 5000);
+
+      toast.success("ID card downloaded successfully!", {
+        id: "pdf-download",
+      });
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("Network error", {
+        id: "pdf-download",
+        description:
+          "Failed to connect to the server. Please check your internet connection.",
+      });
+    }
+  }
+
+  async function getVolunteerCertificate() {
+    const accessToken = Cookies.get("access_token");
+
+    if (!accessToken) {
+      toast.error("Authentication required", {
+        description: "Please login again to download your certificate",
+      });
+      return;
+    }
+
+    toast.loading("Generating volunteer certificate PDF...", {
+      id: "certificate-download",
+    });
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/dashboard/documents/generate/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ document_type: "certificate" }),
+        }
+      );
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        let errorMessage = "Failed to generate volunteer certificate";
+
+        switch (res.status) {
+          case 400:
+            errorMessage =
+              "Invalid request. Please check your account details.";
+            break;
+          case 401:
+            errorMessage = "Session expired. Please login again.";
+            break;
+          case 403:
+            errorMessage = "You don't have permission to download certificate.";
+            break;
+          case 404:
+            errorMessage = "Certificate service not found.";
+            break;
+          case 500:
+            errorMessage = "Server error. Please try again later.";
+            break;
+          default:
+            errorMessage = `Error: ${res.status} - ${res.statusText}`;
+        }
+
+        toast.error(errorMessage, {
+          id: "certificate-download",
+          description:
+            errorText || "Please contact support if the issue persists.",
+        });
+        return;
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "volunteer_certificate.pdf";
+      link.click();
+
+      setTimeout(() => window.URL.revokeObjectURL(url), 5000);
+
+      toast.success("Volunteer certificate downloaded successfully!", {
+        id: "certificate-download",
+      });
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("Network error", {
+        id: "certificate-download",
+        description:
+          "Failed to connect to the server. Please check your internet connection.",
+      });
+    }
+  }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <div className="space-y-6">
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,360px)]">
+      <div className="space-y-4 sm:space-y-6">
+        <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {stats.map((stat) => (
             <Card key={stat.label}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
+                <CardTitle className="text-xs sm:text-sm font-medium">
                   {stat.label}
                 </CardTitle>
                 <stat.icon className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
                 {loading ? (
                   <Skeleton className="h-8 w-20" />
                 ) : (
-                  <div className="text-2xl font-semibold">{stat.value}</div>
+                  <div className="text-xl sm:text-2xl font-semibold">
+                    {stat.value}
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -153,9 +347,11 @@ const StatCard: React.FC<StatCardProps> = ({
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Referral Overview</CardTitle>
-            <CardDescription>
+          <CardHeader className="px-4 sm:px-6">
+            <CardTitle className="text-lg sm:text-xl">
+              Referral Overview
+            </CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
               {loading
                 ? "Fetching referral details..."
                 : `Showing ${referrals.length} referred candidates`}
@@ -164,67 +360,93 @@ const StatCard: React.FC<StatCardProps> = ({
           <CardContent className="p-0">
             {error && (
               <Alert variant="destructive" className="mx-4 mb-4">
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription className="text-xs sm:text-sm">
+                  {error}
+                </AlertDescription>
               </Alert>
             )}
 
-            <div className="max-h-[420px] overflow-x-auto">
+            <div className="h-[300px] sm:h-[380px] flex flex-col">
               {loading ? (
-                <div className="space-y-3 p-6">
-                  {[0, 1, 2, 3].map((key) => (
-                    <Skeleton key={key} className="h-12 w-full" />
+                <div className="space-y-3 p-4 sm:p-6 flex-1">
+                  {[0, 1, 2, 3, 4].map((key) => (
+                    <Skeleton key={key} className="h-10 sm:h-12 w-full" />
                   ))}
                 </div>
               ) : referrals.length === 0 ? (
-                <div className="p-6 text-sm text-muted-foreground">
-                  कोई रेफरल डेटा उपलब्ध नहीं है।
+                <div className="p-4 sm:p-6 text-xs sm:text-sm text-muted-foreground flex-1 flex items-center justify-center">
+                  <div className="text-center">
+                    <p className="text-base sm:text-lg font-medium mb-2">
+                      कोई रेफरल डेटा उपलब्ध नहीं है।
+                    </p>
+                    <p className="text-xs sm:text-sm">
+                      जब आप किसी को रेफर करेंगे तो वे यहाँ दिखाई देंगे।
+                    </p>
+                  </div>
                 </div>
               ) : (
-                <Table>
-                  <TableCaption>
-                    कुल {referrals.length} रेफरल रिकॉर्ड दिखाई जा रहे हैं।
-                  </TableCaption>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>नाम</TableHead>
-                      <TableHead>ईमेल</TableHead>
-                      <TableHead>स्थिति</TableHead>
-                      <TableHead className="w-[120px]">जॉइनिंग</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {referrals.map((referral, idx) => {
-                      const rowKey =
-                        referral.id ?? referral.email ?? `referral-${idx}`;
-                      return (
-                        <TableRow key={rowKey}>
-                        <TableCell className="font-medium">
-                          {referral.name ? referral.name.charAt(0).toUpperCase() + referral.name.slice(1).toLowerCase() : "N/A"}
-                        </TableCell>
-                        <TableCell>{referral.email || "-"}</TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap gap-1">
-                            
-                              <Badge variant="outline" className="text-green-600">
-                                Success
-                              </Badge>
-                            
-                            
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {referral.date_joined
-                            ? format(
-                                new Date(referral.date_joined),
-                                "dd MMM yyyy"
-                              )
-                            : "-"}
-                        </TableCell>
+                <div className="flex-1 overflow-hidden">
+                  <div className="h-full overflow-x-auto overflow-y-auto">
+                    <Table>
+                      <TableHeader className="sticky top-0 bg-background z-10 border-b">
+                        <TableRow>
+                          <TableHead className="bg-background text-xs sm:text-sm min-w-[120px]">
+                            नाम
+                          </TableHead>
+                          <TableHead className="bg-background text-xs sm:text-sm min-w-[150px] hidden sm:table-cell">
+                            ईमेल
+                          </TableHead>
+                          <TableHead className="bg-background text-xs sm:text-sm">
+                            स्थिति
+                          </TableHead>
+                          <TableHead className="bg-background text-xs sm:text-sm w-[100px] sm:w-[120px]">
+                            जॉइनिंग
+                          </TableHead>
                         </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {referrals.map((referral, idx) => {
+                          const rowKey =
+                            referral.id ?? referral.email ?? `referral-${idx}`;
+                          return (
+                            <TableRow
+                              key={rowKey}
+                              className="hover:bg-muted/50"
+                            >
+                              <TableCell className="font-medium text-xs sm:text-sm">
+                                {referral.name
+                                  ? referral.name.charAt(0).toUpperCase() +
+                                    referral.name.slice(1).toLowerCase()
+                                  : "N/A"}
+                              </TableCell>
+                              <TableCell className="text-xs sm:text-sm hidden sm:table-cell">
+                                {referral.email || "-"}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex flex-wrap gap-1">
+                                  <Badge
+                                    variant="outline"
+                                    className="text-green-600 text-[10px] sm:text-xs"
+                                  >
+                                    Success
+                                  </Badge>
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-xs sm:text-sm">
+                                {referral.date_joined
+                                  ? format(
+                                      new Date(referral.date_joined),
+                                      "dd MMM yyyy"
+                                    )
+                                  : "-"}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
               )}
             </div>
           </CardContent>
@@ -232,85 +454,262 @@ const StatCard: React.FC<StatCardProps> = ({
       </div>
 
       <div className="lg:sticky lg:top-24">
-        <Card>
-          <CardHeader className="space-y-4">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-14 w-14">
-                {getUserImageUrl && <AvatarImage src={getUserImageUrl} alt={user?.name || "User"} />}
-                <AvatarFallback className="text-base font-medium">
+        <Card className="h-fit">
+          <CardHeader className="space-y-3 sm:space-y-4 px-4 sm:px-6">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <Avatar className="h-12 w-12 sm:h-14 sm:w-14">
+                {userImageUrl && (
+                  <AvatarImage src={userImageUrl} alt={user?.name || "User"} />
+                )}
+                <AvatarFallback className="text-sm sm:text-base font-medium">
                   {displayInitials}
                 </AvatarFallback>
               </Avatar>
-              <div>
-                <CardTitle className="text-xl">
-                  {user?.name ? user.name.charAt(0).toUpperCase() + user.name.slice(1).toLowerCase() : "User"}
+              <div className="min-w-0 flex-1">
+                <CardTitle className="text-base sm:text-xl truncate">
+                  {user?.name
+                    ? user.name.charAt(0).toUpperCase() +
+                      user.name.slice(1).toLowerCase()
+                    : "User"}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm truncate">
                   {user?.email || "ईमेल उपलब्ध नहीं"}
                 </CardDescription>
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {user?.is_verified && (
-                <Badge variant="outline" className="text-green-600">
+                <Badge
+                  variant="outline"
+                  className="text-green-600 text-[10px] sm:text-xs shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.06)]"
+                >
                   Verified
                 </Badge>
               )}
               {user?.is_member_account && (
-                <Badge variant="outline" className="text-blue-600">
+                <Badge
+                  variant="outline"
+                  className="text-blue-600 text-[10px] sm:text-xs shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.06)]"
+                >
                   Member
                 </Badge>
               )}
               {user?.is_admin_account && (
-                <Badge variant="outline" className="text-red-600">
+                <Badge
+                  variant="outline"
+                  className="text-red-600 text-[10px] sm:text-xs shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.06)]"
+                >
                   Admin
+                </Badge>
+              )}
+              {user?.is_volunteer && (
+                <Badge
+                  variant="outline"
+                  className="text-emerald-600 text-[10px] sm:text-xs shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.06)]"
+                >
+                  Volunteer
+                </Badge>
+              )}
+              {user?.is_staff_account && (
+                <Badge
+                  variant="outline"
+                  className="text-purple-600 text-[10px] sm:text-xs shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.06)]"
+                >
+                  Staff
                 </Badge>
               )}
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-1 text-sm">
-              <p className="text-muted-foreground">User ID</p>
-              <p className="font-mono text-sm">{user?.user_id ?? "N/A"}</p>
-            </div>
 
+          <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
             <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">
-                अपनी रेफरल लिंक साझा करें और अधिक सदस्यों को जोड़ें।
+              <p className="text-xs sm:text-sm font-medium text-foreground">
+                User ID
               </p>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 truncate rounded-md border bg-muted px-3 py-2 text-xs shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.06)]">
-                  {referralLink || "रेफरल लिंक उपलब्ध नहीं"}
-                </div>
-                <Button
-                  size="icon"
-                  variant="outline"
-                  className="shrink-0 shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.06)]"
-                  disabled={!referralLink || copyState !== 'idle'}
-                  onClick={handleCopy}
-                  title={
-                    copyState === 'success' 
-                      ? 'Copied!' 
-                      : copyState === 'error' 
-                      ? 'Failed to copy' 
-                      : 'Copy referral link'
-                  }
-                >
-                  {copyState === 'success' ? (
-                    <Check className="h-4 w-4 text-green-600" />
-                  ) : copyState === 'error' ? (
-                    <X className="h-4 w-4 text-red-600" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                </Button>
+              <div className="rounded-md border bg-muted px-2 sm:px-3 py-1.5 sm:py-2 shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.06)]">
+                <p className="font-mono text-xs sm:text-sm text-foreground truncate">
+                  {user?.user_id ?? "N/A"}
+                </p>
               </div>
             </div>
 
-            <div>
-              <p className="text-sm text-muted-foreground">कुल रेफरल</p>
-              <p className="text-2xl font-semibold">{totalReferrals}</p>
+            {/* {user?.is_verified && (
+              <div className="space-y-2 sm:space-y-3">
+                <div>
+                  <p className="text-xs sm:text-sm font-medium text-foreground mb-1 sm:mb-2">
+                    रेफरल लिंक
+                  </p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mb-2 sm:mb-3">
+                    अपनी रेफरल लिंक साझा करें और अधिक सदस्यों को जोड़ें।
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 truncate rounded-md border bg-muted px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.06)]">
+                    {referralLink || "रेफरल लिंक उपलब्ध नहीं"}
+                  </div>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    className="shrink-0 h-8 w-8 sm:h-10 sm:w-10 shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.06)]"
+                    disabled={!referralLink || copyState !== "idle"}
+                    onClick={handleCopy}
+                    title={
+                      copyState === "success"
+                        ? "Copied!"
+                        : copyState === "error"
+                        ? "Failed to copy"
+                        : "Copy referral link"
+                    }
+                  >
+                    {copyState === "success" ? (
+                      <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
+                    ) : copyState === "error" ? (
+                      <X className="h-3 w-3 sm:h-4 sm:w-4 text-red-600" />
+                    ) : (
+                      <Copy className="h-3 w-3 sm:h-4 sm:w-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+            )} */}
+
+            {user?.is_member_account && (
+              <div className="space-y-2 sm:space-y-3">
+                <div>
+                  <p className="text-xs sm:text-sm font-medium text-foreground mb-1 sm:mb-2">
+                    सदस्य रेफरल लिंक
+                  </p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mb-2 sm:mb-3">
+                    नए सदस्यों को सीधे सदस्यता पृष्ठ पर आमंत्रित करें।
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 truncate rounded-md border bg-muted px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.06)]">
+                    {memberReferralLink || "रेफरल लिंक उपलब्ध नहीं"}
+                  </div>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    className="shrink-0 h-8 w-8 sm:h-10 sm:w-10 shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.06)]"
+                    disabled={!memberReferralLink || memberCopyState !== "idle"}
+                    onClick={handleMemberCopy}
+                    title={
+                      memberCopyState === "success"
+                        ? "Copied!"
+                        : memberCopyState === "error"
+                        ? "Failed to copy"
+                        : "Copy member referral link"
+                    }
+                  >
+                    {memberCopyState === "success" ? (
+                      <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
+                    ) : memberCopyState === "error" ? (
+                      <X className="h-3 w-3 sm:h-4 sm:w-4 text-red-600" />
+                    ) : (
+                      <Copy className="h-3 w-3 sm:h-4 sm:w-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-2 sm:space-y-3 pt-3 sm:pt-4 border-t">
+              <p className="text-xs sm:text-sm font-medium text-foreground">
+                Quick Actions
+              </p>
+              <div className="space-y-1.5 sm:space-y-2">
+                {user?.is_member_account && user?.is_verified && (
+                  <Button
+                    onClick={getpdf}
+                    variant="default"
+                    className="w-full justify-center gap-1.5 sm:gap-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-xs sm:text-sm h-8 sm:h-9"
+                    size="sm"
+                  >
+                    <svg
+                      className="h-3 w-3 sm:h-4 sm:w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                    ID Card PDF
+                  </Button>
+                )}
+                {user?.is_volunteer && user?.is_verified && (
+                  <Button
+                    onClick={getVolunteerCertificate}
+                    variant="default"
+                    className="w-full justify-center gap-1.5 sm:gap-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-xs sm:text-sm h-8 sm:h-9"
+                    size="sm"
+                  >
+                    <svg
+                      className="h-3 w-3 sm:h-4 sm:w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                      />
+                    </svg>
+                    Volunteer Certificate
+                  </Button>
+                )}
+                {!user?.is_member_account && !user?.is_volunteer && (
+                  <p className="text-xs sm:text-sm text-muted-foreground text-center py-3 sm:py-4">
+                    No documents available
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2 sm:space-y-3 pt-3 sm:pt-4 border-t">
+              <p className="text-xs sm:text-sm font-medium text-foreground">
+                Profile Status
+              </p>
+              <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
+                <div className="flex justify-between items-center gap-2">
+                  <span className="text-muted-foreground">Account Type:</span>
+                  <span className="font-medium text-right">
+                    {user?.is_admin_account ? "Admin" : ""}
+                    {user?.is_member_account ? "Member" : ""}
+                    {user?.is_staff_account ? " (Staff)" : ""}
+                    {user?.is_volunteer ? "Volunteer" : ""}
+                    {user?.is_admin_account ||
+                    user?.is_member_account ||
+                    user?.is_staff_account ||
+                    user?.is_volunteer
+                      ? ""
+                      : "User"}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center gap-2">
+                  <span className="text-muted-foreground">Verification:</span>
+                  <span
+                    className={`font-medium text-right ${
+                      user?.is_verified ? "text-green-600" : "text-orange-500"
+                    }`}
+                  >
+                    {user?.is_verified ? "Verified" : "Pending"}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center gap-2">
+                  <span className="text-muted-foreground">Referrals:</span>
+                  <span className="font-medium text-blue-600 text-right">
+                    {totalReferrals}
+                  </span>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>

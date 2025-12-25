@@ -19,7 +19,7 @@ const ShikayatSection: React.FC = () => {
           badgeIcon={CircleDashed}
           title="Shikayat Portal"
           viewAll="Track Shikayat"
-          viewAllLink="#"
+          // viewAllLink="#"
         />
         <div className="flex flex-col lg:flex-row items-center gap-16 xl:gap-32">
           {/* Left Content */}

@@ -40,7 +40,7 @@ const Supporters: React.FC = () => {
           transition={{ duration: 0.6 }}
           className="text-center text-xs font-bold text-gray-400 uppercase tracking-[0.2em]"
         >
-          Endorsed by Government Bodies
+          Our Recognition
         </motion.p>
       </div>
 

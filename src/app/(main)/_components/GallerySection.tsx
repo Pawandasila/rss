@@ -1,93 +1,75 @@
 "use client";
 import React, { useState } from "react";
-import { Play, Image as ImageIcon, Maximize2, Plus } from "lucide-react";
+import {
+  Play,
+  Image as ImageIcon,
+  Maximize2,
+  Plus,
+  Film,
+  Images,
+} from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
+import SectionHeader from "@/components/common/SectionHeader";
 
-const CATEGORIES = ["All", "Seva", "Shakha", "Events", "Youth"];
+import { useImageGallery, useVideoGallery } from "@/module/crm/gallery/hooks";
+import { buildMediaUrl } from "@/lib/media";
 
-const GALLERY_ITEMS = [
-  {
-    id: 1,
-    type: "image",
-    category: "Seva",
-    title: "Flood Relief Operations",
-    thumb:
-      "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=800&auto=format&fit=crop",
-    size: "tall",
-  },
-  {
-    id: 2,
-    type: "video",
-    category: "Events",
-    title: "Vijayadashami Utsav 2023",
-    thumb:
-      "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=800&auto=format&fit=crop",
-    size: "wide",
-  },
-  {
-    id: 3,
-    type: "image",
-    category: "Shakha",
-    title: "Morning Drill Session",
-    thumb:
-      "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=800&auto=format&fit=crop",
-    size: "small",
-  },
-  {
-    id: 4,
-    type: "image",
-    category: "Youth",
-    title: "Leadership Workshop",
-    thumb:
-      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800&auto=format&fit=crop",
-    size: "tall",
-  },
-  {
-    id: 5,
-    type: "video",
-    category: "Seva",
-    title: "Medical Camp Documentary",
-    thumb:
-      "https://images.unsplash.com/photo-1584515606963-27265f78eeee?q=80&w=800&auto=format&fit=crop",
-    size: "small",
-  },
-  {
-    id: 6,
-    type: "video",
-    category: "Seva",
-    title: "Medical Camp Documentary",
-    thumb:
-      "https://images.unsplash.com/photo-1584515606963-27265f78eeee?q=80&w=800&auto=format&fit=crop",
-    size: "small",
-  },
-  {
-    id: 7,
-    type: "image",
-    category: "Events",
-    title: "National Integration Day",
-    thumb:
-      "https://images.unsplash.com/photo-1532375810709-75b1da00537c?q=80&w=800&auto=format&fit=crop",
-    size: "wide",
-  },
-  {
-    id: 8,
-    type: "video",
-    category: "Seva",
-    title: "Medical Camp Documentary",
-    thumb:
-      "https://images.unsplash.com/photo-1584515606963-27265f78eeee?q=80&w=800&auto=format&fit=crop",
-    size: "small",
-  },
-];
+type TabType = "images" | "videos";
+
+interface DisplayGalleryItem {
+  id: number | string;
+  type: "image" | "video";
+  title: string;
+  thumb: string;
+  videoSrc?: string;
+  size: string;
+}
 
 const GallerySection: React.FC = () => {
-  const [filter, setFilter] = useState("All");
+  const { images, loading: loadingImages } = useImageGallery();
+  const { videos, loading: loadingVideos } = useVideoGallery();
 
-  const filteredItems =
-    filter === "All"
-      ? GALLERY_ITEMS
-      : GALLERY_ITEMS.filter((item) => item.category === filter);
+  const [activeTab, setActiveTab] = useState<TabType>("images");
+
+  const sizes = [
+    "tall",
+    "wide",
+    "small",
+    "small",
+    "tall",
+    "wide",
+    "small",
+    "small",
+  ];
+
+  const displayImages: DisplayGalleryItem[] = React.useMemo(() => {
+    if (!images || images.length === 0) return [];
+
+    return images.map((img, index) => ({
+      id: `img-${img.id}`,
+      type: "image" as const,
+      title: img.title,
+      thumb: img.image || "",
+      size: sizes[index % sizes.length],
+    }));
+  }, [images]);
+
+  const displayVideos: DisplayGalleryItem[] = React.useMemo(() => {
+    if (!videos || videos.length === 0) return [];
+
+    return videos.map((vid, index) => ({
+      id: `vid-${vid.id}`,
+      type: "video" as const,
+      title: vid.title,
+      thumb: vid.video_file || "",
+      videoSrc: vid.video_file ? vid.video_file : vid.video_url || "",
+      size: sizes[index % sizes.length],
+    }));
+  }, [videos]);
+
+  const currentItems = activeTab === "images" ? displayImages : displayVideos;
+  const isLoading = activeTab === "images" ? loadingImages : loadingVideos;
 
   return (
     <section className="py-24 bg-white overflow-hidden">
@@ -109,89 +91,140 @@ const GallerySection: React.FC = () => {
             <div className="w-16 h-1 bg-apml-red mt-2 rounded hidden md:block"></div>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-2 bg-gray-50 p-1.5 rounded-xl border border-gray-200 shadow-sm">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setFilter(cat)}
-                className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-300 ${
-                  filter === cat
-                    ? "bg-apml-red text-white shadow-md shadow-red-200"
-                    : "text-gray-500 hover:text-gray-800 hover:bg-white"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+          {/* Tabs for Images / Videos */}
+          <div className="flex gap-2 bg-gray-50 p-1.5 rounded-xl border border-gray-200 shadow-sm">
+            <button
+              onClick={() => setActiveTab("images")}
+              className={`flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-bold transition-all duration-300 ${
+                activeTab === "images"
+                  ? "bg-apml-red text-white shadow-md shadow-red-200"
+                  : "text-gray-500 hover:text-gray-800 hover:bg-white"
+              }`}
+            >
+              <Images size={16} />
+              Images
+            </button>
+            <button
+              onClick={() => setActiveTab("videos")}
+              className={`flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-bold transition-all duration-300 ${
+                activeTab === "videos"
+                  ? "bg-apml-red text-white shadow-md shadow-red-200"
+                  : "text-gray-500 hover:text-gray-800 hover:bg-white"
+              }`}
+            >
+              <Film size={16} />
+              Videos
+            </button>
           </div>
         </motion.div>
 
-        <motion.div
-          layout
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[250px]"
-        >
-          <AnimatePresence mode="popLayout">
-            {filteredItems.map((item) => (
-              <motion.div
-                layout
-                key={item.id}
-                initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                transition={{ duration: 0.5 }}
-                className={`relative rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500 ${
-                  item.size === "tall"
-                    ? "row-span-2"
-                    : item.size === "wide"
-                    ? "md:col-span-2"
-                    : ""
-                }`}
-              >
-                <div className="relative w-full h-full">
-                  <Image
-                    src={item.thumb}
-                    alt={item.title}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                </div>
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex justify-center items-center min-h-[300px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          </div>
+        )}
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-300"></div>
+        {/* Empty State */}
+        {!isLoading && currentItems.length === 0 && (
+          <div className="text-center p-10 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 text-gray-500">
+            {activeTab === "images" ? (
+              <ImageIcon className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            ) : (
+              <Film className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            )}
+            <p className="text-lg font-medium">
+              No {activeTab} found at the moment.
+            </p>
+          </div>
+        )}
 
-                <div className="absolute top-4 right-4 z-10">
-                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white">
+        {/* Gallery Grid */}
+        {!isLoading && currentItems.length > 0 && (
+          <motion.div
+            layout
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[250px]"
+          >
+            <AnimatePresence mode="popLayout">
+              {currentItems.map((item) => (
+                <motion.div
+                  layout
+                  key={item.id}
+                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                  transition={{ duration: 0.5 }}
+                  className={`relative rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500 ${
+                    item.size === "tall"
+                      ? "row-span-2"
+                      : item.size === "wide"
+                      ? "md:col-span-2"
+                      : ""
+                  }`}
+                >
+                  <div className="relative w-full h-full">
                     {item.type === "video" ? (
-                      <Play size={18} fill="currentColor" />
+                      <video
+                        src={buildMediaUrl(item.videoSrc) || ""}
+                        className="w-full h-full object-cover"
+                        muted
+                        loop
+                        playsInline
+                        onMouseOver={(e) =>
+                          (e.target as HTMLVideoElement).play()
+                        }
+                        onMouseOut={(e) => {
+                          const video = e.target as HTMLVideoElement;
+                          video.pause();
+                          video.currentTime = 0;
+                        }}
+                      />
                     ) : (
-                      <ImageIcon size={18} />
+                      <Image
+                        src={buildMediaUrl(item.thumb) || ""}
+                        alt={item.title}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
                     )}
                   </div>
-                </div>
 
-                <div className="absolute inset-x-0 bottom-0 p-6 z-10 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                  <span className="text-[10px] font-bold text-apml-red bg-white px-2 py-0.5 rounded uppercase tracking-wider mb-2 inline-block">
-                    {item.category}
-                  </span>
-                  <h3 className="text-white font-bold text-lg md:text-xl leading-tight">
-                    {item.title}
-                  </h3>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-300"></div>
 
-                  <div className="flex items-center gap-2 mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                    <span className="text-[10px] text-white/70 font-bold uppercase tracking-widest">
-                      {item.type === "video" ? "Watch Now" : "View Full Image"}
-                    </span>
-                    <div className="w-6 h-6 rounded-full bg-apml-red flex items-center justify-center text-white">
-                      <Plus size={14} />
+                  <div className="absolute top-4 right-4 z-10">
+                    <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white">
+                      {item.type === "video" ? (
+                        <Play size={18} fill="currentColor" />
+                      ) : (
+                        <ImageIcon size={18} />
+                      )}
                     </div>
                   </div>
-                </div>
 
-                <div className="absolute inset-0 border-0 group-hover:border-[12px] border-white/10 transition-all duration-500 pointer-events-none"></div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
+                  <div className="absolute inset-x-0 bottom-0 p-6 z-10 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                    <h3 className="text-white font-bold text-lg md:text-xl leading-tight">
+                      {item.title}
+                    </h3>
+
+                    <div className="flex items-center gap-2 mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                      <span className="text-[10px] text-white/70 font-bold uppercase tracking-widest">
+                        {item.type === "video"
+                          ? "Watch Now"
+                          : "View Full Image"}
+                      </span>
+                      <div className="w-6 h-6 rounded-full bg-apml-red flex items-center justify-center text-white">
+                        <Plus size={14} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="absolute inset-0 border-0 group-hover:border-[12px] border-white/10 transition-all duration-500 pointer-events-none"></div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+        )}
 
         <motion.div
           className="mt-16 text-center"

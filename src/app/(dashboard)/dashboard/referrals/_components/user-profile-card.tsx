@@ -13,7 +13,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
-import { User, UserProfileCardProps } from "../referal";
+import { UserProfileCardProps } from "../referal";
+import { getUserImageUrl } from "@/lib/media";
 
 
 export const UserProfileCard: React.FC<UserProfileCardProps> = ({
@@ -31,17 +32,11 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
       .slice(0, 2);
   };
 
-  const getImageUrl = (imagePath?: string) => {
-    if (!imagePath) return undefined;
-    if (imagePath.startsWith("http")) return imagePath;
-    return `${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"}${imagePath}`;
-  };
-
   if (loading) {
     return (
       <Card>
-        <CardHeader>
-          <CardTitle>उपयोगकर्ता प्रोफ़ाइल</CardTitle>
+        <CardHeader className="pb-3 sm:pb-6">
+          <CardTitle className="text-base sm:text-lg">उपयोगकर्ता प्रोफ़ाइल</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -62,8 +57,8 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
   if (!userData) {
     return (
       <Card>
-        <CardHeader>
-          <CardTitle>उपयोगकर्ता प्रोफ़ाइल</CardTitle>
+        <CardHeader className="pb-3 sm:pb-6">
+          <CardTitle className="text-base sm:text-lg">उपयोगकर्ता प्रोफ़ाइल</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="py-8 text-center text-sm text-muted-foreground">
@@ -75,59 +70,58 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
     );
   }
 
+  const userImageUrl = getUserImageUrl(userData.image);
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>उपयोगकर्ता प्रोफ़ाइल</CardTitle>
-        <CardDescription>संपूर्ण उपयोगकर्ता जानकारी</CardDescription>
+      <CardHeader className="pb-3 sm:pb-6">
+        <CardTitle className="text-base sm:text-lg">उपयोगकर्ता प्रोफ़ाइल</CardTitle>
+        <CardDescription className="text-xs sm:text-sm">संपूर्ण उपयोगकर्ता जानकारी</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
+      <CardContent className="px-3 sm:px-6">
+        <div className="space-y-3 sm:space-y-4 lg:space-y-6">
           {/* Avatar and Name */}
-          <div className="flex items-start gap-4">
-            <Avatar className="h-20 w-20">
-              {userData.image && (
-                <AvatarImage
-                  src={getImageUrl(userData.image)}
-                  alt={userData.name}
-                />
+          <div className="flex items-start gap-3 sm:gap-4">
+            <Avatar className="h-16 w-16 sm:h-20 sm:w-20 flex-shrink-0">
+              {userImageUrl && (
+                <AvatarImage src={userImageUrl} alt={userData.name} />
               )}
-              <AvatarFallback className="text-2xl">
+              <AvatarFallback className="text-xl sm:text-2xl">
                 {getInitials(userData.name)}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <h3 className="text-2xl font-bold mb-1 truncate">
+              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold mb-1 truncate">
                 {userData.name || "N/A"}
               </h3>
-              <p className="text-sm text-muted-foreground mb-2">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-2 truncate">
                 {userData.email}
               </p>
 
               {/* Status Badges */}
               <div className="flex flex-wrap gap-1">
                 {userData.is_verified && (
-                  <Badge variant="outline" className="text-green-600">
+                  <Badge variant="outline" className="text-green-600 text-xs">
                     Verified
                   </Badge>
                 )}
                 {userData.is_member_account && (
-                  <Badge variant="outline" className="text-blue-600">
+                  <Badge variant="outline" className="text-blue-600 text-xs">
                     Member
                   </Badge>
                 )}
                 {userData.is_admin_account && (
-                  <Badge variant="outline" className="text-purple-600">
+                  <Badge variant="outline" className="text-purple-600 text-xs">
                     Admin
                   </Badge>
                 )}
                 {userData.is_staff_account && (
-                  <Badge variant="outline" className="text-orange-600">
+                  <Badge variant="outline" className="text-orange-600 text-xs">
                     Staff
                   </Badge>
                 )}
                 {userData.is_volunteer && (
-                  <Badge variant="outline" className="text-teal-600">
+                  <Badge variant="outline" className="text-teal-600 text-xs">
                     Volunteer
                   </Badge>
                 )}
@@ -136,25 +130,25 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
           </div>
 
           {/* Referral Count Card */}
-          <div className="rounded-lg border bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
+          <div className="rounded-lg border bg-gradient-to-br from-blue-50 to-indigo-50 p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">
+                <p className="text-xs sm:text-sm text-muted-foreground mb-1">
                   कुल रेफरल
                 </p>
-                <p className="text-3xl font-bold text-blue-600">
+                <p className="text-2xl sm:text-3xl font-bold text-blue-600">
                   {userData.referral_count || referralsCount || 0}
                 </p>
               </div>
-              <Users className="h-12 w-12 text-blue-600 opacity-20" />
+              <Users className="h-10 w-10 sm:h-12 sm:w-12 text-blue-600 opacity-20" />
             </div>
           </div>
 
           {/* Basic Info Section */}
-          <div className="rounded-lg border bg-muted/50 p-4">
-            <h4 className="font-semibold text-sm mb-3">बेसिक जानकारी</h4>
+          <div className="rounded-lg border bg-muted/50 p-3 sm:p-4">
+            <h4 className="font-semibold text-xs sm:text-sm mb-2 sm:mb-3">बेसिक जानकारी</h4>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground">User ID</p>
                 <p className="font-mono text-sm font-medium">
@@ -208,10 +202,10 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
             userData.district ||
             userData.state ||
             userData.postal_code) && (
-            <div className="rounded-lg border bg-muted/50 p-4">
-              <h4 className="font-semibold text-sm mb-3">पता जानकारी</h4>
+            <div className="rounded-lg border bg-muted/50 p-3 sm:p-4">
+              <h4 className="font-semibold text-xs sm:text-sm mb-2 sm:mb-3">पता जानकारी</h4>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {userData.street && (
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground">स्ट्रीट</p>

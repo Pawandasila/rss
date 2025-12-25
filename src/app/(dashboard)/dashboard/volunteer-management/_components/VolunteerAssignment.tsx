@@ -1,10 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, {
+  useState,
+  useMemo,
+  useEffect,
+  useRef,
+  useCallback,
+} from "react";
+import Image from "next/image";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -13,14 +20,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   Table,
   TableBody,
   TableCell,
@@ -28,508 +27,1301 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { UserMinus, Search, UserCheck } from "lucide-react";
-import useAxios from "@/hooks/use-axios";
-import { toast } from "sonner";
+import {
+  UserCheck,
+  Users,
+  Search,
+  Filter,
+  Eye,
+  FileText,
+  Phone,
+  Calendar,
+  ImageIcon,
+  CreditCard,
+  Download,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { createVolunteerAPI } from "@/module/dashboard/volunteer/api";
+import {
+  Application,
+  ApplicationFilters,
+} from "@/module/dashboard/volunteer/types";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
+import useAxios from "@/hooks/use-axios";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import UserProfileModel from "./userProfile";
+import EmptyState from "./EmptyState";
 
-interface User {
+interface Wing {
   id: number;
   name: string;
-  email: string;
-  phone: string;
 }
 
-interface Position {
-  id: number;
-  pad: number;
-  pad_name?: string;
-  user?: User;
-  is_filled: boolean;
-}
-
-interface Pad {
+interface Level {
   id: number;
   name: string;
-  level_name?: string;
-  category_name?: string;
+}
+
+interface Designation {
+  id: number;
+  title: string;
+}
+
+// Using Application from types instead of local definition where possible, or aliasing
+type VolunteerApplication = Application & {
+  // Add any missing fields if necessary, though Application has most
+  // If Application has user: number, and UI expects it, good.
+};
+
+interface ApiErrorResponse {
+  message?: string;
+  error?: string;
+  detail?: string;
 }
 
 const VolunteerAssignment = () => {
   const axios = useAxios();
-  const [positions, setPositions] = useState<Position[]>([]);
-  const [pads, setPads] = useState<Pad[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
+  const api = useMemo(() => createVolunteerAPI(axios), [axios]);
+
+  const [applications, setApplications] = useState<VolunteerApplication[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
-  const [isUnassignDialogOpen, setIsUnassignDialogOpen] = useState(false);
-  const [currentPosition, setCurrentPosition] = useState<Position | null>(null);
-  const [selectedPad, setSelectedPad] = useState(0);
-  const [selectedUser, setSelectedUser] = useState(0);
-  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [allWings, setAllWings] = useState<Wing[]>([]);
+  const [allLevels, setAllLevels] = useState<Level[]>([]);
+  const [allDesignations, setAllDesignations] = useState<Designation[]>([]);
+
+  const [wingFilter, setWingFilter] = useState<string>("all");
+  const [levelFilter, setLevelFilter] = useState<string>("all");
+  const [designationFilter, setDesignationFilter] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const [userModel, setUserModel] = useState<boolean>(false);
+  const [selectedUserApplicationId, setSelectedUserApplicationId] = useState<
+    number | null
+  >(null);
+  const [selectedApplicationId, setSelectedApplicationId] = useState<
+    number | null
+  >(null);
+  const [selectedApplication, setSelectedApplication] =
+    useState<VolunteerApplication | null>(null);
+  const [detailsDialog, setDetailsDialog] = useState<boolean>(false);
+  const [imageViewerOpen, setImageViewerOpen] = useState<boolean>(false);
+  const [selectedImage, setSelectedImage] = useState<{
+    url: string;
+    title: string;
+  } | null>(null);
+
+  const initialFetchDone = useRef(false);
+  const isInitialMount = useRef(true);
+
+  // Debounce search is handled by the useEffect that calls fetchApplications
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (initialFetchDone.current) return;
+    initialFetchDone.current = true;
 
-  const fetchData = async () => {
-    // TODO: Uncomment when API is ready
-    // try {
-    //   setLoading(true);
-    //   const [positionsRes, padsRes, usersRes] = await Promise.all([
-    //     axios.get("/volunteer/position/"),
-    //     axios.get("/volunteer/pad/"),
-    //     axios.get("/account/user/"),
-    //   ]);
-    //   setPositions(positionsRes.data.results || positionsRes.data || []);
-    //   setPads(padsRes.data.results || padsRes.data || []);
-    //   setUsers(usersRes.data.results || usersRes.data || []);
-    // } catch (error: any) {
-    //   toast.error(error.response?.data?.message || "Failed to fetch data");
-    // } finally {
-    //   setLoading(false);
-    // }
+    const fetchInitialData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-    // Dummy data for now
-    setLoading(true);
-    setTimeout(() => {
-      const dummyPads: Pad[] = [
-        { id: 1, name: "Swayamsevak" },
-        { id: 2, name: "Sahayak" },
-        { id: 3, name: "Mukhya Shikshak" },
-        { id: 4, name: "Zila Karyavah" },
-        { id: 5, name: "Zila Pracharak" },
-      ];
-      const dummyUsers: User[] = [
-        {
-          id: 1,
-          name: "Rajesh Kumar",
-          email: "rajesh@example.com",
-          phone: "+91 98765 43210",
-        },
-        {
-          id: 2,
-          name: "Amit Sharma",
-          email: "amit@example.com",
-          phone: "+91 98765 43211",
-        },
-        {
-          id: 3,
-          name: "Suresh Patil",
-          email: "suresh@example.com",
-          phone: "+91 98765 43212",
-        },
-        {
-          id: 4,
-          name: "Vikram Singh",
-          email: "vikram@example.com",
-          phone: "+91 98765 43213",
-        },
-        {
-          id: 5,
-          name: "Pradeep Joshi",
-          email: "pradeep@example.com",
-          phone: "+91 98765 43214",
-        },
-        {
-          id: 6,
-          name: "Ramesh Gupta",
-          email: "ramesh@example.com",
-          phone: "+91 98765 43215",
-        },
-        {
-          id: 7,
-          name: "Mahesh Verma",
-          email: "mahesh@example.com",
-          phone: "+91 98765 43216",
-        },
-        {
-          id: 8,
-          name: "Anil Kumar",
-          email: "anil@example.com",
-          phone: "+91 98765 43217",
-        },
-        {
-          id: 9,
-          name: "Deepak Rao",
-          email: "deepak@example.com",
-          phone: "+91 98765 43218",
-        },
-      ];
-      const dummyPositions: Position[] = [
-        {
-          id: 1,
-          pad: 1,
-          user: dummyUsers[0],
-          is_filled: true,
-        },
-        {
-          id: 2,
-          pad: 1,
-          user: dummyUsers[1],
-          is_filled: true,
-        },
-        {
-          id: 3,
-          pad: 1,
-          user: dummyUsers[2],
-          is_filled: true,
-        },
-        {
-          id: 4,
-          pad: 1,
-          is_filled: false,
-        },
-        {
-          id: 5,
-          pad: 1,
-          is_filled: false,
-        },
-        {
-          id: 6,
-          pad: 2,
-          user: dummyUsers[3],
-          is_filled: true,
-        },
-        {
-          id: 7,
-          pad: 2,
-          user: dummyUsers[4],
-          is_filled: true,
-        },
-        {
-          id: 8,
-          pad: 2,
-          is_filled: false,
-        },
-        {
-          id: 9,
-          pad: 3,
-          user: dummyUsers[5],
-          is_filled: true,
-        },
-        {
-          id: 10,
-          pad: 3,
-          is_filled: false,
-        },
-        {
-          id: 11,
-          pad: 4,
-          user: dummyUsers[6],
-          is_filled: true,
-        },
-        {
-          id: 12,
-          pad: 5,
-          is_filled: false,
-        },
-        {
-          id: 13,
-          pad: 5,
-          is_filled: false,
-        },
-      ];
-      setPads(dummyPads);
-      setUsers(dummyUsers);
-      setPositions(dummyPositions);
+        const [wingsResponse, levelsResponse, designationsResponse] =
+          await Promise.all([
+            axios.get("/volunteer/wings/"),
+            axios.get("/volunteer/levels/"),
+            axios.get("/volunteer/designations/"),
+          ]);
+
+        setAllWings(wingsResponse.data.results || wingsResponse.data || []);
+        setAllLevels(levelsResponse.data.results || levelsResponse.data || []);
+        setAllDesignations(
+          designationsResponse.data.results || designationsResponse.data || []
+        );
+      } catch (err) {
+        console.error("Error fetching initial data:", err);
+        const errorMessage =
+          (err as { response?: { data?: ApiErrorResponse } }).response?.data
+            ?.message || "Failed to fetch data";
+        setError(errorMessage);
+      } finally {
+        // fetchApplications will handle loading state for list
+        // but we need to stop loading if fetchApplications isn't called immediately
+        // Actually fetchApplications effect will run.
+      }
+    };
+
+    fetchInitialData();
+  }, [axios]);
+
+  const fetchApplications = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const filters: ApplicationFilters = {};
+      if (wingFilter !== "all") filters.wing = Number(wingFilter);
+      if (levelFilter !== "all") filters.level = Number(levelFilter);
+      if (designationFilter !== "all")
+        filters.designation = Number(designationFilter);
+      if (searchTerm) filters.search = searchTerm;
+
+      const data = await api.getApplications(filters, page);
+      setApplications(data.results);
+      setTotalCount(data.count);
+      setTotalPages(data.total_pages || 1);
+    } catch (err) {
+      const errorMessage =
+        (err as { response?: { data?: ApiErrorResponse } }).response?.data
+          ?.message || "Failed to fetch applications";
+      setError(errorMessage);
+    } finally {
       setLoading(false);
+    }
+  }, [api, wingFilter, levelFilter, designationFilter, searchTerm, page]);
+
+  useEffect(() => {
+    // Debounce fetch
+    const timeout = setTimeout(() => {
+      fetchApplications();
     }, 500);
+    return () => clearTimeout(timeout);
+  }, [fetchApplications]);
+
+  const clearFilters = () => {
+    setWingFilter("all");
+    setLevelFilter("all");
+    setDesignationFilter("all");
+    setSearchTerm("");
   };
 
-  const handleAssign = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!currentPosition) return;
-    // TODO: Uncomment when API is ready
-    // try {
-    //   setSubmitting(true);
-    //   await axios.put(`/volunteer/position/${currentPosition.id}/assign/`, {
-    //     user: selectedUser,
-    //   });
-    //   toast.success("Volunteer assigned successfully");
-    //   setIsAssignDialogOpen(false);
-    //   setCurrentPosition(null);
-    //   setSelectedUser(0);
-    //   fetchData();
-    // } catch (error: any) {
-    //   toast.error(error.response?.data?.message || "Failed to assign volunteer");
-    // } finally {
-    //   setSubmitting(false);
-    // }
-
-    // Dummy implementation for now
-    setSubmitting(true);
-    setTimeout(() => {
-      toast.success("Volunteer assigned successfully");
-      setIsAssignDialogOpen(false);
-      setCurrentPosition(null);
-      setSelectedUser(0);
-      setSubmitting(false);
-      fetchData();
-    }, 500);
+  const handleImageView = (imageUrl: string, imageTitle: string) => {
+    setSelectedImage({ url: imageUrl, title: imageTitle });
+    setImageViewerOpen(true);
   };
-
-  const handleUnassign = async () => {
-    if (!currentPosition) return;
-    // TODO: Uncomment when API is ready
-    // try {
-    //   setSubmitting(true);
-    //   await axios.put(`/volunteer/position/${currentPosition.id}/unassign/`);
-    //   toast.success("Volunteer unassigned successfully");
-    //   setIsUnassignDialogOpen(false);
-    //   setCurrentPosition(null);
-    //   fetchData();
-    // } catch (error: any) {
-    //   toast.error(error.response?.data?.message || "Failed to unassign volunteer");
-    // } finally {
-    //   setSubmitting(false);
-    // }
-
-    // Dummy implementation for now
-    setSubmitting(true);
-    setTimeout(() => {
-      toast.success("Volunteer unassigned successfully");
-      setIsUnassignDialogOpen(false);
-      setCurrentPosition(null);
-      setSubmitting(false);
-      fetchData();
-    }, 500);
-  };
-
-  const openAssignDialog = (position: Position) => {
-    setCurrentPosition(position);
-    setIsAssignDialogOpen(true);
-  };
-
-  const openUnassignDialog = (position: Position) => {
-    setCurrentPosition(position);
-    setIsUnassignDialogOpen(true);
-  };
-
-  const getPadName = (padId: number) => {
-    return pads.find((p) => p.id === padId)?.name || "Unknown";
-  };
-
-  const filteredPositions = positions.filter((pos) => {
-    const padName = getPadName(pos.pad).toLowerCase();
-    const userName = pos.user?.name?.toLowerCase() || "";
-    const search = searchTerm.toLowerCase();
-    return padName.includes(search) || userName.includes(search);
-  });
-
-  const availableUsers = users.filter(
-    (user) => !positions.some((p) => p.user?.id === user.id)
-  );
 
   return (
     <>
       <Card>
-        <CardHeader>
-          <CardTitle>Volunteer Assignments</CardTitle>
-          <div className="relative mt-4">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search by pad or volunteer name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+            <Users className="h-4 w-4 sm:h-5 sm:w-5" />
+            Volunteer Applications
+          </CardTitle>
+
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-3 sm:pt-4">
+            <div className="relative w-full sm:min-w-[250px]">
+              <Search className="absolute left-2 sm:left-3 top-1/2 h-3 w-3 sm:h-4 sm:w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search applications..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-8 sm:pl-10 h-9 sm:h-10 text-sm"
+              />
+            </div>
+
+            <Select value={wingFilter} onValueChange={setWingFilter}>
+              <SelectTrigger className="w-full sm:w-[160px] lg:w-[180px] h-9 sm:h-10 text-sm">
+                <SelectValue placeholder="All Wings" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Wings</SelectItem>
+                {allWings.map((wing: Wing) => (
+                  <SelectItem key={wing.id} value={wing.id.toString()}>
+                    {wing.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={levelFilter} onValueChange={setLevelFilter}>
+              <SelectTrigger className="w-full sm:w-[160px] lg:w-[180px] h-9 sm:h-10 text-sm">
+                <SelectValue placeholder="All Levels" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Levels</SelectItem>
+                {allLevels.map((level: Level) => (
+                  <SelectItem key={level.id} value={level.id.toString()}>
+                    {level.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={designationFilter}
+              onValueChange={setDesignationFilter}
+            >
+              <SelectTrigger className="w-full sm:w-[160px] lg:w-[180px] h-9 sm:h-10 text-sm">
+                <SelectValue placeholder="All Designations" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Designations</SelectItem>
+                {allDesignations.map((designation: Designation) => (
+                  <SelectItem
+                    key={designation.id}
+                    value={designation.id.toString()}
+                  >
+                    {designation.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {(wingFilter !== "all" ||
+              levelFilter !== "all" ||
+              designationFilter !== "all" ||
+              searchTerm) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={clearFilters}
+                className="w-full sm:w-auto"
+              >
+                <Filter className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="text-xs sm:text-sm">Clear Filters</span>
+              </Button>
+            )}
+
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full pt-4">
+              <div className="text-xs sm:text-sm text-muted-foreground text-center sm:text-left">
+                Showing {applications.length} of {totalCount} applications
+              </div>
+
+              {totalPages > 1 && (
+                <Pagination className="w-auto flex-none">
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        className={
+                          page === 1
+                            ? "pointer-events-none opacity-50 cursor-default"
+                            : "cursor-pointer"
+                        }
+                      />
+                    </PaginationItem>
+
+                    <div className="hidden sm:flex items-center">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                        (p) => {
+                          if (
+                            p === 1 ||
+                            p === totalPages ||
+                            (p >= page - 1 && p <= page + 1)
+                          ) {
+                            return (
+                              <PaginationItem key={p}>
+                                <PaginationLink
+                                  onClick={() => setPage(p)}
+                                  isActive={page === p}
+                                  className="cursor-pointer"
+                                >
+                                  {p}
+                                </PaginationLink>
+                              </PaginationItem>
+                            );
+                          } else if (p === page - 2 || p === page + 2) {
+                            return (
+                              <PaginationItem key={p}>
+                                <PaginationEllipsis />
+                              </PaginationItem>
+                            );
+                          }
+                          return null;
+                        }
+                      )}
+                    </div>
+                    {/* Mobile simplified pagination */}
+                    <div className="sm:hidden flex items-center px-2 text-sm">
+                      Page {page} of {totalPages}
+                    </div>
+
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() =>
+                          setPage((p) => Math.min(totalPages, p + 1))
+                        }
+                        className={
+                          page === totalPages
+                            ? "pointer-events-none opacity-50 cursor-default"
+                            : "cursor-pointer"
+                        }
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              )}
+            </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Position</TableHead>
-                <TableHead>Pad (Designation)</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Assigned Volunteer</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
+
+        <CardContent className="p-0 sm:p-6">
+          <div className="rounded-md border overflow-x-auto">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center">
-                    Loading...
-                  </TableCell>
+                  <TableHead className="text-xs sm:text-sm">
+                    Applicant Info
+                  </TableHead>
+                  <TableHead className="hidden md:table-cell text-xs sm:text-sm">
+                    Wing
+                  </TableHead>
+                  <TableHead className="hidden lg:table-cell text-xs sm:text-sm">
+                    Level
+                  </TableHead>
+                  <TableHead className="hidden sm:table-cell text-xs sm:text-sm">
+                    Designation
+                  </TableHead>
+                  <TableHead className="hidden lg:table-cell text-xs sm:text-sm">
+                    Documents
+                  </TableHead>
+                  <TableHead className="hidden sm:table-cell text-xs sm:text-sm">
+                    Status
+                  </TableHead>
+                  <TableHead className="hidden md:table-cell text-xs sm:text-sm">
+                    Applied Date
+                  </TableHead>
+                  <TableHead className="text-right text-xs sm:text-sm">
+                    Actions
+                  </TableHead>
                 </TableRow>
-              ) : filteredPositions.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center">
-                    No positions found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredPositions.map((position, index) => (
-                  <TableRow key={position.id}>
-                    <TableCell>
-                      <Badge variant="outline">#{index + 1}</Badge>
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {getPadName(position.pad)}
-                    </TableCell>
-                    <TableCell>
-                      {position.is_filled ? (
-                        <Badge variant="default">Filled</Badge>
-                      ) : (
-                        <Badge variant="destructive">Vacant</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {position.user ? (
-                        <div className="flex items-center gap-2">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={position.user.email} />
-                            <AvatarFallback>
-                              {position.user.name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")
-                                .toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span>{position.user.name}</span>
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground">Not assigned</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {position.user ? (
-                        <div className="text-sm">
-                          <div>{position.user.email}</div>
-                          <div className="text-muted-foreground">
-                            {position.user.phone}
-                          </div>
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {position.is_filled ? (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openUnassignDialog(position)}
-                        >
-                          <UserMinus className="mr-2 h-4 w-4" />
-                          Unassign
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openAssignDialog(position)}
-                        >
-                          <UserCheck className="mr-2 h-4 w-4" />
-                          Assign
-                        </Button>
-                      )}
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={8}
+                      className="text-center py-8 sm:py-12"
+                    >
+                      <EmptyState
+                        title="Loading applications..."
+                        description="Please wait while we fetch volunteer applications"
+                      />
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : error ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={8}
+                      className="text-center py-8 sm:py-12"
+                    >
+                      <EmptyState
+                        icon={Users}
+                        title="Error Loading Data"
+                        description={error}
+                        actionLabel="Retry"
+                        onAction={() => window.location.reload()}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ) : applications.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="p-0">
+                      <EmptyState
+                        icon={Users}
+                        title="No applications found"
+                        description={
+                          searchTerm ||
+                          wingFilter !== "all" ||
+                          levelFilter !== "all" ||
+                          designationFilter !== "all"
+                            ? "No applications match your current filters. Try adjusting your search criteria."
+                            : "No applications available yet"
+                        }
+                        actionLabel={
+                          searchTerm ||
+                          wingFilter !== "all" ||
+                          levelFilter !== "all" ||
+                          designationFilter !== "all"
+                            ? "Clear Filters"
+                            : undefined
+                        }
+                        onAction={
+                          searchTerm ||
+                          wingFilter !== "all" ||
+                          levelFilter !== "all" ||
+                          designationFilter !== "all"
+                            ? clearFilters
+                            : undefined
+                        }
+                      />
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  applications.map((application: VolunteerApplication) => {
+                    const hasAadharFront = application.aadhar_card_front;
+                    const hasAadharBack = application.aadhar_card_back;
+                    const hasImage = application.image;
+                    const documentsCount = [
+                      hasAadharFront,
+                      hasAadharBack,
+                      hasImage,
+                    ].filter(Boolean).length;
+
+                    return (
+                      <TableRow key={application.id}>
+                        <TableCell className="text-xs sm:text-sm">
+                          <div className="flex items-center space-x-2 sm:space-x-3">
+                            {application.image ? (
+                              <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
+                                <Image
+                                  src={application.image}
+                                  alt="Profile"
+                                  fill
+                                  className="rounded-full object-cover border"
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 rounded-full bg-muted flex items-center justify-center">
+                                <Users className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+                              </div>
+                            )}
+                            <div className="min-w-0">
+                              <div className="font-medium text-xs sm:text-sm truncate">
+                                {application.user_name ||
+                                  `User ${application.user}`}
+                              </div>
+                              <div className="flex items-center text-xs text-muted-foreground">
+                                <Phone className="h-3 w-3 mr-1 flex-shrink-0" />
+                                <span className="truncate">
+                                  {application.phone_number || "No phone"}
+                                </span>
+                              </div>
+                              <div className="sm:hidden mt-1 space-y-0.5">
+                                <div className="text-xs text-muted-foreground">
+                                  {application.designation_title || "N/A"}
+                                </div>
+                                <div className="md:hidden text-xs text-muted-foreground">
+                                  {application.wing_name || "N/A"}
+                                </div>
+                                <div className="lg:hidden text-xs text-muted-foreground">
+                                  {application.level_name || "N/A"}
+                                </div>
+                                <div className="flex items-center gap-2 sm:hidden">
+                                  <Badge
+                                    variant={
+                                      application.status === "approved"
+                                        ? "default"
+                                        : application.status === "pending"
+                                        ? "secondary"
+                                        : "destructive"
+                                    }
+                                    className="text-xs"
+                                  >
+                                    {application.status}
+                                  </Badge>
+                                  <Badge
+                                    variant="outline"
+                                    className="text-xs lg:hidden"
+                                  >
+                                    {documentsCount}/3
+                                  </Badge>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell text-xs sm:text-sm">
+                          <div className="font-medium">
+                            {application.wing_name || "N/A"}
+                          </div>
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell text-xs sm:text-sm">
+                          <div>{application.level_name || "N/A"}</div>
+                        </TableCell>
+                        <TableCell className="hidden sm:table-cell text-xs sm:text-sm">
+                          <div className="font-medium">
+                            {application.designation_title || "N/A"}
+                          </div>
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell">
+                          <div className="flex items-center space-x-1">
+                            <Badge variant="outline" className="text-xs">
+                              {documentsCount}/3 docs
+                            </Badge>
+                            <div className="flex space-x-1">
+                              {hasAadharFront && (
+                                <div
+                                  className="w-2 h-2 bg-green-500 rounded-full"
+                                  title="Aadhar Front"
+                                />
+                              )}
+                              {hasAadharBack && (
+                                <div
+                                  className="w-2 h-2 bg-green-500 rounded-full"
+                                  title="Aadhar Back"
+                                />
+                              )}
+                              {hasImage && (
+                                <div
+                                  className="w-2 h-2 bg-blue-500 rounded-full"
+                                  title="Profile Image"
+                                />
+                              )}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="hidden sm:table-cell">
+                          <Badge
+                            variant={
+                              application.status === "approved"
+                                ? "default"
+                                : application.status === "pending"
+                                ? "secondary"
+                                : "destructive"
+                            }
+                            className="text-xs"
+                          >
+                            {application.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell text-xs sm:text-sm text-muted-foreground">
+                          <div className="flex items-center">
+                            <Calendar className="h-3 w-3 mr-1" />
+                            {new Date(
+                              application.timestamp
+                            ).toLocaleDateString()}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedApplication(application);
+                                setDetailsDialog(true);
+                              }}
+                              className="h-8 sm:h-9 px-2 sm:px-3"
+                            >
+                              <Eye className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                              <span className="hidden sm:inline text-xs">
+                                Details
+                              </span>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setUserModel(true);
+                                setSelectedUserApplicationId(application.user);
+                                setSelectedApplicationId(application.id);
+                                setSelectedApplication(application);
+                              }}
+                              className="h-8 sm:h-9 px-2 sm:px-3"
+                            >
+                              <UserCheck className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                              <span className="hidden sm:inline text-xs">
+                                Assign
+                              </span>
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Assign Dialog */}
-      <Dialog open={isAssignDialogOpen} onOpenChange={setIsAssignDialogOpen}>
-        <DialogContent>
+      <Dialog open={userModel} onOpenChange={setUserModel}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Assign Volunteer</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Volunteer Application Review
+            </DialogTitle>
             <DialogDescription>
-              Assign a volunteer to this position
+              Complete user profile and application details
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleAssign}>
-            <div className="space-y-4">
-              <div>
-                <Label className="mb-2 block">Position</Label>
-                <Input
-                  value={currentPosition ? getPadName(currentPosition.pad) : ""}
-                  disabled
-                  className="bg-muted"
-                />
-              </div>
-              <div>
-                <Label htmlFor="user" className="mb-2 block">
-                  Select Volunteer <span className="text-red-500">*</span>
-                </Label>
-                <Select
-                  value={selectedUser > 0 ? selectedUser.toString() : ""}
-                  onValueChange={(value) => setSelectedUser(parseInt(value))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select volunteer" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableUsers.length === 0 ? (
-                      <SelectItem value="0" disabled>
-                        No available volunteers
-                      </SelectItem>
-                    ) : (
-                      availableUsers.map((user) => (
-                        <SelectItem key={user.id} value={user.id.toString()}>
-                          {user.name} - {user.email}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <DialogFooter className="mt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setIsAssignDialogOpen(false);
-                  setSelectedUser(0);
-                }}
-                disabled={submitting}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={submitting || selectedUser === 0}>
-                {submitting ? "Assigning..." : "Assign"}
-              </Button>
-            </DialogFooter>
-          </form>
+
+          <div className="space-y-6">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  User Profile
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <UserProfileModel id={selectedUserApplicationId} />
+              </CardContent>
+            </Card>
+
+            {selectedApplication && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Application Documents
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Application ID
+                        </label>
+                        <p className="font-semibold">
+                          {selectedApplication.id}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Wing
+                        </label>
+                        <p className="font-semibold">
+                          {selectedApplication.wing_name || "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Level
+                        </label>
+                        <p className="font-semibold">
+                          {selectedApplication.level_name || "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Designation
+                        </label>
+                        <p className="font-semibold">
+                          {selectedApplication.designation_title || "N/A"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Status
+                        </label>
+                        <div className="mt-1">
+                          <Badge
+                            variant={
+                              selectedApplication.status === "approved"
+                                ? "default"
+                                : selectedApplication.status === "pending"
+                                ? "secondary"
+                                : "destructive"
+                            }
+                          >
+                            {selectedApplication.status}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Applied Date
+                        </label>
+                        <div className="flex items-center mt-1">
+                          <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
+                          <span>
+                            {new Date(
+                              selectedApplication.timestamp
+                            ).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Phone Number
+                        </label>
+                        <div className="flex items-center mt-1">
+                          <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
+                          <span>
+                            {selectedApplication.phone_number || "N/A"}
+                          </span>
+                        </div>
+                      </div>
+                      {selectedApplication.remarks && (
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">
+                            Remarks
+                          </label>
+                          <p className="text-sm bg-muted p-2 rounded mt-1">
+                            {selectedApplication.remarks}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-base">
+                      Submitted Documents
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          Aadhar Card (Front)
+                        </label>
+                        {selectedApplication.aadhar_card_front ? (
+                          <div
+                            className="relative group cursor-pointer w-full h-32"
+                            onClick={() =>
+                              handleImageView(
+                                selectedApplication.aadhar_card_front!,
+                                "Aadhar Card (Front)"
+                              )
+                            }
+                          >
+                            <Image
+                              src={selectedApplication.aadhar_card_front}
+                              alt="Aadhar Front"
+                              fill
+                              className="object-cover rounded border hover:opacity-75 transition-opacity"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black bg-opacity-60 rounded backdrop-blur-sm">
+                              <div className="text-center text-white transform group-hover:scale-110 transition-transform duration-300">
+                                <Eye className="h-8 w-8 mx-auto mb-2 drop-shadow-lg" />
+                                <p className="text-sm font-medium">
+                                  Click to View
+                                </p>
+                              </div>
+                            </div>
+                            <Badge className="absolute top-2 right-2 bg-green-500">
+                              ✓ Uploaded
+                            </Badge>
+                          </div>
+                        ) : (
+                          <div className="w-full h-32 border-2 border-dashed border-muted-foreground/25 rounded flex items-center justify-center">
+                            <div className="text-center">
+                              <CreditCard className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
+                              <p className="text-sm text-muted-foreground">
+                                Not uploaded
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          Aadhar Card (Back)
+                        </label>
+                        {selectedApplication.aadhar_card_back ? (
+                          <div
+                            className="relative group cursor-pointer w-full h-32"
+                            onClick={() =>
+                              handleImageView(
+                                selectedApplication.aadhar_card_back!,
+                                "Aadhar Card (Back)"
+                              )
+                            }
+                          >
+                            <Image
+                              src={selectedApplication.aadhar_card_back}
+                              alt="Aadhar Back"
+                              fill
+                              className="object-cover rounded border hover:opacity-75 transition-opacity"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black bg-opacity-60 rounded backdrop-blur-sm">
+                              <div className="text-center text-white transform group-hover:scale-110 transition-transform duration-300">
+                                <Eye className="h-8 w-8 mx-auto mb-2 drop-shadow-lg" />
+                                <p className="text-sm font-medium">
+                                  Click to View
+                                </p>
+                              </div>
+                            </div>
+                            <Badge className="absolute top-2 right-2 bg-green-500">
+                              ✓ Uploaded
+                            </Badge>
+                          </div>
+                        ) : (
+                          <div className="w-full h-32 border-2 border-dashed border-muted-foreground/25 rounded flex items-center justify-center">
+                            <div className="text-center">
+                              <CreditCard className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
+                              <p className="text-sm text-muted-foreground">
+                                Not uploaded
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          Profile Image
+                        </label>
+                        {selectedApplication.image ? (
+                          <div
+                            className="relative group cursor-pointer w-full h-32"
+                            onClick={() =>
+                              handleImageView(
+                                selectedApplication.image!,
+                                "Profile Image"
+                              )
+                            }
+                          >
+                            <Image
+                              src={selectedApplication.image}
+                              alt="Profile"
+                              fill
+                              className="object-cover rounded border hover:opacity-75 transition-opacity"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black bg-opacity-60 rounded backdrop-blur-sm">
+                              <div className="text-center text-white transform group-hover:scale-110 transition-transform duration-300">
+                                <Eye className="h-8 w-8 mx-auto mb-2 drop-shadow-lg" />
+                                <p className="text-sm font-medium">
+                                  Click to View
+                                </p>
+                              </div>
+                            </div>
+                            <Badge className="absolute top-2 right-2 bg-blue-500">
+                              ✓ Uploaded
+                            </Badge>
+                          </div>
+                        ) : (
+                          <div className="w-full h-32 border-2 border-dashed border-muted-foreground/25 rounded flex items-center justify-center">
+                            <div className="text-center">
+                              <ImageIcon className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
+                              <p className="text-sm text-muted-foreground">
+                                Not uploaded
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button
+              variant="default"
+              onClick={async () => {
+                if (!selectedApplicationId) return;
+                try {
+                  await axios.put(
+                    `/volunteer/applications/assign/${selectedApplicationId}/`
+                  );
+                  setUserModel(false);
+                  const response = await axios.get("/volunteer/applications/");
+                  setApplications(response.data.results || response.data || []);
+                } catch (err) {
+                  if (err instanceof Error) {
+                    console.error("Failed to assign as volunteer:", err);
+                  }
+                  alert("Failed to assign as volunteer");
+                }
+              }}
+            >
+              <UserCheck className="h-4 w-4 mr-2" />
+              Assign as Volunteer
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Unassign Dialog */}
-      <Dialog open={isUnassignDialogOpen} onOpenChange={setIsUnassignDialogOpen}>
-        <DialogContent>
+      <Dialog open={detailsDialog} onOpenChange={setDetailsDialog}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Unassign Volunteer</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Application Details
+            </DialogTitle>
             <DialogDescription>
-              Are you sure you want to unassign {currentPosition?.user?.name} from
-              this position?
+              Complete information about the volunteer application
             </DialogDescription>
           </DialogHeader>
+
+          {selectedApplication && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 gap-6">
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      Personal Information
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center space-x-3">
+                      {selectedApplication.image ? (
+                        <Image
+                          src={selectedApplication.image}
+                          height={100}
+                          width={100}
+                          alt="Profile"
+                          className="w-16 h-16 rounded-full object-cover border-2"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center border-2">
+                          <Users className="h-8 w-8 text-muted-foreground" />
+                        </div>
+                      )}
+                      <div>
+                        <h3 className="font-semibold text-md">
+                          {selectedApplication.user_name ||
+                            `User ${selectedApplication.user}`}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          ID: {selectedApplication.id}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center">
+                        <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <span className="text-sm">
+                          {selectedApplication.phone_number ||
+                            "No phone number"}
+                        </span>
+                      </div>
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <span className="text-sm">
+                          Applied:{" "}
+                          {new Date(
+                            selectedApplication.timestamp
+                          ).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex items-center">
+                        <Badge
+                          variant={
+                            selectedApplication.status === "approved"
+                              ? "default"
+                              : selectedApplication.status === "pending"
+                              ? "secondary"
+                              : "destructive"
+                          }
+                          className="w-fit"
+                        >
+                          {selectedApplication.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <UserCheck className="h-4 w-4" />
+                      Position Details
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Wing
+                      </label>
+                      <p className="font-semibold">
+                        {selectedApplication.wing_name || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Level
+                      </label>
+                      <p className="font-semibold">
+                        {selectedApplication.level_name || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Designation
+                      </label>
+                      <p className="font-semibold">
+                        {selectedApplication.designation_title || "N/A"}
+                      </p>
+                    </div>
+                    {selectedApplication.remarks && (
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Remarks
+                        </label>
+                        <p className="text-sm bg-muted p-2 rounded">
+                          {selectedApplication.remarks}
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Submitted Documents
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        Aadhar Card (Front)
+                      </label>
+                      {selectedApplication.aadhar_card_front ? (
+                        <div
+                          className="relative group cursor-pointer w-full h-32"
+                          onClick={() =>
+                            handleImageView(
+                              selectedApplication.aadhar_card_front!,
+                              "Aadhar Card (Front)"
+                            )
+                          }
+                        >
+                          <Image
+                            src={selectedApplication.aadhar_card_front}
+                            alt="Aadhar Front"
+                            fill
+                            className="object-cover rounded border hover:opacity-75 transition-opacity"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black bg-opacity-60 rounded backdrop-blur-sm">
+                            <div className="text-center text-white transform group-hover:scale-110 transition-transform duration-300">
+                              <Eye className="h-8 w-8 mx-auto mb-2 drop-shadow-lg" />
+                              <p className="text-sm font-medium">
+                                Click to View
+                              </p>
+                            </div>
+                          </div>
+                          <Badge className="absolute top-2 right-2 bg-green-500">
+                            ✓ Uploaded
+                          </Badge>
+                        </div>
+                      ) : (
+                        <div className="w-full h-32 border-2 border-dashed border-muted-foreground/25 rounded flex items-center justify-center">
+                          <div className="text-center">
+                            <CreditCard className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
+                            <p className="text-sm text-muted-foreground">
+                              Not uploaded
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        Aadhar Card (Back)
+                      </label>
+                      {selectedApplication.aadhar_card_back ? (
+                        <div
+                          className="relative group cursor-pointer w-full h-32"
+                          onClick={() =>
+                            handleImageView(
+                              selectedApplication.aadhar_card_back!,
+                              "Aadhar Card (Back)"
+                            )
+                          }
+                        >
+                          <Image
+                            src={selectedApplication.aadhar_card_back}
+                            alt="Aadhar Back"
+                            fill
+                            className="object-cover rounded border hover:opacity-75 transition-opacity"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black bg-opacity-60 rounded backdrop-blur-sm">
+                            <div className="text-center text-white transform group-hover:scale-110 transition-transform duration-300">
+                              <Eye className="h-8 w-8 mx-auto mb-2 drop-shadow-lg" />
+                              <p className="text-sm font-medium">
+                                Click to View
+                              </p>
+                            </div>
+                          </div>
+                          <Badge className="absolute top-2 right-2 bg-green-500">
+                            ✓ Uploaded
+                          </Badge>
+                        </div>
+                      ) : (
+                        <div className="w-full h-32 border-2 border-dashed border-muted-foreground/25 rounded flex items-center justify-center">
+                          <div className="text-center">
+                            <CreditCard className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
+                            <p className="text-sm text-muted-foreground">
+                              Not uploaded
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        Profile Image
+                      </label>
+                      {selectedApplication.image ? (
+                        <div
+                          className="relative group cursor-pointer w-full h-32"
+                          onClick={() =>
+                            handleImageView(
+                              selectedApplication.image!,
+                              "Profile Image"
+                            )
+                          }
+                        >
+                          <Image
+                            src={selectedApplication.image}
+                            alt="Profile"
+                            fill
+                            className="object-cover rounded border hover:opacity-75 transition-opacity"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black bg-opacity-60 rounded backdrop-blur-sm">
+                            <div className="text-center text-white transform group-hover:scale-110 transition-transform duration-300">
+                              <Eye className="h-8 w-8 mx-auto mb-2 drop-shadow-lg" />
+                              <p className="text-sm font-medium">
+                                Click to View
+                              </p>
+                            </div>
+                          </div>
+                          <Badge className="absolute top-2 right-2 bg-blue-500">
+                            ✓ Uploaded
+                          </Badge>
+                        </div>
+                      ) : (
+                        <div className="w-full h-32 border-2 border-dashed border-muted-foreground/25 rounded flex items-center justify-center">
+                          <div className="text-center">
+                            <ImageIcon className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
+                            <p className="text-sm text-muted-foreground">
+                              Not uploaded
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsUnassignDialogOpen(false)}
-              disabled={submitting}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleUnassign}
-              disabled={submitting}
-            >
-              {submitting ? "Unassigning..." : "Unassign"}
-            </Button>
+            <DialogClose asChild>
+              <Button variant="outline">Close</Button>
+            </DialogClose>
+            {selectedApplication && (
+              <Button
+                variant="default"
+                onClick={async () => {
+                  if (!selectedApplicationId) return;
+                  try {
+                    await axios.put(
+                      `/volunteer/applications/assign/${selectedApplication.id}/`
+                    );
+                    setDetailsDialog(false);
+                    const response = await axios.get(
+                      "/volunteer/applications/"
+                    );
+                    setApplications(
+                      response.data.results || response.data || []
+                    );
+                  } catch (err) {
+                    if (err instanceof Error) {
+                      console.error("Failed to assign as volunteer:", err);
+                    }
+                    alert("Failed to assign as volunteer");
+                  }
+                }}
+              >
+                <UserCheck className="h-4 w-4 mr-2" />
+                Assign as Volunteer
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={imageViewerOpen} onOpenChange={setImageViewerOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+          <DialogHeader className="p-6 pb-0">
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="h-5 w-5" />
+              {selectedImage?.title || "Document Preview"}
+            </DialogTitle>
+            <DialogDescription>
+              Click and drag to pan • Scroll to zoom • Right-click to save
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="p-6 pt-4">
+            {selectedImage && (
+              <div className="relative bg-gray-50 rounded-lg p-4 min-h-[400px] flex items-center justify-center">
+                <img
+                  src={selectedImage.url}
+                  alt={selectedImage.title}
+                  className="max-w-full max-h-[70vh] object-contain rounded shadow-lg cursor-zoom-in"
+                  onClick={() => window.open(selectedImage.url, "_blank")}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src =
+                      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIxIDNIMy4wMSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTk5IiBzdHJva2Utd2lkdGg9IjEuNSIvPgo8L3N2Zz4K";
+                  }}
+                />
+                <div className="absolute top-2 right-2 space-x-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => window.open(selectedImage.url, "_blank")}
+                    className="bg-white/90 hover:bg-white shadow-md"
+                  >
+                    <Eye className="h-4 w-4 mr-1" />
+                    Open Full Size
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      const link = document.createElement("a");
+                      link.href = selectedImage.url;
+                      link.download = selectedImage.title
+                        .replace(/\s+/g, "_")
+                        .toLowerCase();
+                      link.target = "_blank";
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                    className="bg-white/90 hover:bg-white shadow-md"
+                  >
+                    <Download className="h-4 w-4 mr-1" />
+                    Download
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="p-6 pt-0">
+            <DialogClose asChild>
+              <Button variant="outline">Close</Button>
+            </DialogClose>
           </DialogFooter>
         </DialogContent>
       </Dialog>

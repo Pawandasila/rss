@@ -43,17 +43,17 @@ export const ReferralsTable: React.FC<ReferralsTableProps> = ({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5" />
+      <CardHeader className="pb-3 sm:pb-6">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+          <Users className="h-4 w-4 sm:h-5 sm:w-5" />
           रेफरल की सूची
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-xs sm:text-sm">
           इस उपयोगकर्ता द्वारा रेफर किए गए सभी लोग
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+      <CardContent className="px-3 sm:px-6">
+        <div className="space-y-3 sm:space-y-4">
           {loading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
@@ -72,25 +72,26 @@ export const ReferralsTable: React.FC<ReferralsTableProps> = ({
               </p>
             </div>
           ) : (
-            <Table>
-              <TableCaption>कुल {referrals.length} रेफरल रिकॉर्ड</TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>नाम</TableHead>
-                  <TableHead>ईमेल</TableHead>
-                  <TableHead>पेशा</TableHead>
-                  <TableHead>रेफरल</TableHead>
-                  <TableHead className="w-[120px]">जॉइनिंग</TableHead>
-                </TableRow>
-              </TableHeader>
+            <div className="-mx-3 sm:mx-0 overflow-x-auto">
+              <Table>
+                <TableCaption className="text-xs sm:text-sm">कुल {referrals.length} रेफरल रिकॉर्ड</TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs sm:text-sm">नाम</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden sm:table-cell">ईमेल</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">पेशा</TableHead>
+                    <TableHead className="text-xs sm:text-sm">रेफरल</TableHead>
+                    <TableHead className="text-xs sm:text-sm w-[100px] sm:w-[120px]">जॉइनिंग</TableHead>
+                  </TableRow>
+                </TableHeader>
               <TableBody>
                 {referrals.map((referral, idx) => {
                   const rowKey = referral.id ?? referral.email ?? `ref-${idx}`;
                   return (
                     <TableRow key={rowKey}>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium py-3">
                         <div className="flex items-center gap-2">
-                          <Avatar className="h-8 w-8">
+                          <Avatar className="h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0">
                             {referral.image && (
                               <AvatarImage
                                 src={referral.image}
@@ -101,34 +102,32 @@ export const ReferralsTable: React.FC<ReferralsTableProps> = ({
                               {getInitials(referral.name)}
                             </AvatarFallback>
                           </Avatar>
-                          {referral.name || "N/A"}
+                          <span className="text-xs sm:text-sm truncate">{referral.name || "N/A"}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm">
-                        {referral.email || "-"}
+                      <TableCell className="text-xs sm:text-sm hidden sm:table-cell">
+                        <span className="truncate block max-w-[200px]">{referral.email || "-"}</span>
                       </TableCell>
-                      <TableCell className="text-sm">
+                      <TableCell className="text-xs sm:text-sm hidden md:table-cell">
                         {referral.profession || "-"}
                       </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Badge
-                            variant="secondary"
-                            className="bg-blue-50 text-blue-700 hover:bg-blue-100 cursor-pointer transition-all hover:scale-105"
-                            onClick={() =>
-                              referral.user_id &&
-                              onReferralClick(
-                                referral.user_id,
-                                referral.name || "Unknown"
-                              )
-                            }
-                          >
-                            <Users className="mr-1 h-3 w-3" />
-                            {referral.referral_count || 0}
-                          </Badge>
-                        </div>
+                      <TableCell className="py-3">
+                        <Badge
+                          variant="secondary"
+                          className="bg-blue-50 text-blue-700 hover:bg-blue-100 cursor-pointer transition-all hover:scale-105 text-xs"
+                          onClick={() =>
+                            referral.user_id &&
+                            onReferralClick(
+                              referral.user_id,
+                              referral.name || "Unknown"
+                            )
+                          }
+                        >
+                          <Users className="mr-1 h-3 w-3" />
+                          {referral.referral_count || 0}
+                        </Badge>
                       </TableCell>
-                      <TableCell className="text-sm">
+                      <TableCell className="text-xs sm:text-sm py-3 whitespace-nowrap">
                         {referral.date_joined
                           ? format(new Date(referral.date_joined), "dd MMM yyyy")
                           : "-"}
@@ -138,6 +137,7 @@ export const ReferralsTable: React.FC<ReferralsTableProps> = ({
                 })}
               </TableBody>
             </Table>
+            </div>
           )}
         </div>
       </CardContent>

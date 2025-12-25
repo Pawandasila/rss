@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
-  Building2,
   Layers,
   Search,
   ArrowRight,
@@ -19,6 +18,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import useAxios from "@/hooks/use-axios";
 import type { Category } from "../types";
+import { buildMediaUrl } from "@/lib/media";
 
 export default function CategoriesPage() {
   const router = useRouter();
@@ -31,31 +31,29 @@ export default function CategoriesPage() {
 
   // Helper function to get full image URL
   const getImageUrl = (imagePath: string | null | undefined) => {
-    if (!imagePath) return null;
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      return imagePath;
-    }
-    const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
-    return `${baseURL}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+    return buildMediaUrl(imagePath) ?? null;
   };
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const response = await axios.get("/vyapari/category/");
       setCategories(response.data.results || response.data || []);
-    } catch (err: any) {
-      console.error("Error fetching categories:", err);
-      setError(err.response?.data?.message || "Failed to load categories");
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error("Error fetching categories:", err);
+      }
+      const errorResponse = err as { response?: { data?: { message?: string } } };
+      setError(errorResponse.response?.data?.message || "Failed to load categories");
     } finally {
       setLoading(false);
     }
-  };
+  }, [axios]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   // Filter categories by search term
   const filteredCategories = categories.filter((category) =>

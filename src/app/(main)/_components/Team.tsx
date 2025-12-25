@@ -5,77 +5,54 @@ import {
   Quote,
   Linkedin,
   Twitter,
-  Mail,
   Plus,
   CircleDashed,
+  Users,
 } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SectionHeader from "@/components/common/SectionHeader";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 gsap.registerPlugin(ScrollTrigger);
 
-import yogiJi from "@/assets/people/yogi_ji.jpg";
-import darshanJi from "@/assets/people/darshan.jpg";
-import himanshuJi from "@/assets/people/himanshu_joshi.jpg";
-import pawanJi from "@/assets/people/pawan_joshi.jpg";
-import sunilJi from "@/assets/people/sunil_datt.jpg";
-import vedmaniJi from "@/assets/people/vedmani.jpg";
-import prashadJi from "@/assets/people/prashad.jpg";
+import { useLeadership } from "@/module/crm/team/hooks/useLeadership";
+import { buildMediaUrl } from "@/lib/media";
 
-const TEAM_MEMBERS = [
-  {
-    id: 1,
-    name: "पू. योगी श्री आदित्यनाथ जी",
-    role: "मुख्य प्रेरणा स्रोत",
-    image: yogiJi,
-  },
-  {
-    id: 2,
-    name: "पू. स्वामी श्री दर्शन भारती जी",
-    role: "मुख्य संरक्षक",
-    image: darshanJi,
-  },
-  {
-    id: 3,
-    name: "श्री हिमांशु जोशी",
-    role: "संस्थापक एवं राष्ट्रीय अध्यक्ष",
-    image: himanshuJi,
-  },
-  {
-    id: 4,
-    name: "श्री पवन जोशी",
-    role: "रा. वरिष्ठ उपाध्यक्ष",
-    image: pawanJi,
-  },
-  {
-    id: 5,
-    name: "श्री सुनील दत्त पंत",
-    role: "रा. संगठन मंत्री",
-    image: sunilJi,
-  },
-  {
-    id: 6,
-    name: "श्री वेदमणि शुक्ला",
-    role: "रा. महामंत्री",
-    image: vedmaniJi,
-  },
-  {
-    id: 7,
-    name: "श्री बी. प्रसाद जोशी",
-    role: "रा. सचिव",
-    image: prashadJi,
-  },
-];
+interface DisplayTeamMember {
+  id: number | string;
+  name: string;
+  role: string;
+  bio: string;
+  image: string;
+}
 
 const TeamSection: React.FC = () => {
+  const { members, loading } = useLeadership();
+
+  const displayTeam: DisplayTeamMember[] = React.useMemo(() => {
+    if (!members || members.length === 0) return [];
+
+    return members.map((member) => ({
+      id: member.id,
+      name: member.name,
+      role: member.position,
+      bio: member.bio || "",
+      image: member.photo || "",
+    }));
+  }, [members]);
+
   const sectionRef = useRef<HTMLElement>(null);
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
+    if (loading || displayTeam.length === 0) return;
+
     const timer = setTimeout(() => {
       const ctx = gsap.context(() => {
         gsap.fromTo(
@@ -116,7 +93,39 @@ const TeamSection: React.FC = () => {
     }, 200);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [loading, displayTeam.length]);
+
+  if (loading) {
+    return (
+      <section className="py-24 bg-gray-50 overflow-hidden min-h-[600px]">
+        <div className="container mx-auto px-4 flex justify-center items-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!displayTeam || displayTeam.length === 0) {
+    return (
+      <section className="py-24 bg-gray-50 overflow-hidden">
+        <div className="container mx-auto px-4 text-center">
+          <SectionHeader
+            badgeTitle="नेतृत्व एवं मार्गदर्शन"
+            badgeIcon={CircleDashed}
+            title="Our core Team"
+            viewAll="View All Members"
+            viewAllLink="/team"
+          />
+          <div className="mt-10 p-10 border-2 border-dashed border-gray-200 rounded-xl bg-white text-gray-500">
+            <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p className="text-lg font-medium">
+              No team members found at the moment.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -129,7 +138,7 @@ const TeamSection: React.FC = () => {
           badgeIcon={CircleDashed}
           title="Key Initiatives"
           viewAll="View All Members"
-          viewAllLink="#"
+          viewAllLink="/team"
         />
 
         <div className="team-swiper-container opacity-0 pb-16">
@@ -156,33 +165,24 @@ const TeamSection: React.FC = () => {
             }}
             className="!overflow-visible"
           >
-            {TEAM_MEMBERS.map((member) => (
+            {displayTeam.map((member) => (
               <SwiperSlide key={member.id}>
                 <div className="group relative bg-white rounded-[2.5rem] overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100 h-full flex flex-col">
                   <div className="h-[280px] relative overflow-hidden shrink-0">
-                    <Image
-                      src={member.image}
-                      alt={member.name}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
+                    {member.image ? (
+                      <Image
+                        src={buildMediaUrl(member.image) || ""}
+                        alt={member.name}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                        <Users className="w-16 h-16 text-gray-400" />
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
-
-                    <div className="absolute top-6 right-6 flex flex-col gap-3 transform translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500 delay-100">
-                      <a
-                        href="#"
-                        className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-apml-red hover:border-apml-red transition-all"
-                      >
-                        <Twitter size={16} />
-                      </a>
-                      <a
-                        href="#"
-                        className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-apml-red hover:border-apml-red transition-all"
-                      >
-                        <Linkedin size={16} />
-                      </a>
-                    </div>
                   </div>
 
                   <div className="p-8 text-center relative flex-grow flex flex-col">
@@ -197,6 +197,7 @@ const TeamSection: React.FC = () => {
                       <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-6">
                         {member.role}
                       </p>
+                      <p>{member.bio}</p>
                     </div>
                     <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-100 group-hover:bg-apml-red transition-colors duration-500"></div>
                   </div>

@@ -13,20 +13,15 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import logo from "@/assets/logo/logo.png";
+import Link from "next/link";
 
 const Footer = () => {
   const LOCATIONS = [
-    "RSS Delhi Prant",
-    "RSS Mumbai Mahanagar",
-    "RSS Karnataka Dakshin",
-    "RSS Kerala Prant",
+    "RSS Uttarakhand",
     "RSS Uttar Pradesh East",
     "RSS Rajasthan Jaipur",
     "RSS Gujarat Prant",
-    "RSS West Bengal",
-    "RSS Madhya Bharat",
-    "RSS Konkan Prant",
-    "RSS Devgiri Prant",
+    "RSS Delhi",
     "RSS Vidarbha",
     "RSS Tamil Nadu North",
     "RSS Telangana",
@@ -35,19 +30,11 @@ const Footer = () => {
   ];
 
   const QUICK_LINKS = [
-    { name: "Vision & Mission", href: "#" },
-    { name: "History", href: "#" },
-    { name: "Founder", href: "#" },
-    { name: "Sarsanghchalaks", href: "#" },
-    { name: "Timeline", href: "#" },
-  ];
-
-  const RESOURCES = [
-    { name: "Downloads", href: "#" },
-    { name: "Literature", href: "#" },
-    { name: "Songs (Geet)", href: "#" },
-    { name: "Photo Gallery", href: "#" },
-    { name: "Archives", href: "#" },
+    { name: "Vision & Mission", href: "/divine-mission" },
+    { name: "Blogs", href: "/blog" },
+    { name: "Press", href: "/press" },
+    { name: "Contact", href: "/contact" },
+    { name: "About", href: "/about" },
   ];
 
   const scrollToTop = () => {
@@ -118,83 +105,84 @@ const Footer = () => {
             <ul className="space-y-4">
               {QUICK_LINKS.map((link) => (
                 <li key={link.name}>
-                  <a
+                  <Link
                     href={link.href}
                     className="text-sm hover:text-white transition-colors flex items-center gap-2 group"
                   >
                     <span className="w-0 h-0.5 bg-apml-red group-hover:w-3 transition-all"></span>
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Resources */}
-          <div className="lg:col-span-2">
-            <h4 className="text-white font-black text-sm uppercase tracking-widest mb-8 flex items-center gap-2">
+          {/* Contact & Address */}
+          <div className="lg:col-span-3 space-y-6">
+            <h4 className="text-white font-black text-sm uppercase tracking-widest mb-6 flex items-center gap-2">
               <div className="w-1.5 h-1.5 bg-apml-red rounded-full"></div>
-              Resources
+              Contact Us
             </h4>
-            <ul className="space-y-4">
-              {RESOURCES.map((link) => (
-                <li key={link.name}>
-                  <a
-                    href={link.href}
-                    className="text-sm hover:text-white transition-colors flex items-center gap-2 group"
-                  >
-                    <span className="w-0 h-0.5 bg-apml-red group-hover:w-3 transition-all"></span>
-                    {link.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
+
+            <div
+              className="flex items-center gap-4 group cursor-pointer"
+              onClick={() => window.open("tel:+919429693593")}
+            >
+              <div className="w-10 h-10 rounded-xl bg-apml-red/10 border border-apml-red/20 flex items-center justify-center text-apml-red group-hover:bg-apml-red group-hover:text-white transition-all flex-shrink-0">
+                <Phone size={18} />
+              </div>
+              <div>
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-600">
+                  Central Helpline
+                </span>
+                <span className="text-white font-bold">+91 94296 93593</span>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-apml-red/10 border border-apml-red/20 flex items-center justify-center text-apml-red flex-shrink-0 mt-1">
+                <MapPin size={18} />
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-600 mb-1">
+                    Delhi Office
+                  </span>
+                  <span className="text-gray-400 text-sm leading-relaxed block">
+                    D BLOCK, POCKET-5 (Flat No. 34), DDA Flat, CRPF Flat,
+                    Bawana, New Delhi – 110040
+                  </span>
+                </div>
+                <div>
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-600 mb-1">
+                    Uttarakhand Office
+                  </span>
+                  <span className="text-gray-400 text-sm leading-relaxed block">
+                    Bareilly - Nainital Road, Near Motahaldu Bus Stop, Haldwani,
+                    Nainital - 263139
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Regional & Contact */}
-          <div className="lg:col-span-4 space-y-8">
-            <div className="bg-gray-800/30 rounded-2xl p-6 border border-gray-800/50 backdrop-blur-sm">
+          {/* Regional Centers */}
+          <div className="lg:col-span-3">
+            <div className="bg-gray-800/30 rounded-2xl p-6 border border-gray-800/50 backdrop-blur-sm h-full">
               <h4 className="text-white font-black text-sm uppercase tracking-widest mb-4 flex items-center justify-between">
                 <span>Regional Centers</span>
                 <Globe size={14} className="text-apml-red" />
               </h4>
-              <div className="h-40 overflow-y-auto pr-2 custom-scrollbar grid grid-cols-1 gap-2">
+              <div className="h-48 overflow-y-auto pr-2 custom-scrollbar grid grid-cols-1 gap-2">
                 {LOCATIONS.map((loc, i) => (
-                  <a
+                  <Link
                     key={i}
                     href="#"
                     className="text-xs text-gray-500 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-lg transition-all border border-transparent hover:border-gray-700"
                   >
                     {loc}
-                  </a>
+                  </Link>
                 ))}
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center gap-4 group cursor-pointer">
-                <div className="w-10 h-10 rounded-xl bg-apml-red/10 border border-apml-red/20 flex items-center justify-center text-apml-red group-hover:bg-apml-red group-hover:text-white transition-all">
-                  <Phone size={18} />
-                </div>
-                <div>
-                  <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-600">
-                    Central Helpline
-                  </span>
-                  <span className="text-white font-bold">+91 712 272 3003</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-4 group cursor-pointer">
-                <div className="w-10 h-10 rounded-xl bg-apml-red/10 border border-apml-red/20 flex items-center justify-center text-apml-red group-hover:bg-apml-red group-hover:text-white transition-all">
-                  <MapPin size={18} />
-                </div>
-                <div>
-                  <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-600">
-                    Headquarters
-                  </span>
-                  <span className="text-white font-bold">
-                    Nagpur, Maharashtra
-                  </span>
-                </div>
               </div>
             </div>
           </div>
@@ -208,35 +196,64 @@ const Footer = () => {
             {/* Social Icons */}
             <div className="flex items-center gap-4">
               {[
-                { Icon: Facebook, color: "hover:bg-blue-600" },
-                { Icon: Twitter, color: "hover:bg-sky-500" },
-                { Icon: Youtube, color: "hover:bg-red-600" },
-                { Icon: Instagram, color: "hover:bg-pink-600" },
-                { Icon: Linkedin, color: "hover:bg-blue-700" },
-              ].map(({ Icon, color }, i) => (
-                <a
+                {
+                  Icon: Facebook,
+                  color: "hover:bg-blue-600",
+                  href: "https://www.facebook.com/joinrss ",
+                },
+                {
+                  Icon: Twitter,
+                  color: "hover:bg-sky-500",
+                  href: "https://twitter.com/joinrss",
+                },
+                {
+                  Icon: Youtube,
+                  color: "hover:bg-red-600",
+                  href: "https://www.youtube.com/@joinrss",
+                },
+                {
+                  Icon: Instagram,
+                  color: "hover:bg-pink-600",
+                  href: "https://www.instagram.com/joinrss",
+                },
+                {
+                  Icon: Linkedin,
+                  color: "hover:bg-blue-700",
+                  href: "https://www.linkedin.com/company/joinrss",
+                },
+              ].map(({ Icon, color, href }, i) => (
+                <Link
                   key={i}
-                  href="#"
+                  href={href}
                   className={`w-10 h-10 rounded-xl bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-500 transition-all duration-300 ${color} hover:text-white hover:-translate-y-1 hover:shadow-lg`}
                 >
                   <Icon size={18} />
-                </a>
+                </Link>
               ))}
             </div>
 
             {/* Copyright & Links */}
             <div className="flex flex-col md:flex-row items-center gap-4 md:gap-10 text-xs text-gray-500 font-medium">
-              <p>© 2024 Rashtriya Swayamsevak Sangh. All Rights Reserved.</p>
+              <p>© 2024 Rashtriya Seva Sangh. All Rights Reserved.</p>
               <div className="flex items-center gap-6">
-                <a href="#" className="hover:text-white transition-colors">
+                <Link
+                  href="/privacy-policy"
+                  className="hover:text-white transition-colors"
+                >
                   Privacy Policy
-                </a>
-                <a href="#" className="hover:text-white transition-colors">
+                </Link>
+                <Link
+                  href="/terms-and-conditions"
+                  className="hover:text-white transition-colors"
+                >
                   Terms of Use
-                </a>
-                <a href="#" className="hover:text-white transition-colors">
-                  Sitemap
-                </a>
+                </Link>
+                <Link
+                  href="/refund-policy"
+                  className="hover:text-white transition-colors"
+                >
+                  Refund Policy
+                </Link>
               </div>
             </div>
 

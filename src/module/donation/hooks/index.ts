@@ -1,84 +1,33 @@
 "use client";
 
-import { useState, useCallback, use } from "react";
+import { useState, useCallback } from "react";
 import useAxios from "@/hooks/use-axios";
 import { useAuth } from "@/hooks/use-auth";
 import type { DonationFormData, ManualPaymentFormData } from "../types";
-import logo from "@/assets/logo/logo.png";
-
-function convertNumberToWords(num: number): string {
-  if (num === 0) return "Zero Rupees Only";
-
-  const ones = [
-    "",
-    "One",
-    "Two",
-    "Three",
-    "Four",
-    "Five",
-    "Six",
-    "Seven",
-    "Eight",
-    "Nine",
-  ];
-  const tens = [
-    "",
-    "",
-    "Twenty",
-    "Thirty",
-    "Forty",
-    "Fifty",
-    "Sixty",
-    "Seventy",
-    "Eighty",
-    "Ninety",
-  ];
-  const teens = [
-    "Ten",
-    "Eleven",
-    "Twelve",
-    "Thirteen",
-    "Fourteen",
-    "Fifteen",
-    "Sixteen",
-    "Seventeen",
-    "Eighteen",
-    "Nineteen",
-  ];
-
-  function convertLessThanThousand(n: number): string {
-    if (n === 0) return "";
-    if (n < 10) return ones[n];
-    if (n < 20) return teens[n - 10];
-    if (n < 100)
-      return (
-        tens[Math.floor(n / 10)] + (n % 10 !== 0 ? " " + ones[n % 10] : "")
-      );
-    return (
-      ones[Math.floor(n / 100)] +
-      " Hundred" +
-      (n % 100 !== 0 ? " " + convertLessThanThousand(n % 100) : "")
-    );
-  }
-
-  const crore = Math.floor(num / 10000000);
-  const lakh = Math.floor((num % 10000000) / 100000);
-  const thousand = Math.floor((num % 100000) / 1000);
-  const remainder = Math.floor(num % 1000);
-
-  let result = "";
-
-  if (crore > 0) result += convertLessThanThousand(crore) + " Crore ";
-  if (lakh > 0) result += convertLessThanThousand(lakh) + " Lakh ";
-  if (thousand > 0) result += convertLessThanThousand(thousand) + " Thousand ";
-  if (remainder > 0) result += convertLessThanThousand(remainder);
-
-  return result.trim() + " Rupees Only";
-}
 
 declare global {
   interface Window {
-    Razorpay: any;
+    Razorpay: new (options: RazorpayOptions) => {
+      open: () => void;
+      on: (
+        event: string,
+        handler: (response: RazorpayFailureResponse) => void
+      ) => void;
+    };
+  }
+
+  interface RazorpayFailureResponse {
+    error: {
+      code: string;
+      description: string;
+      source: string;
+      step: string;
+      reason: string;
+      metadata: {
+        order_id: string;
+        payment_id: string;
+      };
+    };
   }
 }
 
@@ -90,19 +39,41 @@ interface RazorpayOptions {
   description: string;
   image?: string;
   order_id: string;
-  handler: (response: any) => void;
+  handler: (response: PaymentResponse) => void;
   prefill?: {
     name?: string;
     email?: string;
     contact?: string;
   };
-  notes?: Record<string, any>;
+  notes?: Record<string, unknown>;
   theme?: {
     color?: string;
+    backdrop_color?: string;
   };
   modal?: {
     ondismiss?: () => void;
+    escape?: boolean;
+    backdropclose?: boolean;
+    animation?: boolean;
+    confirm_close?: boolean;
   };
+  readonly?: {
+    contact?: boolean;
+    email?: boolean;
+    name?: boolean;
+  };
+  hidden?: {
+    contact?: boolean;
+    email?: boolean;
+  };
+  send_sms_hash?: boolean;
+  allow_rotation?: boolean;
+  retry?: {
+    enabled?: boolean;
+    max_count?: number;
+  };
+  timeout?: number;
+  remember_customer?: boolean;
 }
 
 interface PaymentResponse {
@@ -155,22 +126,36 @@ export function useDonationPayment() {
   const createOrder = useCallback(
     async (formData: DonationFormData): Promise<OrderCreateResponse> => {
       try {
-        const response = await axios.post("/payment/init/", {
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          amount: formData.amount,
-          payment_for: formData.payment_for,
-          notes: formData.notes || "",
-          currency: "INR",
-        });
+        if (!axios) {
+          throw new Error(
+            "Axios instance not available. Please login and try again."
+          );
+        }
+
+        const response = await axios.post(
+          "/payment/init/",
+          {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            amount: formData.amount,
+            payment_for: formData.payment_for,
+            notes: formData.notes || "",
+            currency: "INR",
+          },
+          {
+            timeout: 30000,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         const responseMessage = response.data?.message?.toLowerCase() || "";
         const responseError = response.data?.error?.toLowerCase() || "";
 
         if (
           responseMessage.includes("already a member") ||
-          responseMessage.includes("user already a member") ||
           responseError.includes("already a member") ||
           responseError.includes("user already a member")
         ) {
@@ -201,19 +186,70 @@ export function useDonationPayment() {
           razorpay_key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "",
           message: "Order created successfully",
         };
-      } catch (error: any) {
-        console.error("Order creation error:", error);
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error("Order creation error:", error);
+        }
+        const errorResponse = error as {
+          response?: {
+            status?: number;
+            data?: { error?: string; message?: string };
+          };
+          config?: { url?: string; method?: string };
+          code?: string;
+          message?: string;
+        };
+
+        const errorDetails = {
+          message: errorResponse?.message || "Unknown error",
+          response: errorResponse?.response?.data || null,
+          status: errorResponse?.response?.status || null,
+          config: {
+            url: errorResponse?.config?.url || "Unknown URL",
+            method: errorResponse?.config?.method || "Unknown method",
+          },
+        };
+        console.error("Order creation error details:", errorDetails);
+
+        let errorMessage = "Failed to create order";
+
+        const status = errorResponse?.response?.status;
+
+        if (status === 409) {
+          errorMessage =
+            errorResponse.response?.data?.error || "User already a member";
+        } else if (status === 400) {
+          errorMessage =
+            errorResponse.response?.data?.error ||
+            "Invalid payment details. Please check your information.";
+        } else if (status === 401 || status === 403) {
+          errorMessage = "Please login to continue with payment";
+        } else if (status === 502 || status === 503) {
+          errorMessage =
+            "Payment gateway is temporarily unavailable. Please try again in a few moments.";
+        } else if (status === 500) {
+          errorMessage = "Server error. Please try again later";
+        } else if (errorResponse?.code === "ECONNABORTED") {
+          errorMessage =
+            "Request timed out. Please check your internet connection and try again.";
+        } else if (errorResponse?.code === "ERR_NETWORK") {
+          errorMessage =
+            "Network error. Please check your internet connection and try again.";
+        } else if (errorResponse?.response?.data?.error) {
+          errorMessage = errorResponse.response.data.error;
+        } else if (errorResponse?.response?.data?.message) {
+          errorMessage = errorResponse.response.data.message;
+        } else if (errorResponse?.message) {
+          errorMessage = errorResponse.message;
+        }
+
         return {
           success: false,
-          error:
-            error.response?.data?.error ||
-            error.response?.data?.message ||
-            error.message ||
-            "Failed to create order",
+          error: errorMessage,
         };
       }
     },
-    []
+    [axios]
   );
 
   const verifyPayment = useCallback(
@@ -223,6 +259,10 @@ export function useDonationPayment() {
       razorpaySignature: string
     ): Promise<PaymentVerificationResponse> => {
       try {
+        if (!axios) {
+          throw new Error("Axios instance not available");
+        }
+
         const response = await axios.post("/payment/verify/", {
           order_id: razorpayOrderId,
           payment_id: razorpayPaymentId,
@@ -237,19 +277,36 @@ export function useDonationPayment() {
           order_id: response.data.order_id,
           status: response.data.status,
         };
-      } catch (error: any) {
-        console.error("Payment verification error:", error);
+      } catch (err) {
+        if (err instanceof Error) {
+          console.error("Payment verification error:", err);
+        }
+        const errorResponse = err as {
+          response?: { data?: { error?: string; message?: string } };
+          message?: string;
+        };
+        console.error("Payment verification error details:", {
+          message: errorResponse?.message || "Unknown error",
+          response: errorResponse?.response?.data || null,
+        });
+
+        let errorMessage = "Payment verification failed";
+
+        if (errorResponse?.response?.data?.error) {
+          errorMessage = errorResponse.response.data.error;
+        } else if (errorResponse?.response?.data?.message) {
+          errorMessage = errorResponse.response.data.message;
+        } else if (errorResponse?.message) {
+          errorMessage = errorResponse.message;
+        }
+
         return {
           success: false,
-          error:
-            error.response?.data?.error ||
-            error.response?.data?.message ||
-            error.message ||
-            "Payment verification failed",
+          error: errorMessage,
         };
       }
     },
-    []
+    [axios]
   );
 
   const processPayment = useCallback(
@@ -270,18 +327,24 @@ export function useDonationPayment() {
         }
 
         if (!orderResponse.success) {
-          throw new Error(
-            orderResponse.error || "Failed to create payment order"
-          );
+          const errorMsg =
+            orderResponse.error ||
+            "Failed to create payment order. Please try again.";
+          setError(errorMsg);
+          setIsProcessing(false);
+          setCurrentStep("idle");
+          return;
         }
 
         if (!orderResponse.order_id) {
-          throw new Error("No order ID received from server");
+          setError("No order ID received from server. Please try again.");
+          setIsProcessing(false);
+          setCurrentStep("idle");
+          return;
         }
 
         setOrderData(orderResponse);
         setCurrentStep("waiting-payment");
-        setIsProcessing(false);
 
         const options: RazorpayOptions = {
           key:
@@ -290,9 +353,9 @@ export function useDonationPayment() {
             "",
           amount: orderResponse.amount || 0,
           currency: orderResponse.currency || "INR",
-          name: "RSS - Rashtriya Swayamsevak Sangh",
-          description: `Donation - ${formData.payment_for}`,
-          image: logo.src,
+          name: "राष्ट्रीय सेवा संघ",
+          description: `दान - ${formData.payment_for}`,
+          image: `${window.location.origin}/logo/logo.png`,
           order_id: orderResponse.order_id,
           handler: async (response: PaymentResponse) => {
             try {
@@ -310,47 +373,24 @@ export function useDonationPayment() {
               ) {
                 setSuccess(true);
                 setDonationId(verificationResponse.donation_id || null);
-                setReceiptUrl(verificationResponse.receipt_url || null);
                 setCurrentStep("completed");
-
-                // Navigate to receipt page instead of opening popup
-                setTimeout(() => {
-                  const receiptParams = new URLSearchParams({
-                    name: formData.name || "",
-                    phone: formData.phone || "",
-                    date: new Date().toLocaleDateString("en-IN"),
-                    mode: "Online payment",
-                    amount: String(formData.amount / 100),
-                    amountWords: convertNumberToWords(formData.amount / 100),
-                    receiptNumber:
-                      verificationResponse.payment_id ||
-                      verificationResponse.order_id ||
-                      "N/A",
-                    location: "state",
-                  });
-
-                  const receiptUrl = `/receipt?${receiptParams.toString()}`;
-
-                  // Create a temporary link and click it (works without popup blocker)
-                  const link = document.createElement("a");
-                  link.href = receiptUrl;
-                  link.target = "_blank";
-                  link.rel = "noopener noreferrer";
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-                }, 100);
               } else {
                 throw new Error(
                   verificationResponse.error || "Payment verification failed"
                 );
               }
-            } catch (verifyError: any) {
-              console.error(
-                "Step 3 Failed: Payment verification error",
-                verifyError
-              );
-              setError(verifyError.message || "Payment verification failed");
+            } catch (verifyError) {
+              if (verifyError instanceof Error) {
+                console.error(
+                  "Step 3 Failed: Payment verification error",
+                  verifyError
+                );
+              }
+              const errorMsg =
+                verifyError instanceof Error
+                  ? verifyError.message
+                  : "Payment verification failed";
+              setError(errorMsg);
               setCurrentStep("idle");
             } finally {
               setIsProcessing(false);
@@ -364,35 +404,78 @@ export function useDonationPayment() {
           notes: {
             payment_for: formData.payment_for,
             notes: formData.notes || "",
+            donor_name: formData.name,
+            donor_email: formData.email,
+            donor_phone: formData.phone,
+            state: formData.state || "",
+            district: formData.district || "",
           },
           theme: {
             color: "#FF9933",
+            backdrop_color: "rgba(0, 0, 0, 0.6)",
           },
           modal: {
             ondismiss: () => {
-              console.log("Payment cancelled by user");
+              console.log("Payment cancelled by user (ondismiss triggered)");
               setIsProcessing(false);
-              setError("Payment cancelled by user");
+              setError("Payment cancelled");
               setCurrentStep("idle");
+              setOrderData(null);
             },
+            escape: true,
+            backdropclose: false,
+            animation: true,
+            confirm_close: true,
           },
+          readonly: {
+            contact: true,
+            email: true,
+            name: true,
+          },
+          send_sms_hash: true,
+          allow_rotation: true,
+          retry: {
+            enabled: true,
+            max_count: 4,
+          },
+          timeout: 900,
+          remember_customer: false,
         };
 
         if (typeof window.Razorpay === "undefined") {
-          await loadRazorpayScript();
+          const loaded = await loadRazorpayScript();
+          if (!loaded || typeof window.Razorpay === "undefined") {
+            setError("Unable to load payment gateway. Please retry.");
+            setIsProcessing(false);
+            setCurrentStep("idle");
+            return;
+          }
         }
 
         const rzp = new window.Razorpay(options);
+
+        rzp.on("payment.failed", function (response: RazorpayFailureResponse) {
+          console.error("Payment Failed via Event:", response.error);
+          setIsProcessing(false);
+          setError(response.error.description || "Payment failed");
+          setCurrentStep("idle");
+        });
+
         rzp.open();
-      } catch (error: any) {
-        setError(
-          error.message || "An error occurred during payment processing"
-        );
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error("Payment processing error:", error);
+        }
+        const errorMsg =
+          error instanceof Error
+            ? error.message
+            : "An error occurred during payment processing";
+        setError(errorMsg);
         setIsProcessing(false);
         setCurrentStep("idle");
       }
     },
-    [createOrder, verifyPayment]
+    [createOrder, verifyPayment, user]
   );
 
   const mannualPayment = useCallback(
@@ -411,7 +494,7 @@ export function useDonationPayment() {
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
-          amount: formData.amount,
+          amount: formData.amount * 100,
           payment_for: formData.payment_for,
           notes: formData.notes || "",
           method: formData.method,
@@ -419,6 +502,7 @@ export function useDonationPayment() {
           status: "COMPLETED",
           order_id: orderIdManual,
           payment_id: paymentIdManual,
+          is_manual: true,
         });
 
         if (response.data && response.data.id) {
@@ -430,19 +514,28 @@ export function useDonationPayment() {
         } else {
           throw new Error("Invalid response from server");
         }
-      } catch (error: any) {
-        console.error("Manual payment error:", error);
+      } catch (err) {
+        if (err instanceof Error) {
+          console.error("Manual payment error:", err);
+        }
+        const errorResponse = err as {
+          response?: {
+            status?: number;
+            data?: { error?: string; message?: string };
+          };
+          message?: string;
+        };
 
         let errorMessage = "Manual payment entry failed";
 
-        if (error.response?.status === 403) {
+        if (errorResponse?.response?.status === 403) {
           errorMessage =
             "You need admin or staff privileges to create manual payments. Please contact an administrator to get the required permissions.";
         } else {
           errorMessage =
-            error.response?.data?.error ||
-            error.response?.data?.message ||
-            error.message ||
+            errorResponse?.response?.data?.error ||
+            errorResponse?.response?.data?.message ||
+            errorResponse?.message ||
             "Manual payment entry failed";
         }
 
@@ -451,7 +544,7 @@ export function useDonationPayment() {
         setIsProcessing(false);
       }
     },
-    [user]
+    [axios]
   );
 
   const reset = useCallback(() => {

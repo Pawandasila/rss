@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import {
@@ -23,6 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import useAxios from "@/hooks/use-axios";
+import { IMAGE_BLUR_DATA_URL } from "@/lib/image-placeholder";
 
 interface VyapariDetail {
   id: number;
@@ -64,11 +65,6 @@ interface VyapariDetail {
   date_joined: string;
 }
 
-interface Category {
-  id: number;
-  name: string;
-}
-
 const VyapariDetailPage = () => {
   const params = useParams();
   const router = useRouter();
@@ -77,13 +73,7 @@ const VyapariDetailPage = () => {
   const [categoryName, setCategoryName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (params.id) {
-      fetchVyapariDetail();
-    }
-  }, [params.id]);
-
-  const fetchVyapariDetail = async () => {
+  const fetchVyapariDetail = useCallback(async () => {
     try {
       const response = await axios.get(`/vyapari/vyapari/${params.id}/`);
       const data = response.data;
@@ -124,7 +114,13 @@ const VyapariDetailPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [axios, params.id]);
+
+  useEffect(() => {
+    if (params.id) {
+      fetchVyapariDetail();
+    }
+  }, [params.id, fetchVyapariDetail]);
 
   const handleShare = () => {
     if (navigator.share) {
@@ -202,7 +198,7 @@ const VyapariDetailPage = () => {
         <Building2 className="h-16 w-16 text-muted-foreground mb-4" />
         <h2 className="text-2xl font-bold mb-2">Business Not Found</h2>
         <p className="text-muted-foreground mb-4">
-          The business you're looking for doesn't exist or has been removed.
+          The business you&apos;re looking for doesn&apos;t exist or has been removed.
         </p>
         <Button onClick={() => router.push("/vyapari")}>
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -222,6 +218,8 @@ const VyapariDetailPage = () => {
             fill
             className="object-cover"
             priority
+            placeholder="blur"
+            blurDataURL={IMAGE_BLUR_DATA_URL}
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
@@ -265,6 +263,8 @@ const VyapariDetailPage = () => {
                           alt={vyapari.name}
                           fill
                           className="object-cover"
+                          placeholder="blur"
+                          blurDataURL={IMAGE_BLUR_DATA_URL}
                         />
                       ) : (
                         <div className="h-full w-full bg-primary/10 flex items-center justify-center">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Plus, Pencil, Trash2, Image as ImageIcon, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +33,7 @@ import { toast } from "sonner";
 import useAxios from "@/hooks/use-axios";
 import type { Category, CategoryFormData } from "../types";
 import Image from "next/image";
+import { IMAGE_BLUR_DATA_URL } from "@/lib/image-placeholder";
 
 export default function CategoryManagement() {
   const axios = useAxios();
@@ -56,24 +57,25 @@ export default function CategoryManagement() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const fetchCategories = async (search?: string) => {
+  const fetchCategories = useCallback(async (search?: string) => {
     try {
       setLoading(true);
       const searchParam = search ? `?search=${encodeURIComponent(search)}` : "";
       const response = await axios.get(`/vyapari/category/${searchParam}`);
       setCategories(response.data.results || response.data || []);
-    } catch (error: any) {
+    } catch (error) {
+      const errorResponse = error as { response?: { data?: { message?: string } } };
       toast.error(
-        error.response?.data?.message || "Failed to fetch categories"
+        errorResponse.response?.data?.message || "Failed to fetch categories"
       );
     } finally {
       setLoading(false);
     }
-  };
+  }, [axios]);
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -81,7 +83,7 @@ export default function CategoryManagement() {
     }, 400);
 
     return () => clearTimeout(handler);
-  }, [searchTerm]);
+  }, [searchTerm, fetchCategories]);
 
   // Handle image selection
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,9 +135,10 @@ export default function CategoryManagement() {
       setIsCreateDialogOpen(false);
       resetForm();
       fetchCategories();
-    } catch (error: any) {
+    } catch (error) {
+      const errorResponse = error as { response?: { data?: { name?: string[] } } };
       toast.error(
-        error.response?.data?.name?.[0] || "Failed to create category"
+        errorResponse.response?.data?.name?.[0] || "Failed to create category"
       );
     } finally {
       setSubmitting(false);
@@ -176,9 +179,10 @@ export default function CategoryManagement() {
       setIsEditDialogOpen(false);
       resetForm();
       fetchCategories();
-    } catch (error: any) {
+    } catch (error) {
+      const errorResponse = error as { response?: { data?: { name?: string[] } } };
       toast.error(
-        error.response?.data?.name?.[0] || "Failed to update category"
+        errorResponse.response?.data?.name?.[0] || "Failed to update category"
       );
     } finally {
       setSubmitting(false);
@@ -203,67 +207,65 @@ export default function CategoryManagement() {
       setIsDeleteDialogOpen(false);
       setCurrentCategory(null);
       fetchCategories();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to delete category");
+    } catch (error) {
+      const errorResponse = error as { response?: { data?: { message?: string } } };
+      toast.error(errorResponse.response?.data?.message || "Failed to delete category");
     } finally {
       setSubmitting(false);
     }
   };
 
-
-
   return (
     <Card>
-
-      <CardHeader>
-        <div className="flex items-center justify-between">
+      <CardHeader className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
           <div>
-            <CardTitle>Categories</CardTitle>
-            <CardDescription>Manage business categories</CardDescription>
+            <CardTitle className="text-lg sm:text-xl">Categories</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">Manage business categories</CardDescription>
           </div>
           <Button
             title="Create Category"
             onClick={() => setIsCreateDialogOpen(true)}
+            className="h-9 sm:h-10 w-full sm:w-auto"
           >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Category
+            <Plus className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Add Category</span>
+            <span className="sm:hidden">Add</span>
           </Button>
         </div>
       </CardHeader>
 
-      <CardContent>
-        
+      <CardContent className="p-4 sm:p-6">
         <div className="mb-4 flex items-center gap-2">
-          <Search className="h-4 w-4 text-muted-foreground" />
+          <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
           <Input
             placeholder="Search categories..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
+            className="h-9 sm:h-10 text-sm w-full sm:max-w-sm"
           />
         </div>
 
-        
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Image</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-xs sm:text-sm">Image</TableHead>
+                <TableHead className="text-xs sm:text-sm">Name</TableHead>
+                <TableHead className="hidden md:table-cell text-xs sm:text-sm">Description</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center">
+                  <TableCell colSpan={4} className="text-center text-xs sm:text-sm py-6">
                     Loading...
                   </TableCell>
                 </TableRow>
               ) : categories.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center">
+                  <TableCell colSpan={4} className="text-center text-xs sm:text-sm py-6">
                     No categories found
                   </TableCell>
                 </TableRow>
@@ -272,25 +274,32 @@ export default function CategoryManagement() {
                   <TableRow key={category.id}>
                     <TableCell>
                       {category.image ? (
-                        <div className="relative h-12 w-12 overflow-hidden rounded">
+                        <div className="relative h-10 w-10 sm:h-12 sm:w-12 overflow-hidden rounded flex-shrink-0">
                           <Image
                             src={category.image}
                             alt={category.name}
                             fill
                             className="object-cover"
+                            placeholder="blur"
+                            blurDataURL={IMAGE_BLUR_DATA_URL}
                           />
                         </div>
                       ) : (
-                        <div className="flex h-12 w-12 items-center justify-center rounded bg-muted">
-                          <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                        <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded bg-muted flex-shrink-0">
+                          <ImageIcon className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground" />
                         </div>
                       )}
                     </TableCell>
-                    <TableCell className="font-medium">
-                      {category.name}
-                    </TableCell>
                     <TableCell>
-                      <p className="line-clamp-2 text-sm text-muted-foreground">
+                      <div>
+                        <p className="font-medium text-xs sm:text-sm">{category.name}</p>
+                        <p className="md:hidden line-clamp-1 text-xs text-muted-foreground mt-0.5">
+                          {category.description || "No description"}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      <p className="line-clamp-2 text-xs sm:text-sm text-muted-foreground">
                         {category.description || "No description"}
                       </p>
                     </TableCell>
@@ -322,7 +331,6 @@ export default function CategoryManagement() {
         </div>
       </CardContent>
 
-      
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -344,7 +352,9 @@ export default function CategoryManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="description" className="mb-2 block">Description</Label>
+              <Label htmlFor="description" className="mb-2 block">
+                Description
+              </Label>
               <Textarea
                 id="description"
                 value={formData.description}
@@ -373,6 +383,8 @@ export default function CategoryManagement() {
                     alt="Preview"
                     fill
                     className="object-cover"
+                    placeholder="blur"
+                    blurDataURL={IMAGE_BLUR_DATA_URL}
                   />
                 </div>
               )}
@@ -401,7 +413,6 @@ export default function CategoryManagement() {
         </DialogContent>
       </Dialog>
 
-      
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -423,7 +434,9 @@ export default function CategoryManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="edit-description" className="mb-2 block">Description</Label>
+              <Label htmlFor="edit-description" className="mb-2 block">
+                Description
+              </Label>
               <Textarea
                 id="edit-description"
                 value={formData.description}
@@ -435,7 +448,9 @@ export default function CategoryManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="edit-image" className="mb-2 block">Image</Label>
+              <Label htmlFor="edit-image" className="mb-2 block">
+                Image
+              </Label>
               <Input
                 id="edit-image"
                 type="file"
@@ -449,6 +464,8 @@ export default function CategoryManagement() {
                     alt="Preview"
                     fill
                     className="object-cover"
+                    placeholder="blur"
+                    blurDataURL={IMAGE_BLUR_DATA_URL}
                   />
                 </div>
               )}
@@ -472,13 +489,12 @@ export default function CategoryManagement() {
         </DialogContent>
       </Dialog>
 
-      
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Category</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{currentCategory?.name}"? This
+              Are you sure you want to delete &quot;{currentCategory?.name}&quot;? This
               action cannot be undone.
             </DialogDescription>
           </DialogHeader>

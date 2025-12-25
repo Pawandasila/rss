@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Plus, Pencil, Trash2, Image as ImageIcon, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,6 +41,7 @@ import { toast } from "sonner";
 import useAxios from "@/hooks/use-axios";
 import type { Category, SubCategory, SubCategoryFormData } from "../types";
 import Image from "next/image";
+import { IMAGE_BLUR_DATA_URL } from "@/lib/image-placeholder";
 
 export default function SubCategoryManagement() {
   const axios = useAxios();
@@ -68,7 +69,7 @@ export default function SubCategoryManagement() {
   const [submitting, setSubmitting] = useState(false);
 
   // Fetch categories and subcategories
-  const fetchData = async (search?: string) => {
+  const fetchData = useCallback(async (search?: string) => {
     try {
       setLoading(true);
       const searchParam = search ? `?search=${encodeURIComponent(search)}` : "";
@@ -80,16 +81,17 @@ export default function SubCategoryManagement() {
       setSubcategories(
         subcategoriesRes.data.results || subcategoriesRes.data || []
       );
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to fetch data");
+    } catch (error) {
+      const errorResponse = error as { response?: { data?: { message?: string } } };
+      toast.error(errorResponse.response?.data?.message || "Failed to fetch data");
     } finally {
       setLoading(false);
     }
-  };
+  }, [axios]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   // Debounced search
   useEffect(() => {
@@ -98,7 +100,7 @@ export default function SubCategoryManagement() {
     }, 400);
 
     return () => clearTimeout(timeoutId);
-  }, [searchTerm]);
+  }, [searchTerm, fetchData]);
 
   // Handle image selection
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,9 +159,10 @@ export default function SubCategoryManagement() {
       setIsCreateDialogOpen(false);
       resetForm();
       fetchData();
-    } catch (error: any) {
+    } catch (error) {
+      const errorResponse = error as { response?: { data?: { name?: string[] } } };
       toast.error(
-        error.response?.data?.name?.[0] || "Failed to create subcategory"
+        errorResponse.response?.data?.name?.[0] || "Failed to create subcategory"
       );
     } finally {
       setSubmitting(false);
@@ -202,9 +205,10 @@ export default function SubCategoryManagement() {
       setIsEditDialogOpen(false);
       resetForm();
       fetchData();
-    } catch (error: any) {
+    } catch (error) {
+      const errorResponse = error as { response?: { data?: { name?: string[] } } };
       toast.error(
-        error.response?.data?.name?.[0] || "Failed to update subcategory"
+        errorResponse.response?.data?.name?.[0] || "Failed to update subcategory"
       );
     } finally {
       setSubmitting(false);
@@ -229,9 +233,10 @@ export default function SubCategoryManagement() {
       setIsDeleteDialogOpen(false);
       setCurrentSubCategory(null);
       fetchData();
-    } catch (error: any) {
+    } catch (error) {
+      const errorResponse = error as { response?: { data?: { message?: string } } };
       toast.error(
-        error.response?.data?.message || "Failed to delete subcategory"
+        errorResponse.response?.data?.message || "Failed to delete subcategory"
       );
     } finally {
       setSubmitting(false);
@@ -304,6 +309,8 @@ export default function SubCategoryManagement() {
                             alt={subcategory.name}
                             fill
                             className="object-cover"
+                            placeholder="blur"
+                            blurDataURL={IMAGE_BLUR_DATA_URL}
                           />
                         </div>
                       ) : (
@@ -432,6 +439,8 @@ export default function SubCategoryManagement() {
                     alt="Preview"
                     fill
                     className="object-cover"
+                    placeholder="blur"
+                    blurDataURL={IMAGE_BLUR_DATA_URL}
                   />
                 </div>
               )}
@@ -531,6 +540,8 @@ export default function SubCategoryManagement() {
                     alt="Preview"
                     fill
                     className="object-cover"
+                    placeholder="blur"
+                    blurDataURL={IMAGE_BLUR_DATA_URL}
                   />
                 </div>
               )}
@@ -560,8 +571,8 @@ export default function SubCategoryManagement() {
           <DialogHeader>
             <DialogTitle>Delete SubCategory</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "
-              <b>{currentSubCategory?.name.toUpperCase()}</b>"? This action
+              Are you sure you want to delete &quot;
+              <b>{currentSubCategory?.name.toUpperCase()}</b>&quot;? This action
               cannot be undone.
             </DialogDescription>
           </DialogHeader>
@@ -587,7 +598,6 @@ export default function SubCategoryManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
     </Card>
   );
 }

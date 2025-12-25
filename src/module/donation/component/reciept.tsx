@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import { IMAGE_BLUR_DATA_URL } from "@/lib/image-placeholder";
 import logo from "@/assets/logo/logo.png";
 
 interface ReceiptProps {
@@ -10,7 +11,11 @@ interface ReceiptProps {
   donationAmountWords?: string;
   donationAmountNumbers?: number;
   receiptNumber?: string;
-  location?: string;
+  country?: string;
+  state?: string;
+  district?: string;
+  city?: string;
+  postal_code?: string;
 }
 
 const Receipt: React.FC<ReceiptProps> = ({
@@ -21,8 +26,20 @@ const Receipt: React.FC<ReceiptProps> = ({
   donationAmountWords = "",
   donationAmountNumbers = 0,
   receiptNumber = "DA000000023",
-  location = "state",
+  country = "",
+  state = "",
+  district = "",
+  city = "",
+  postal_code = "",
 }) => {
+  const clean = (v?: string) =>
+    v && v.trim() && v.trim().toUpperCase() !== "N/A" ? v.trim() : "";
+  const left = [clean(state), clean(district)].filter(Boolean).join(", ");
+  const rightParts = [clean(city), clean(postal_code)].filter(Boolean);
+  const right = rightParts.length ? ` - ${rightParts.join(" - ")}` : "";
+  const countryClean = clean(country);
+  const locationLine =
+    [left || null, countryClean || null].filter(Boolean).join(", ") + right;
   return (
     <div className="receipt-container relative w-full max-w-4xl mx-auto bg-white p-8 shadow-lg border-4 border-black">
       <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden">
@@ -33,6 +50,8 @@ const Receipt: React.FC<ReceiptProps> = ({
             fill
             className="object-contain"
             priority
+            placeholder="blur"
+            blurDataURL={IMAGE_BLUR_DATA_URL}
           />
         </div>
       </div>
@@ -44,7 +63,7 @@ const Receipt: React.FC<ReceiptProps> = ({
               Rashtriya Seva Sangh
             </h1>
             <p className="text-base italic text-gray-700 mb-1">
-              Durgapalpur Parma Halduchaur Lalkuan Nainital (UK)
+              {locationLine || ""}
             </p>
             <p className="text-sm text-gray-700 mb-0.5">
               (Registered Public Charitable Trust, REG NO. 47/2024)
@@ -65,6 +84,8 @@ const Receipt: React.FC<ReceiptProps> = ({
                 fill
                 className="object-contain"
                 priority
+                placeholder="blur"
+                blurDataURL={IMAGE_BLUR_DATA_URL}
               />
             </div>
           </div>
@@ -74,9 +95,6 @@ const Receipt: React.FC<ReceiptProps> = ({
           <p className="text-lg font-semibold text-gray-900">
             <span className="font-bold">Receipt #:</span>
             {receiptNumber}
-          </p>
-          <p className="text-base font-semibold text-gray-900">
-            <span className="font-bold">Location:</span> {location}
           </p>
         </div>
 
@@ -137,8 +155,9 @@ const Receipt: React.FC<ReceiptProps> = ({
 
         <div className="bg-yellow-300 px-4 py-2 mb-6">
           <p className="text-center text-sm font-bold text-gray-900">
-            "Thank you for your support and for your belief in doing good.we
-            simply couldn't do what we do without amazing people like you."
+            &quot;Thank you for your support and for your belief in doing
+            good.we simply couldn&apos;t do what we do without amazing people
+            like you.&quot;
           </p>
         </div>
 
@@ -146,12 +165,15 @@ const Receipt: React.FC<ReceiptProps> = ({
           <p className="text-center text-base italic text-blue-700 mb-1">
             For more information or help please visit: Rashtriya Seva Sangh{" "}
             <a
-              href="http://www.joinrss.org.in"
+              href={
+                process.env.NEXT_PUBLIC_FRONTEND_URL ||
+                "https://www.joinrss.org.in"
+              }
               className="underline hover:text-blue-900"
               target="_blank"
               rel="noopener noreferrer"
             >
-              www.joinrss.org.in
+              {process.env.NEXT_PUBLIC_FRONTEND_URL || "www.joinrss.org.in"}
             </a>
           </p>
           <p className="text-center text-sm text-gray-700">

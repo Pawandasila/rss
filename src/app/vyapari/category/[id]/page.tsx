@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import {
   ArrowLeft,
   Building2,
@@ -37,6 +36,8 @@ import {
 import { toast } from "sonner";
 import useAxios from "@/hooks/use-axios";
 import type { Category, SubCategory, Vyapari } from "../../types";
+import { buildMediaUrl } from "@/lib/media";
+import { IMAGE_BLUR_DATA_URL } from "@/lib/image-placeholder";
 
 export default function CategoryDetailPage() {
   const params = useParams();
@@ -55,20 +56,11 @@ export default function CategoryDetailPage() {
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("all");
   const [verificationFilter, setVerificationFilter] = useState<string>("all");
 
-  useEffect(() => {
-    fetchData();
-  }, [categoryId]);
-
   const getImageUrl = (imagePath: string | null | undefined) => {
-    if (!imagePath) return null;
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      return imagePath;
-    }
-    const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
-    return `${baseURL}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+    return buildMediaUrl(imagePath) ?? null;
   };
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -94,14 +86,21 @@ export default function CategoryDetailPage() {
         []
       ).filter((v: Vyapari) => v.category === parseInt(categoryId));
       setVyaparis(filteredVyaparis);
-    } catch (err: any) {
-      console.error("Error fetching data:", err);
-      setError(err.response?.data?.message || "Failed to load category data");
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error("Error fetching data:", err);
+      }
+      const errorResponse = err as { response?: { data?: { message?: string } } };
+      setError(errorResponse.response?.data?.message || "Failed to load category data");
       toast.error("Failed to load category");
     } finally {
       setLoading(false);
     }
-  };
+  }, [axios, categoryId]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   // Get subcategory name
   const getSubcategoryName = (subcategoryId: number | null) => {
@@ -167,7 +166,6 @@ export default function CategoryDetailPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-muted/20 to-background">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        
         <Button
           variant="ghost"
           onClick={() => router.push("/vyapari")}
@@ -177,7 +175,6 @@ export default function CategoryDetailPage() {
           Back to Home
         </Button>
 
-        
         <Card className="mb-8 overflow-hidden border-2 shadow-lg">
           <div className="relative">
             <CardContent className="relative">
@@ -190,6 +187,8 @@ export default function CategoryDetailPage() {
                       alt={category.name}
                       fill
                       className="object-cover"
+                      placeholder="blur"
+                      blurDataURL={IMAGE_BLUR_DATA_URL}
                     />
                   </div>
                 ) : (
@@ -198,7 +197,6 @@ export default function CategoryDetailPage() {
                   </div>
                 )}
 
-                
                 <div className="flex-1">
                   <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
                     <Building2 className="h-4 w-4" />
@@ -239,7 +237,6 @@ export default function CategoryDetailPage() {
           </div>
         </Card>
 
-        
         <Card className="border shadow-md">
           <CardContent className="p-6">
             <div className="mb-4 flex items-center gap-2">
@@ -298,7 +295,6 @@ export default function CategoryDetailPage() {
         </Card>
 
         <div className="flex items-center justify-between gap-6 mb-6 ">
-          
           {(searchTerm ||
             selectedSubcategory !== "all" ||
             verificationFilter !== "all") && (
@@ -348,6 +344,8 @@ export default function CategoryDetailPage() {
                         alt={vyapari.name}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        placeholder="blur"
+                        blurDataURL={IMAGE_BLUR_DATA_URL}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                     </div>

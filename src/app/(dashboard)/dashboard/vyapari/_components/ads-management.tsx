@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,10 +23,37 @@ const AdsManagement = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAd, setEditingAd] = useState<Advertisement | null>(null);
 
+  const fetchAds = useCallback(async (search?: string) => {
+    setLoading(true);
+    try {
+      const searchParam = search ? `?search=${encodeURIComponent(search)}` : "";
+      const response = await axios.get(`/vyapari/advertisement/${searchParam}`);
+      setAds(response.data.results || response.data || []);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error fetching ads:", error);
+      }
+      toast.error("Failed to fetch advertisements");
+    } finally {
+      setLoading(false);
+    }
+  }, [axios]);
+
+  const fetchVyaparis = useCallback(async () => {
+    try {
+      const response = await axios.get("/vyapari/vyapari/");
+      setVyaparis(response.data.results || response.data || []);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error fetching vyaparis:", error);
+      }
+    }
+  }, [axios]);
+
   useEffect(() => {
     fetchAds();
     fetchVyaparis();
-  }, []);
+  }, [fetchAds, fetchVyaparis]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -34,30 +61,7 @@ const AdsManagement = () => {
     }, 400);
 
     return () => clearTimeout(timeoutId);
-  }, [searchQuery]);
-
-  const fetchAds = async (search?: string) => {
-    setLoading(true);
-    try {
-      const searchParam = search ? `?search=${encodeURIComponent(search)}` : "";
-      const response = await axios.get(`/vyapari/advertisement/${searchParam}`);
-      setAds(response.data.results || response.data || []);
-    } catch (error) {
-      console.error("Error fetching ads:", error);
-      toast.error("Failed to fetch advertisements");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchVyaparis = async () => {
-    try {
-      const response = await axios.get("/vyapari/vyapari/");
-      setVyaparis(response.data.results || response.data || []);
-    } catch (error) {
-      console.error("Error fetching vyaparis:", error);
-    }
-  };
+  }, [searchQuery, fetchAds]);
 
   const handleOpenDialog = (ad?: Advertisement) => {
     setEditingAd(ad || null);
@@ -84,9 +88,12 @@ const AdsManagement = () => {
       }
       fetchAds();
       handleCloseDialog();
-    } catch (error: any) {
-      console.error("Error saving ad:", error);
-      toast.error(error.response?.data?.message || "Failed to save advertisement");
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error saving ad:", error);
+      }
+      const errorResponse = error as { response?: { data?: { message?: string } } };
+      toast.error(errorResponse.response?.data?.message || "Failed to save advertisement");
     }
   };
 
@@ -98,7 +105,9 @@ const AdsManagement = () => {
       toast.success("Advertisement deleted successfully");
       fetchAds();
     } catch (error) {
-      console.error("Error deleting ad:", error);
+      if (error instanceof Error) {
+        console.error("Error deleting ad:", error);
+      }
       toast.error("Failed to delete advertisement");
     }
   };
@@ -111,7 +120,9 @@ const AdsManagement = () => {
       toast.success(`Advertisement ${!ad.is_active ? "activated" : "deactivated"}`);
       fetchAds();
     } catch (error) {
-      console.error("Error toggling ad status:", error);
+      if (error instanceof Error) {
+        console.error("Error toggling ad status:", error);
+      }
       toast.error("Failed to update advertisement status");
     }
   };
@@ -119,26 +130,27 @@ const AdsManagement = () => {
 
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Advertisement Management</CardTitle>
-            <Button onClick={() => handleOpenDialog()}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Advertisement
+        <CardHeader className="p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+            <CardTitle className="text-lg sm:text-xl">Advertisement Management</CardTitle>
+            <Button onClick={() => handleOpenDialog()} className="h-9 sm:h-10 w-full sm:w-auto">
+              <Plus className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Add Advertisement</span>
+              <span className="sm:hidden">Add Ad</span>
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 sm:p-6">
           <div className="mb-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search advertisements..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 h-9 sm:h-10 text-sm"
               />
             </div>
           </div>

@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, FreeMode } from "swiper/modules";
 import useAxios from "@/hooks/use-axios";
 import "swiper/css";
+import { IMAGE_BLUR_DATA_URL } from "@/lib/image-placeholder";
 
 interface Ad {
   id: number;
@@ -36,11 +37,7 @@ export const Ads: React.FC<AdsProps> = ({
   const [ads, setAds] = useState<Ad[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchActiveAds();
-  }, [selectedCategory, selectedState, selectedDistrict, selectedMarket]);
-
-  const fetchActiveAds = async () => {
+  const fetchActiveAds = useCallback(async () => {
     try {
       const params = new URLSearchParams();
 
@@ -75,7 +72,11 @@ export const Ads: React.FC<AdsProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [axios, selectedCategory, selectedState, selectedDistrict, selectedMarket]);
+
+  useEffect(() => {
+    fetchActiveAds();
+  }, [fetchActiveAds]);
 
   const handleAdClick = (ad: Ad) => {
     console.log(`Ad clicked: ${ad.title}`);
@@ -121,6 +122,8 @@ export const Ads: React.FC<AdsProps> = ({
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
                 sizes="(max-width: 640px) 320px, 400px"
+                placeholder="blur"
+                blurDataURL={IMAGE_BLUR_DATA_URL}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-4">

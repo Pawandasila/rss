@@ -4,63 +4,82 @@ import React from "react";
 import Image from "next/image";
 import { Calendar, ArrowUpRight, Newspaper } from "lucide-react";
 import { motion } from "motion/react";
+import { usePressCoverage } from "@/module/crm/press/hooks/usePressCoverage";
+import { buildMediaUrl } from "@/lib/media";
 import SectionHeader from "@/components/common/SectionHeader";
+import { useRouter } from "next/navigation";
 
-const ARTICLES = [
-  {
-    id: 1,
-    source: "The Times of India",
-    date: "12 Oct 2023",
-    title: "RSS volunteers lead massive cleanliness drive across 500 cities",
-    image:
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop",
-    category: "Social Service",
-  },
-  {
-    id: 2,
-    source: "Hindustan Times",
-    date: "28 Sep 2023",
-    title:
-      "Sarkaryavah highlights the importance of family values in modern era",
-    image:
-      "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=600&auto=format&fit=crop",
-    category: "Culture",
-  },
-  {
-    id: 3,
-    source: "The Hindu",
-    date: "15 Aug 2023",
-    title: "Independence Day celebrated with pomp at Nagpur headquarters",
-    image:
-      "https://images.unsplash.com/photo-1532375810709-75b1da00537c?q=80&w=600&auto=format&fit=crop",
-    category: "National",
-  },
-  {
-    id: 4,
-    source: "Dainik Jagran",
-    date: "05 Jul 2023",
-    title: "New hostels inaugurated for tribal students in remote districts",
-    image:
-      "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=600&auto=format&fit=crop",
-    category: "Education",
-  },
-];
+interface DisplayPressArticle {
+  id: number | string;
+  source?: string;
+  date: string;
+  title: string;
+  image: string;
+  category?: string;
+}
 
-const PressSection: React.FC = () => {
+const PressSection = () => {
+  const { pressItems, loading } = usePressCoverage();
+  const router = useRouter();
+
+  const displayArticles: DisplayPressArticle[] = React.useMemo(() => {
+    if (!pressItems || pressItems.length === 0) return [];
+
+    return pressItems.map((article) => ({
+      id: article.id,
+      date: article.published_at,
+      title: article.title,
+      image: article.image || "",
+    }));
+  }, [pressItems]);
+
+  if (loading) {
+    return (
+      <section className="py-24 bg-background border-t border-border">
+        <div className="w-full px-4 md:px-8 lg:px-16 xl:px-24 flex justify-center items-center min-h-[300px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!displayArticles || displayArticles.length === 0) {
+    return (
+      <section className="py-24 bg-background border-t border-border">
+        <div className="w-full px-4 md:px-8 lg:px-16 xl:px-24 text-center">
+          <SectionHeader
+            badgeTitle="Press"
+            badgeIcon={Newspaper}
+            title="RSS in the Press"
+            viewAll="View all News"
+            viewAllLink="/press"
+          />
+          <div className="mt-10 p-10 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 text-gray-500">
+            <Newspaper className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p className="text-lg font-medium">
+              No press coverage found at the moment.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-24 bg-background border-t border-border">
       <div className="w-full px-4 md:px-8 lg:px-16 xl:px-24">
         <SectionHeader
           badgeTitle="Press"
           badgeIcon={Newspaper}
-          title="RSS in the Press"
+          title="RSS In The News"
           viewAll="View all News"
-          viewAllLink="#"
+          viewAllLink="/press"
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {ARTICLES.map((article, index) => (
+          {displayArticles.map((article, index) => (
             <motion.article
+              onClick={() => router.push(`/press/${article.id}`)}
               key={article.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -69,23 +88,31 @@ const PressSection: React.FC = () => {
               className="group bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-border flex flex-col h-full cursor-pointer"
             >
               <div className="relative h-48 overflow-hidden">
-                <Image
-                  src={article.image}
-                  alt={article.title}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  sizes="(max-width: 768px) 100vw, 25vw"
-                />
+                {article.image ? (
+                  <Image
+                    src={buildMediaUrl(article.image) || ""}
+                    alt={article.title}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    sizes="(max-width: 768px) 100vw, 25vw"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <Newspaper className="w-12 h-12 text-gray-400" />
+                  </div>
+                )}
 
-                {/* Category Badge */}
-                <div className="absolute top-3 right-3 bg-primary text-primary-foreground text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-md">
-                  {article.category}
-                </div>
+                {article.category && (
+                  <div className="absolute top-3 right-3 bg-primary text-primary-foreground text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-md">
+                    {article.category}
+                  </div>
+                )}
 
-                {/* Source Label */}
-                <div className="absolute bottom-3 left-3 bg-background/95 backdrop-blur-sm px-3 py-1.5 rounded text-[10px] font-bold uppercase tracking-wider text-foreground shadow-sm border-l-2 border-primary">
-                  {article.source}
-                </div>
+                {article.source && (
+                  <div className="absolute bottom-3 left-3 bg-background/95 backdrop-blur-sm px-3 py-1.5 rounded text-[10px] font-bold uppercase tracking-wider text-foreground shadow-sm border-l-2 border-primary">
+                    {article.source}
+                  </div>
+                )}
               </div>
 
               <div className="p-5 flex flex-col flex-grow">

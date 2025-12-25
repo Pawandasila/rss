@@ -1,4 +1,22 @@
-import { LucideIcon, Home, Users, UserPlus, Heart, Newspaper, Target, Award, FileText, Users2, LogIn, UserCheck, IdCard, BookOpen, Camera, Edit3, PhoneCall } from 'lucide-react';
+import {
+  LucideIcon,
+  Home,
+  Users,
+  UserPlus,
+  Heart,
+  Newspaper,
+  Target,
+  Award,
+  FileText,
+  Users2,
+  LogIn,
+  UserCheck,
+  IdCard,
+  BookOpen,
+  Camera,
+  Edit3,
+  PhoneCall,
+} from "lucide-react";
 
 export interface NavItem {
   id: string;
@@ -15,7 +33,7 @@ export const navigationItems: NavItem[] = [
     title: "Home",
     href: "/",
     icon: Home,
-    description: "राष्ट्रीय सेवा संघ का मुख्य पृष्ठ"
+    description: "राष्ट्रीय सेवा संघ का मुख्य पृष्ठ",
   },
   {
     id: "about-us",
@@ -27,7 +45,7 @@ export const navigationItems: NavItem[] = [
       {
         id: "vision-mission",
         title: "Vision & Mission",
-        href: "/#rss-overview",
+        href: "/divine-mission",
         icon: Target,
         description: "हमारा दृष्टिकोण और मिशन",
       },
@@ -96,7 +114,7 @@ export const navigationItems: NavItem[] = [
     title: "Support",
     href: "/donate-now",
     icon: Heart,
-    description: "दान करें और हमारा समर्थन करें"
+    description: "दान करें और हमारा समर्थन करें",
   },
   {
     id: "news-updates",
@@ -127,11 +145,12 @@ export const navigationItems: NavItem[] = [
         description: "ब्लॉग और लेख",
       },
     ],
-  },{
+  },
+  {
     id: "contact",
     title: "Contact",
     href: "/contact-us",
     icon: PhoneCall,
-    description: "हमसे संपर्क करें"
+    description: "हमसे संपर्क करें",
   },
 ];

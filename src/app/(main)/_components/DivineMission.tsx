@@ -1,69 +1,46 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import {
-  ArrowRight,
-  Eye,
-  Heart,
-  CheckCircle2,
-  UserCircle,
-  Users,
-  Anchor,
-} from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, CheckCircle2, UserCircle, Target } from "lucide-react";
 import Image from "next/image";
-import hero01 from "@/assets/hero/hero-01.png";
-import hero02 from "@/assets/hero/hero-02.png";
-import hero03 from "@/assets/hero/hero-03.png";
-import hero04 from "@/assets/hero/hero-04.png";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SectionHeader from "@/components/common/SectionHeader";
 
+import { useMissionApi } from "@/module/crm/mission/hooks";
+import { buildMediaUrl } from "@/lib/media";
+
 gsap.registerPlugin(ScrollTrigger);
 
-const MISSIONS = [
-  {
-    category: "Ideology",
-    title: "Constructive Work",
-    description:
-      "The Sangh believes that the organized power of the society is the guarantee of national security and prosperity. Through its unique methodology of 'Man Making', RSS moulds individuals who are dedicated to the service of the nation.",
-    image: hero01,
-    icon: Users,
-    cta: "Read Our Constitution",
-    tags: ["Cultural Nationalism", "Integral Humanism", "Unity in Diversity"],
-  },
-  {
-    category: "Methodology",
-    title: "Man Making",
-    description:
-      "Shakha is the crucible where swayamsevaks are forged. It is not just physical exercise but a holistic development of personality, instilling discipline, patriotism, and a sense of duty towards society.",
-    image: hero02,
-    icon: Anchor,
-    cta: "Join Shakha",
-    tags: ["Character Building", "Discipline", "Physical Fitness"],
-  },
-  {
-    category: "View Point",
-    title: "Cultural Nationalism",
-    description:
-      "We believe that Bharat is not just a political entity but a cultural nation with a continuous history of thousands of years. Our identity is rooted in the values of Dharma and universal brotherhood.",
-    image: hero03,
-    icon: Eye,
-    cta: "Explore Vision",
-    tags: ["One Nation", "One People", "One Culture"],
-  },
-  {
-    category: "Social Harmony",
-    title: "Samajik Samarasata",
-    description:
-      "Eradicating caste distinctions and untouchability is a core mission. We strive for a harmonious society where every individual is treated with equal dignity and respect, irrespective of birth or occupation.",
-    image: hero04,
-    icon: Heart,
-    cta: "Seva Activities",
-    tags: ["Equality", "Brotherhood", "Justice"],
-  },
-];
+interface DisplayMission {
+  id?: number;
+  category?: string;
+  title: string;
+  description: string;
+  image: string;
+  icon: string | null;
+  cta?: string;
+  tags?: string[];
+}
 
 const FeaturesSection: React.FC = () => {
+  const { missions, isLoadingMissions } = useMissionApi();
+
+  const displayMissions: DisplayMission[] = React.useMemo(() => {
+    if (!missions || missions.length === 0) return [];
+
+    return missions.map((mission) => ({
+      id: mission.id,
+      category: "Mission",
+      title: mission.title,
+      description: mission.description || "",
+      image: mission.image || "",
+      icon: mission.icon || null,
+      cta: "Learn More",
+      tags: [],
+    }));
+  }, [missions]);
+
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef(null);
   const imageRef = useRef(null);
@@ -95,13 +72,47 @@ const FeaturesSection: React.FC = () => {
     }
   }, [activeIndex]);
 
+  if (isLoadingMissions) {
+    return (
+      <section className="py-12 md:py-20 bg-gray-50">
+        <div className="container mx-auto px-4 flex justify-center items-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!displayMissions || displayMissions.length === 0) {
+    return (
+      <section className="py-12 md:py-20 bg-gray-50">
+        <div className="container mx-auto px-4 text-center">
+          <SectionHeader
+            title="Our Mission"
+            badgeIcon={UserCircle}
+            badgeTitle="सेवा क्षेत्र"
+            viewAll="view all missions"
+            viewAllLink="/"
+          />
+          <div className="mt-10 p-10 border-2 border-dashed border-gray-200 rounded-xl bg-white text-gray-500">
+            <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p className="text-lg font-medium">
+              No missions found at the moment.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const activeMission = displayMissions[activeIndex];
+
   return (
     <section className="py-12 md:py-20 bg-gray-50" ref={containerRef}>
       <div className="container mx-auto px-4">
         <SectionHeader
           title="Our Mission"
           badgeIcon={UserCircle}
-          badgeTitle="Divine Mission"
+          badgeTitle="सेवा क्षेत्र"
           viewAll="view all missions"
           viewAllLink="/"
         />
@@ -113,9 +124,9 @@ const FeaturesSection: React.FC = () => {
             <div className="absolute left-[19px] md:left-[23px] top-6 bottom-10 w-0.5 bg-gray-200"></div>
 
             <div className="space-y-4">
-              {MISSIONS.map((mission, index) => (
+              {displayMissions.map((mission, index) => (
                 <div
-                  key={index}
+                  key={mission.id || index}
                   onClick={() => setActiveIndex(index)}
                   className={`relative pl-12 md:pl-16 py-3 md:py-4 cursor-pointer group transition-all duration-300 rounded-2xl ${
                     activeIndex === index
@@ -125,18 +136,24 @@ const FeaturesSection: React.FC = () => {
                 >
                   {/* Icon Marker - Responsive sizing */}
                   <div
-                    className={`absolute left-0 top-6 w-10 h-10 md:w-12 md:h-12 rounded-full border-4 transition-all duration-300 z-10 flex items-center justify-center
+                    className={`absolute left-0 top-6 w-10 h-10 md:w-12 md:h-12 rounded-full border-4 transition-all duration-300 z-10 flex items-center justify-center overflow-hidden
                                 ${
                                   activeIndex === index
                                     ? "bg-apml-red border-red-100 text-white scale-110 shadow-lg"
                                     : "bg-white border-gray-200 text-gray-400 group-hover:border-red-200 group-hover:text-apml-red"
                                 }`}
                   >
-                    <mission.icon
-                      size={18}
-                      className="md:w-5 md:h-5"
-                      strokeWidth={2}
-                    />
+                    {mission.icon ? (
+                      <Image
+                        src={buildMediaUrl(mission.icon) || ""}
+                        alt="icon"
+                        width={24}
+                        height={24}
+                        className="object-contain"
+                      />
+                    ) : (
+                      <CheckCircle2 size={18} className="md:w-5 md:h-5" />
+                    )}
                   </div>
 
                   {/* Title Area */}
@@ -148,7 +165,7 @@ const FeaturesSection: React.FC = () => {
                           : "text-gray-400"
                       }`}
                     >
-                      {mission.category}
+                      {mission.category || "Mission"}
                     </span>
                     <h3
                       className={`text-lg md:text-xl font-bold transition-colors ${
@@ -170,40 +187,41 @@ const FeaturesSection: React.FC = () => {
                     }`}
                   >
                     <div className="overflow-hidden pr-2 md:pr-4">
-                      <p className="text-gray-600 text-sm leading-relaxed mb-4 md:mb-6 border-l-2 border-apml-red pl-3 md:pl-4">
-                        {mission.description}
-                      </p>
+                      <div
+                        className="text-gray-600 text-sm leading-relaxed mb-4 md:mb-6 border-l-2 border-apml-red pl-3 md:pl-4"
+                        dangerouslySetInnerHTML={{
+                          __html: mission.description,
+                        }}
+                      />
 
                       {/* Mobile Image (Visible only on small/medium screens) */}
-                      <div className="lg:hidden mb-5 rounded-lg overflow-hidden h-40 sm:h-56 w-full shadow-md">
-                        <Image
-                          src={mission.image}
-                          alt={mission.title}
-                          fill
-                          className="object-cover group-hover:scale-110 transition-transform duration-700"
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                        />
-                      </div>
+                      {mission.image && (
+                        <div className="lg:hidden mb-5 rounded-lg overflow-hidden h-40 sm:h-56 w-full shadow-md relative">
+                          <Image
+                            src={buildMediaUrl(mission.image) || ""}
+                            alt={mission.title}
+                            fill
+                            className="object-cover group-hover:scale-110 transition-transform duration-700"
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                          />
+                        </div>
+                      )}
 
-                      <div className="flex flex-wrap gap-2 mb-5 md:mb-6">
-                        {mission.tags.map((tag, i) => (
-                          <span
-                            key={i}
-                            className="text-[10px] bg-gray-100 text-gray-600 px-2 py-1 rounded font-bold uppercase tracking-wide flex items-center gap-1"
-                          >
-                            <CheckCircle2 size={10} className="text-apml-red" />{" "}
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-
-                      <button className="text-xs font-bold bg-gray-900 text-white px-5 py-2.5 md:px-6 md:py-3 rounded-lg hover:bg-apml-red transition-all flex items-center gap-2 uppercase tracking-wider shadow-lg w-fit group/btn">
-                        {mission.cta}{" "}
-                        <ArrowRight
-                          size={14}
-                          className="group-hover/btn:translate-x-1 transition-transform"
-                        />
-                      </button>
+                      <Link
+                        href={
+                          mission.id
+                            ? `/divine-mission/${mission.id}`
+                            : "/divine-mission"
+                        }
+                      >
+                        <button className="text-xs font-bold bg-gray-900 text-white px-5 py-2.5 md:px-6 md:py-3 rounded-lg hover:bg-apml-red transition-all flex items-center gap-2 uppercase tracking-wider shadow-lg w-fit group/btn">
+                          {"Learn More"}{" "}
+                          <ArrowRight
+                            size={14}
+                            className="group-hover/btn:translate-x-1 transition-transform"
+                          />
+                        </button>
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -218,32 +236,44 @@ const FeaturesSection: React.FC = () => {
                 {/* Background abstract decoration */}
                 <div className="absolute inset-0 bg-gray-900/10 z-0"></div>
 
-                <Image
-                  ref={imageRef}
-                  src={MISSIONS[activeIndex].image}
-                  alt={MISSIONS[activeIndex].title}
-                  fill
-                  className="absolute inset-0 object-cover z-10"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
+                {activeMission && activeMission.image && (
+                  <Image
+                    ref={imageRef}
+                    src={buildMediaUrl(activeMission.image) || ""}
+                    alt={activeMission.title}
+                    fill
+                    className="absolute inset-0 object-cover z-10"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                )}
 
                 {/* Overlay Card - "Story Behind It" Style */}
-                <div className="absolute bottom-8 right-8 z-20 bg-apml-red text-white p-6 rounded-xl shadow-lg max-w-xs transform rotate-2 hover:rotate-0 transition-transform duration-300 cursor-pointer group">
-                  <div className="text-[10px] font-bold uppercase tracking-widest mb-2 opacity-80 border-b border-white/20 pb-2">
-                    In Focus
-                  </div>
-                  <div className="text-xl font-bold leading-tight mb-4">
-                    {MISSIONS[activeIndex].title}
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase">
-                      Learn More
-                    </span>
-                    <div className="w-8 h-8 rounded-full bg-white text-apml-red flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                      <ArrowRight size={16} />
+                {activeMission && (
+                  <Link
+                    href={
+                      activeMission.id
+                        ? `/divine-mission/${activeMission.id}`
+                        : "/divine-mission"
+                    }
+                  >
+                    <div className="absolute bottom-8 right-8 z-20 bg-apml-red text-white p-6 rounded-xl shadow-lg max-w-xs transform rotate-2 hover:rotate-0 transition-transform duration-300 cursor-pointer group">
+                      <div className="text-[10px] font-bold uppercase tracking-widest mb-2 opacity-80 border-b border-white/20 pb-2">
+                        In Focus
+                      </div>
+                      <div className="text-xl font-bold leading-tight mb-4">
+                        {activeMission.title}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold uppercase">
+                          Learn More
+                        </span>
+                        <div className="w-8 h-8 rounded-full bg-white text-apml-red flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                          <ArrowRight size={16} />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </Link>
+                )}
               </div>
 
               {/* Decorative dashed border behind */}

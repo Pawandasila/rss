@@ -9,6 +9,7 @@ export interface User {
   user_id: string;
   gender?: string;
   profession?: string;
+  blood_group?: string;
   
  
   image?: string;
@@ -22,9 +23,11 @@ export interface User {
   sub_district?: string;
   district?: string;
   city?: string;
+  division?: string;
   state?: string;
   country?: string;
   postal_code?: string;
+  member_payment_status?: string;
   
  
   is_verified: boolean;
@@ -38,6 +41,7 @@ export interface User {
   
   // Referral
   referred_by?: string | null;
+  referral_count?: number; // total number of successful referrals
   
   // System fields
   is_staff: boolean;
@@ -75,7 +79,7 @@ export interface LoginResponse {
   tokens?: AuthTokens;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   message: string;
   data?: T;
@@ -98,6 +102,7 @@ export interface AuthContextType extends AuthState {
   verifyToken: (token?: string) => Promise<boolean>;
   updateUser: (userData: Partial<User>) => void;
   setUserData: (userData: User) => void;
+  refreshUserData: () => Promise<boolean>;
   clearError: () => void;
   checkAuth: () => Promise<void>;
   isAdmin: () => boolean;

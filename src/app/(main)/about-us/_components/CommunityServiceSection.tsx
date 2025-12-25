@@ -1,0 +1,91 @@
+import React from "react";
+import Image from "next/image";
+import { Card } from "@/components/ui/card";
+import { IMAGE_BLUR_DATA_URL } from "@/lib/image-placeholder";
+import { motion } from "motion/react";
+
+const CommunityServiceSection: React.FC = () => {
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+      viewport={{ once: true }}
+      className="py-12 sm:py-16 lg:py-20 bg-muted/20"
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+      >
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 items-center">
+          <div className="space-y-4 sm:space-y-5">
+            <motion.h3
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground"
+            >
+              समाज सेवा और रक्तदान
+            </motion.h3>
+            <div className="space-y-3 sm:space-y-4">
+              <motion.p
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+                className="text-sm sm:text-base text-muted-foreground leading-relaxed"
+              >
+                हमारा संगठन नियमित रूप से रक्तदान शिविर आयोजित करता है। यह हमारी
+                सेवा भावना का प्रत्यक्ष प्रमाण है।
+              </motion.p>
+              <motion.p
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+                className="text-sm sm:text-base text-muted-foreground leading-relaxed"
+              >
+                रक्तदान जीवनदान है - यह सिद्धांत हमारे हर सदस्य के हृदय में बसा
+                है। हम समाज की सेवा के लिए हमेशा तत्पर रहते हैं।
+              </motion.p>
+              <motion.p
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+                className="text-sm sm:text-base text-muted-foreground leading-relaxed"
+              >
+                आपातकाल में, प्राकृतिक आपदाओं में, या किसी भी समय जब समाज को
+                हमारी आवश्यकता होती है, हम तत्काल सेवा के लिए उपस्थित होते हैं।
+              </motion.p>
+            </div>
+          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <Card className="overflow-hidden border">
+              <Image
+                src="/live/img-10.jpg"
+                alt="Blood Donation Camp - Community Service"
+                width={1200}
+                height={800}
+                className="w-full h-[250px] sm:h-[350px] lg:h-[450px] object-cover"
+                placeholder="blur"
+                blurDataURL={IMAGE_BLUR_DATA_URL}
+              />
+            </Card>
+          </motion.div>
+        </div>
+      </motion.div>
+    </motion.section>
+  );
+};
+
+export default CommunityServiceSection;

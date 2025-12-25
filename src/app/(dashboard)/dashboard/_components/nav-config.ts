@@ -1,14 +1,13 @@
 import type { LucideIcon } from "lucide-react";
 import {
-  Calendar,
   CreditCard,
   Home,
   Users,
   Store,
   MessageSquareWarning,
   UsersRound,
-  IdCard,
   UserPlus,
+  MapIcon,
 } from "lucide-react";
 
 import type { User } from "@/types/auth.types";
@@ -83,19 +82,19 @@ export const DASHBOARD_NAV_ITEMS: NavItemConfig[] = [
     description: "User management",
     roles: ["admin", "staff"],
   },
-  {
-    title: "Events",
-    url: "/dashboard/events",
-    icon: Calendar,
-    description: "Event planning",
-    roles: ["admin", "staff", "volunteer"],
-  },
+  // {
+  //   title: "Events",
+  //   url: "/dashboard/events",
+  //   icon: Calendar,
+  //   description: "Event planning",
+  //   roles: ["staff", "volunteer"],
+  // },
   {
     title: "Vayapari",
     url: "/dashboard/vyapari",
     icon: Store,
     description: "Business directory",
-    roles: ["staff" , "admin"],
+    roles: ["staff", "admin"],
   },
   {
     title: "Shikayat Portal",
@@ -109,14 +108,7 @@ export const DASHBOARD_NAV_ITEMS: NavItemConfig[] = [
     url: "/dashboard/volunteer-management",
     icon: UsersRound,
     description: "Manage volunteers",
-    roles: ["member"],
-  },
-  {
-    title: "ID Card Management",
-    url: "/dashboard/id-card-management",
-    icon: IdCard,
-    description: "Manage ID cards",
-    roles: ["member"],
+    roles: ["admin"],
   },
   {
     title: "Referral",
@@ -124,6 +116,27 @@ export const DASHBOARD_NAV_ITEMS: NavItemConfig[] = [
     icon: UserPlus,
     description: "Manage referrals",
     roles: ["admin", "staff"],
+  },
+  {
+    title: "Volunteer Registration",
+    url: "/dashboard/volunteer-registration",
+    icon: CreditCard,
+    description: "Volunteer Registration",
+    roles: ["volunteer", "member"],
+  },
+  {
+    title: "Volunteer Details",
+    url: "/dashboard/volunteer-info",
+    icon: Users,
+    description: "Volunteer Information",
+    roles: ["volunteer", "member"],
+  },
+  {
+    title: "State Management",
+    url: "/dashboard/country-state-management",
+    icon: MapIcon,
+    description: "Manage states and districts",
+    roles: ["admin"],
   },
 ];
 

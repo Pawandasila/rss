@@ -114,11 +114,10 @@ const RecentDonors: React.FC = () => {
     <section className="py-12 md:py-20 bg-white border-t border-gray-100 overflow-hidden">
       <div className="w-full px-4 md:px-8 lg:px-16 xl:px-24">
         <SectionHeader
-          badgeTitle="Our Donors"
+          badgeTitle="दान सूची"
           badgeIcon={CircleDashed}
-          title="Live Contributions"
+          title="Pillars of Support"
           viewAll="View All Donors"
-          viewAllLink="#"
         />
         <div className="flex flex-col lg:flex-row gap-8 md:gap-16 items-start">
           {/* Left Side: Stats & Call to Action */}
@@ -153,10 +152,10 @@ const RecentDonors: React.FC = () => {
               </div>
               <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                 <div className="text-2xl md:text-3xl font-black text-gray-800 mb-1">
-                  ₹5Cr+
+                  ₹5 Lk+
                 </div>
                 <div className="text-[10px] md:text-xs text-gray-500 font-bold uppercase">
-                  Funds Raised
+                  Total Donation
                 </div>
               </div>
             </div>

@@ -16,9 +16,9 @@ const AboutSection: React.FC = () => {
         <SectionHeader
           title="About Us"
           badgeIcon={UserCircle}
-          badgeTitle="Who We Are"
+          badgeTitle="हमारे बारे में"
           viewAll="About Us"
-          viewAllLink="/about"
+          viewAllLink="/about-us"
         />
         <div className="flex flex-col lg:flex-row items-center gap-8 md:gap-16 lg:gap-24">
           <motion.div
@@ -96,9 +96,13 @@ const AboutSection: React.FC = () => {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="text-gray-500 text-sm md:text-lg leading-relaxed mb-8 md:mb-10 font-medium max-w-lg"
             >
-              Rashtriya Swayamsevak Sangh (RSS) is not just an organization; it
-              is a social movement. We forge character, instill patriotism, and
-              unite society to build a glorious Bharat.
+              राष्ट्रीय सेवा संघ भारतवर्ष एक वैदिक सनातन धर्म पर आधारित
+              राष्ट्रीय, धार्मिक एवं सांस्कृतिक संगठन है, जिसकी स्थापना 28 फरवरी
+              2024 (विक्रमी संवत 2081, फाल्गुन कृष्ण चतुर्थी) को भारतवर्ष के
+              संत-महात्माओं एवं धर्मगुरुओं के आशीर्वाद से की गई। इस संघ की नींव
+              उस पवित्र उद्देश्य के साथ रखी गई है, जिसमें भारत की सनातन परंपरा,
+              सांस्कृतिक मूल्यों, और वैदिक जीवन पद्धति की पुनर्स्थापना को केंद्र
+              में रखा गया है
             </motion.p>
 
             <div className="grid grid-cols-3 gap-2 sm:gap-4 values-grid">

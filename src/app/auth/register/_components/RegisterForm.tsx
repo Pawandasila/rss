@@ -5,12 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -39,6 +34,7 @@ import {
   CheckCircle,
   AlertCircle,
   UserPlus,
+  ArrowLeft,
 } from "lucide-react";
 import { format } from "date-fns";
 import { hi } from "date-fns/locale";
@@ -142,8 +138,6 @@ const RegisterFormContent = () => {
         referred_by: referredBy ? referredBy : null,
       };
 
-      console.log("Sending registration data:", registrationData);
-
       const result = await registerUser(registrationData);
 
       if (result.success) {
@@ -165,15 +159,36 @@ const RegisterFormContent = () => {
         );
         toast.error(result.message || "पंजीकरण असफल");
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Registration error:", error);
 
       let errorMessage = "पंजीकरण में त्रुटि हुई। कृपया पुनः प्रयास करें।";
 
-      if (error?.response?.data?.error) {
-        errorMessage = error.response.data.error;
-      } else if (error?.message) {
-        errorMessage = error.message;
+      const errorResponse = error as {
+        response?: { data?: Record<string, any> };
+        message?: string;
+      };
+
+      if (errorResponse?.response?.data) {
+        const data = errorResponse.response.data;
+
+        if (Array.isArray(data.phone) && data.phone[0]) {
+          errorMessage = data.phone[0];
+        } else if (Array.isArray(data.email) && data.email[0]) {
+          errorMessage = data.email[0];
+        } else if (data.error && typeof data.error === "string") {
+          errorMessage = data.error;
+        } else if (data.detail && typeof data.detail === "string") {
+          errorMessage = data.detail;
+        } else {
+          // Fallback: take the first key's first error message if it's an array
+          const firstKey = Object.keys(data)[0];
+          if (firstKey && Array.isArray(data[firstKey]) && data[firstKey][0]) {
+            errorMessage = data[firstKey][0];
+          }
+        }
+      } else if (errorResponse?.message) {
+        errorMessage = errorResponse.message;
       }
 
       setSubmitStatus("error");
@@ -186,15 +201,19 @@ const RegisterFormContent = () => {
 
   return (
     <div className="w-full max-w-xl mx-auto">
-      <Card className="shadow-sm border border-border bg-card">
-        <CardHeader className="space-y-3 text-center py-6">
-          
-          <CardTitle className="text-2xl font-semibold text-foreground">
+      <Card className="shadow-lg border bg-card">
+        <CardHeader className="space-y-2 sm:space-y-3 text-center py-4 sm:py-6 px-4 sm:px-6">
+          <div className="flex justify-center mb-2">
+            <div className="p-2 sm:p-3 bg-primary/10 rounded-full">
+              <UserPlus className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+            </div>
+          </div>
+          <CardTitle className="text-lg sm:text-2xl font-semibold">
             नया खाता बनाएं
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="space-y-5 px-6 pb-6">
+        <CardContent className="space-y-4 sm:space-y-5 px-4 sm:px-6 pb-4 sm:pb-6">
           {submitStatus === "success" && (
             <Alert className="border-green-200 bg-green-50 dark:bg-green-950/50 dark:border-green-800">
               <CheckCircle className="h-4 w-4 text-green-600" />
@@ -243,6 +262,20 @@ const RegisterFormContent = () => {
                           onKeyPress={handleEnglishOnlyInput}
                           onPaste={handleEnglishOnlyPaste}
                           {...field}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            // Check for Hindi characters
+                            if (/[\u0900-\u097F]/.test(value)) {
+                              toast.error("कृपया केवल अंग्रेजी में नाम लिखें");
+                              const cleanValue = value.replace(
+                                /[\u0900-\u097F]/g,
+                                ""
+                              );
+                              field.onChange(cleanValue);
+                            } else {
+                              field.onChange(value);
+                            }
+                          }}
                         />
                       </FormControl>
                       <FormMessage className="text-xs text-destructive" />
@@ -255,21 +288,21 @@ const RegisterFormContent = () => {
                   name="email"
                   render={({ field }) => (
                     <FormItem className="space-y-1">
-                      <FormLabel className="flex items-center gap-2 text-sm font-medium text-foreground">
-                        <Mail className="w-3 h-3 text-primary" />
+                      <FormLabel className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium">
+                        <Mail className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
                         ईमेल पता
                       </FormLabel>
                       <FormControl>
                         <Input
                           type="email"
                           placeholder="example@domain.com"
-                          className="h-9 text-sm placeholder:text-foreground/60"
+                          className="h-9 sm:h-10 text-sm"
                           onKeyPress={handleEnglishOnlyInput}
                           onPaste={handleEnglishOnlyPaste}
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage className="text-xs text-destructive" />
+                      <FormMessage className="text-xs" />
                     </FormItem>
                   )}
                 />
@@ -279,14 +312,14 @@ const RegisterFormContent = () => {
                   name="phone"
                   render={({ field }) => (
                     <FormItem className="space-y-1">
-                      <FormLabel className="flex items-center gap-2 text-sm font-medium text-foreground">
-                        <Phone className="w-3 h-3 text-primary" />
+                      <FormLabel className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium">
+                        <Phone className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
                         मोबाइल नंबर
                       </FormLabel>
                       <FormControl>
                         <Input
                           placeholder="9876543210"
-                          className="h-9 text-sm placeholder:text-foreground/60"
+                          className="h-9 sm:h-10 text-sm"
                           type="tel"
                           maxLength={10}
                           {...field}
@@ -296,7 +329,7 @@ const RegisterFormContent = () => {
                           }}
                         />
                       </FormControl>
-                      <FormMessage className="text-xs text-destructive" />
+                      <FormMessage className="text-xs" />
                     </FormItem>
                   )}
                 />
@@ -306,8 +339,8 @@ const RegisterFormContent = () => {
                   name="dateOfBirth"
                   render={({ field }) => (
                     <FormItem className="space-y-1">
-                      <FormLabel className="flex items-center gap-2 text-sm font-medium text-foreground">
-                        <CalendarIcon className="w-3 h-3 text-primary" />
+                      <FormLabel className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium">
+                        <CalendarIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
                         जन्म तिथि
                       </FormLabel>
                       <Popover>
@@ -316,11 +349,11 @@ const RegisterFormContent = () => {
                             <Button
                               variant={"outline"}
                               className={cn(
-                                "h-9 justify-start text-left font-normal text-sm",
+                                "h-9 sm:h-10 justify-start text-left font-normal text-sm w-full",
                                 !field.value && "text-muted-foreground"
                               )}
                             >
-                              <CalendarIcon className="mr-2 h-3 w-3 text-primary" />
+                              <CalendarIcon className="mr-2 h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary" />
                               {field.value ? (
                                 format(field.value, "PPP", { locale: hi })
                               ) : (
@@ -334,24 +367,7 @@ const RegisterFormContent = () => {
                             mode="single"
                             captionLayout="dropdown"
                             selected={field.value}
-                            onSelect={(date) => {
-                              if (date) {
-                                const age = calculateAge(date);
-                                if (age < 18) {
-                                  toast.error("आयु 18 वर्ष से कम है");
-                                  return;
-                                }
-                                if (age > 100) {
-                                  toast.error("आयु 100 वर्ष से अधिक है");
-                                  return;
-                                }
-                              }
-                              field.onChange(date);
-                            }}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
-                            initialFocus
+                            onSelect={field.onChange}
                           />
                         </PopoverContent>
                       </Popover>
@@ -361,36 +377,36 @@ const RegisterFormContent = () => {
                 />
               </div>
 
-              <div className="rounded-md border border-border/60 bg-muted p-3 space-y-2">
-                <div className="flex items-center gap-2">
-                  <Lock className="h-3 w-3 text-primary" />
-                  <p className="text-sm font-medium text-foreground">
+              <div className="rounded-md border border-border/60 bg-muted p-2.5 sm:p-3 space-y-2">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <Lock className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary flex-shrink-0" />
+                  <p className="text-xs sm:text-sm font-medium">
                     पासवर्ड की जानकारी
                   </p>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  पंजीकरण के बाद आपका पासवर्ड आपकी जन्म तिथि होगी (YYYYMMDD
+                  पंजीकरण के बाद आपका पासवर्ड आपकी जन्म तिथि होगी (DDMMYYYY
                   format में)।
                 </p>
-                <div className="rounded bg-card px-2 py-1">
+                <div className="rounded bg-card px-2 py-1.5">
                   <p className="text-xs text-muted-foreground">
                     <strong>उदाहरण:</strong> जन्म तिथि 15/01/1990 = पासवर्ड:
-                    <code className="ml-1 rounded bg-muted px-1 py-0.5 text-xs font-mono text-foreground/80">
-                      19900115
+                    <code className="ml-1 rounded bg-muted px-1 py-0.5 text-xs font-mono">
+                      15011990
                     </code>
                   </p>
                 </div>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-3 sm:space-y-4">
                 <Button
                   type="button"
                   variant="link"
-                  className="p-0 h-auto text-primary hover:text-primary/80 text-sm"
+                  className="p-0 h-auto text-primary hover:text-primary/80 text-xs sm:text-sm"
                   onClick={() => setShowReferralCode(!showReferralCode)}
                 >
-                  <div className="flex items-center gap-2">
-                    <Key className="w-3 h-3" />
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <Key className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                     {showReferralCode ? "रेफरल कोड छुपाएं" : "रेफरल कोड है?"}
                   </div>
                 </Button>
@@ -403,7 +419,11 @@ const RegisterFormContent = () => {
                       <FormItem className="space-y-1">
                         <FormControl>
                           <Input
-                            placeholder={referralParam ? "रेफरल कोड (URL से आया है)" : "रेफरल कोड दर्ज करें"}
+                            placeholder={
+                              referralParam
+                                ? "रेफरल कोड (URL से आया है)"
+                                : "रेफरल कोड दर्ज करें"
+                            }
                             className={cn(
                               "h-9 text-sm placeholder:text-foreground/60",
                               referralParam && "bg-muted cursor-not-allowed"
@@ -458,34 +478,51 @@ const RegisterFormContent = () => {
               </Link>
             </p>
           </div>
+
+          <div className="text-center pt-2">
+            <Link
+              href="/"
+              className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4 mr-1" />
+              Go Back to Home
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>
   );
 };
 
-export default function RegisterForm() {
+const RegisterForm = () => {
   return (
-    <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-orange-50 to-white p-4">
-        <Card className="w-full max-w-2xl shadow-lg">
-          <CardHeader className="space-y-2 text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-orange-100">
-              <UserPlus className="h-7 w-7 text-orange-600" />
+    <Suspense
+      fallback={
+        <Card className="w-full shadow-xl border-2">
+          <CardHeader className="space-y-4 text-center bg-gradient-to-br from-orange-50 to-white border-b-2">
+            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <UserPlus className="w-8 h-8 text-white" />
             </div>
-            <CardTitle className="text-3xl font-bold text-orange-600">
-              Loading...
-            </CardTitle>
+            <div>
+              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
+                Loading...
+              </CardTitle>
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-center h-32">
-              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+          <CardContent className="p-8">
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+                <p className="mt-4 text-muted-foreground">Loading form...</p>
+              </div>
             </div>
           </CardContent>
         </Card>
-      </div>
-    }>
+      }
+    >
       <RegisterFormContent />
     </Suspense>
   );
-}
+};
+
+export default RegisterForm;

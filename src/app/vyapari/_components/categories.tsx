@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Layers, AlertCircle } from "lucide-react";
@@ -8,6 +8,7 @@ import useAxios from "@/hooks/use-axios";
 import { Category } from "../types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { IMAGE_BLUR_DATA_URL } from "@/lib/image-placeholder";
 
 const VyapariCategories = () => {
   const axios = useAxios();
@@ -15,23 +16,26 @@ const VyapariCategories = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const response = await axios.get("/vyapari/category/");
       setCategories(response.data.results || response.data || []);
-    } catch (err: any) {
-      console.error("Error fetching categories:", err);
-      setError(err.response?.data?.message || "Failed to load categories");
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error("Error fetching categories:", err);
+      }
+      const errorResponse = err as { response?: { data?: { message?: string } } };
+      setError(errorResponse.response?.data?.message || "Failed to load categories");
     } finally {
       setLoading(false);
     }
-  };
+  }, [axios]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   return (
     <section className="w-full bg-muted/30 py-16 sm:py-20">
@@ -103,6 +107,8 @@ const VyapariCategories = () => {
                       fill
                       className="object-cover transition-transform duration-300 group-hover:scale-110"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      placeholder="blur"
+                      blurDataURL={IMAGE_BLUR_DATA_URL}
                     />
 
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />

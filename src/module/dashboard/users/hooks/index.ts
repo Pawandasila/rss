@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, use } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { User } from "@/types/auth.types";
 import useAxios from "@/hooks/use-axios";
 
@@ -12,6 +12,11 @@ interface PaginationData {
   previous: string | null;
 }
 
+export type UserUpdateData = 
+  | Partial<User> 
+  | FormData 
+  | Record<string, string | number | boolean | null | undefined | File | Blob>;
+
 export interface UserStats {
   total_user: number;
   verified_user: number;
@@ -21,6 +26,13 @@ export interface UserStats {
   staff_user: number;
   admin_user: number;
   blocked_user: number;
+  today_total_user: number;
+  today_verified_user: number;
+  today_blocked_user: number;
+  today_member_user: number;
+  today_volunteer_user: number;
+  today_business_user: number;
+  today_unverified_member_user: number;
 }
 
 export interface searchUsersParams {
@@ -83,28 +95,98 @@ export function useUsers(page: number = 1, page_size: number = 30) {
         console.warn("Unexpected API response format:", userData);
         setUsers([]);
       }
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to fetch users";
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error("Error fetching users:", err);
+      }
+      const errorResponse = err as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
+      const errorMessage =
+        errorResponse.response?.data?.message ||
+        errorResponse.message ||
+        "Failed to fetch users";
       setError(errorMessage);
-      console.error("Error fetching users:", err);
       setUsers([]); 
     } finally {
       setLoading(false);
     }
-  }, [page, page_size]);
+  }, [page, page_size, axios]);
 
 
-  const updateUser = async (userId: number, data: Partial<User>) => {
+  const updateUser = async (
+    userId: number, 
+    data: UserUpdateData,
+    options?: { useFormData?: boolean }
+  ) => {
     try {
-      const response = await axios.put(`/account/detail/${userId}/`, data);
+      let payload: Partial<User> | FormData;
+      let headers: Record<string, string> = {};
+
+      
+      if (data instanceof FormData) {
+        payload = data;
+        headers = { "Content-Type": "multipart/form-data" };
+      } else if (options?.useFormData) {
+        
+        const formData = new FormData();
+        Object.entries(data).forEach(([key, value]) => {
+          if (value !== null && value !== undefined) {
+            if ((value instanceof File) || (value instanceof Blob)) {
+              formData.append(key, value);
+            } else {
+              formData.append(key, String(value));
+            }
+          }
+        });
+        payload = formData;
+        headers = { "Content-Type": "multipart/form-data" };
+      } else {
+        
+        const hasFile = Object.values(data).some(
+          (value) => (value instanceof File) || (value instanceof Blob)
+        );
+        if (hasFile) {
+          const formData = new FormData();
+          Object.entries(data).forEach(([key, value]) => {
+            if (value !== null && value !== undefined) {
+              if ((value instanceof File) || (value instanceof Blob)) {
+                formData.append(key, value);
+              } else {
+                formData.append(key, String(value));
+              }
+            }
+          });
+          payload = formData;
+          headers = { "Content-Type": "multipart/form-data" };
+        } else {
+          payload = data as Partial<User>;
+        }
+      }
+
+      const response = await axios.put(`/account/detail/${userId}/`, payload, {
+        headers: Object.keys(headers).length > 0 ? headers : undefined,
+      });
       
       setUsers(prevUsers => 
         prevUsers.map((user) => user.id === userId ? { ...user, ...response.data } : user)
       );
       return { success: true, message: "User updated successfully", data: response.data };
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to update user";
-      console.error("Error updating user:", err);
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error("Error updating user:", err);
+      }
+      const errorResponse = err as {
+        response?: { data?: { message?: string; error?: string; detail?: string } };
+        message?: string;
+      };
+      const errorMessage =
+        errorResponse.response?.data?.error ||
+        errorResponse.response?.data?.message ||
+        errorResponse.response?.data?.detail ||
+        errorResponse.message ||
+        "Failed to update user";
       return { success: false, error: errorMessage };
     }
   };
@@ -157,10 +239,19 @@ export function useUsers(page: number = 1, page_size: number = 30) {
       }
       
       return { success: true, message: "Search completed successfully" };
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to search users";
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error("Error searching users:", err);
+      }
+      const errorResponse = err as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
+      const errorMessage =
+        errorResponse.response?.data?.message ||
+        errorResponse.message ||
+        "Failed to search users";
       setError(errorMessage);
-      console.error("Error searching users:", err);
       setUsers([]);
       return { success: false, error: errorMessage };
     } finally {
@@ -183,6 +274,157 @@ export function useUsers(page: number = 1, page_size: number = 30) {
   };
 }
 
+export function useUpdateCurrentUser() {
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const axios = useAxios();
+
+  const updateCurrentUser = useCallback(
+    async (
+      userId: number,
+      data: UserUpdateData,
+      options?: { useFormData?: boolean }
+    ) => {
+      try {
+        setIsUpdating(true);
+        setError(null);
+
+        
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; 
+
+        let payload: Partial<User> | FormData;
+        let headers: Record<string, string> = {};
+
+        
+        if (data instanceof FormData) {
+          
+          for (const [, value] of (data as FormData).entries()) {
+            if (value instanceof File && value.size > MAX_FILE_SIZE) {
+              setIsUpdating(false);
+              return {
+                success: false,
+                error: `File "${value.name}" is too large. Maximum size is 5MB. Your file is ${(value.size / (1024 * 1024)).toFixed(2)}MB.`
+              };
+            }
+          }
+          payload = data;
+          headers = { "Content-Type": "multipart/form-data" };
+        } else if (options?.useFormData) {
+          
+          const formData = new FormData();
+          Object.entries(data).forEach(([key, value]) => {
+            if (value !== null && value !== undefined) {
+              if ((value instanceof File) || (value instanceof Blob)) {
+                
+                if ((value as File).size && (value as File).size > MAX_FILE_SIZE) {
+                  throw new Error(`File is too large. Maximum size is 5MB. Your file is ${((value as File).size / (1024 * 1024)).toFixed(2)}MB.`);
+                }
+                formData.append(key, value);
+              } else {
+                formData.append(key, String(value));
+              }
+            }
+          });
+          payload = formData;
+          headers = { "Content-Type": "multipart/form-data" };
+        } else {
+          
+          const hasFile = Object.values(data).some(
+            (value) => (value instanceof File) || (value instanceof Blob)
+          );
+          if (hasFile) {
+            const formData = new FormData();
+            Object.entries(data).forEach(([key, value]) => {
+              if (value !== null && value !== undefined) {
+                if ((value instanceof File) || (value instanceof Blob)) {
+                  if ((value as File).size && (value as File).size > MAX_FILE_SIZE) {
+                    throw new Error(`File is too large. Maximum size is 5MB. Your file is ${((value as File).size / (1024 * 1024)).toFixed(2)}MB.`);
+                  }
+                  formData.append(key, value);
+                } else {
+                  formData.append(key, String(value));
+                }
+              }
+            });
+            payload = formData;
+            headers = { "Content-Type": "multipart/form-data" };
+          } else {
+            payload = data as Partial<User>;
+          }
+        }
+ 
+
+        const response = await axios.put(`/account/detail/${userId}/`, payload, {
+          headers: Object.keys(headers).length > 0 ? headers : undefined,
+        });
+
+        return { 
+          success: true, 
+          message: "Profile updated successfully", 
+          data: response.data 
+        };
+      } catch (err) {
+        const errorResponse = err as {
+          response?: { 
+            data?: { 
+              message?: string; 
+              error?: string; 
+              detail?: string;
+              [key: string]: unknown;
+            };
+            status?: number;
+            statusText?: string;
+          };
+          message?: string;
+        };
+
+        let errorMessage = "Failed to update profile";
+        
+        if (errorResponse.response) {
+          const responseData = errorResponse.response.data;
+          errorMessage = 
+            responseData?.error ||
+            responseData?.message ||
+            responseData?.detail ||
+            (typeof responseData === 'string' ? responseData : null) ||
+            `Server error (${errorResponse.response.status})`;
+          
+          
+          if (responseData && typeof responseData === 'object') {
+            const fieldErrors = Object.entries(responseData)
+              .filter(([key]) => !['error', 'message', 'detail'].includes(key))
+              .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+              .join('; ');
+            
+            if (fieldErrors) {
+              errorMessage += ` - ${fieldErrors}`;
+            }
+          }
+        } else if (errorResponse.message) {
+          errorMessage = errorResponse.message;
+        }
+
+        setError(errorMessage);
+        return { success: false, error: errorMessage };
+      } finally {
+        setIsUpdating(false);
+      }
+    },
+    [axios]
+  );
+
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
+
+  return {
+    updateCurrentUser,
+    isUpdating,
+    error,
+    clearError,
+  };
+}
+
 export function useUserById(userId: number) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -200,15 +442,24 @@ export function useUserById(userId: number) {
       setError(null);
       const response = await axios.get(`/account/detail/${userId}/`);
       setUser(response.data);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to fetch user";
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error("Error fetching user:", err);
+      }
+      const errorResponse = err as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
+      const errorMessage =
+        errorResponse.response?.data?.message ||
+        errorResponse.message ||
+        "Failed to fetch user";
       setError(errorMessage);
-      console.error("Error fetching user:", err);
       setUser(null);
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, axios]);
 
   useEffect(() => {
     fetchUser();
@@ -233,18 +484,28 @@ export function useUserStats() {
       setLoading(true);
       const response = await axios.get(`/dashboard/user-count/`);
       setStats(response.data);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to fetch user stats";
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error("Error fetching user stats:", err);
+      }
+      const errorResponse = err as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
+      const errorMessage =
+        errorResponse.response?.data?.message ||
+        errorResponse.message ||
+        "Failed to fetch user stats";
       console.error("Error fetching user stats:", errorMessage);
       setStats(null);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [axios]);
 
   useEffect(() => {
     fetchStats();
-  }, []);
+  }, [fetchStats]);
 
   return {
     stats,

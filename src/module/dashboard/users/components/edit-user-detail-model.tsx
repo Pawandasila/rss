@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { User } from "@/types/auth.types";
 import {
   Dialog,
@@ -8,13 +8,26 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import useAxios from "@/hooks/use-axios";
+import useAuth from "@/hooks/use-auth";
+import { toast } from "sonner";
 import {
   Form,
   FormControl,
@@ -47,7 +60,16 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
+  Droplet,
+  Camera,
 } from "lucide-react";
+import { getUserImageUrl } from "@/lib/media";
+import { PROFESSIONS } from "@/app/(main)/become-member/page";
+import {
+  StateSelect,
+  DistrictSelect,
+} from "@/module/country/components/country-select";
+import { useCountryApi } from "@/module/country/hooks";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -56,6 +78,7 @@ const formSchema = z.object({
   dob: z.string().optional(),
   gender: z.string().optional(),
   profession: z.string().optional(),
+  blood_group: z.string().optional(),
 
   // Address fields
   street: z.string().optional(),
@@ -71,16 +94,15 @@ const formSchema = z.object({
   pan_number: z.string().optional(),
 
   // Account status
-  is_active: z.boolean().default(true),
-  is_verified: z.boolean().default(false),
-  is_blocked: z.boolean().default(false),
+  is_verified: z.boolean(),
+  is_blocked: z.boolean(),
 
   // Roles
-  is_volunteer: z.boolean().default(false),
-  is_staff_account: z.boolean().default(false),
-  is_field_worker: z.boolean().default(false),
-  is_admin_account: z.boolean().default(false),
-  is_member_account: z.boolean().default(false),
+  is_volunteer: z.boolean(),
+  is_staff_account: z.boolean(),
+  is_field_worker: z.boolean(),
+  is_admin_account: z.boolean(),
+  is_member_account: z.boolean(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -89,7 +111,7 @@ interface EditUserDetailModalProps {
   user: User | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (userId: number, data: Partial<User>) => Promise<void>;
+  onSave: (userId: number, data: any) => Promise<void>;
   loading?: boolean;
 }
 
@@ -100,8 +122,22 @@ export function EditUserDetailModal({
   onSave,
   loading = false,
 }: EditUserDetailModalProps) {
+  const axios = useAxios();
+  const { states, districts, mandals } = useCountryApi();
+  const { isAdmin, isStaff } = useAuth();
+  const restrictRoles = isStaff() && !isAdmin();
+  const [showVerifyDialog, setShowVerifyDialog] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [pendingVerificationValue, setPendingVerificationValue] =
+    useState(false);
+  const [selectedStateId, setSelectedStateId] = useState<number | undefined>(
+    undefined
+  );
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema) as any,
+    resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -109,21 +145,21 @@ export function EditUserDetailModal({
       dob: "",
       gender: "",
       profession: "",
+      blood_group: "",
       street: "",
       sub_district: "",
       district: "",
       city: "",
       state: "",
-      country: "",
+
       postal_code: "",
       aadhar_number: "",
       pan_number: "",
-      is_active: true,
       is_verified: false,
       is_blocked: false,
       is_volunteer: false,
       is_staff_account: false,
-  is_field_worker: false,
+      is_field_worker: false,
       is_admin_account: false,
       is_member_account: false,
     },
@@ -138,6 +174,7 @@ export function EditUserDetailModal({
         dob: user.dob || "",
         gender: user.gender || "",
         profession: user.profession || "",
+        blood_group: user.blood_group || "",
         street: user.street || "",
         sub_district: user.sub_district || "",
         district: user.district || "",
@@ -147,7 +184,6 @@ export function EditUserDetailModal({
         postal_code: user.postal_code || "",
         aadhar_number: user.aadhar_number || "",
         pan_number: user.pan_number || "",
-        is_active: user.is_active,
         is_verified: user.is_verified,
         is_blocked: user.is_blocked,
         is_volunteer: user.is_volunteer,
@@ -156,12 +192,131 @@ export function EditUserDetailModal({
         is_admin_account: user.is_admin_account,
         is_member_account: user.is_member_account,
       });
+      setSelectedImage(null);
+      setPreviewUrl(null);
     }
   }, [user, form]);
 
+  useEffect(() => {
+    if (user && states.length > 0) {
+      const stateName = user.state;
+      if (stateName) {
+        const state = states.find(
+          (s: { name: string; id?: number }) => s.name === stateName
+        );
+        if (state && state.id) {
+          setSelectedStateId(state.id);
+        }
+      }
+    }
+  }, [user, states]);
+
+  const handleVerificationChange = (checked: boolean) => {
+    if (checked && !user?.is_verified) {
+      setPendingVerificationValue(true);
+      setShowVerifyDialog(true);
+    } else if (!checked && user?.is_verified) {
+      setPendingVerificationValue(false);
+      setShowVerifyDialog(true);
+    } else {
+      form.setValue("is_verified", checked);
+    }
+  };
+
+  const handleVerifyConfirm = async () => {
+    if (!user) return;
+
+    try {
+      setIsVerifying(true);
+
+      await axios.post(`/account/verify/${user.id}/`);
+
+      form.setValue("is_verified", pendingVerificationValue);
+
+      toast.success(
+        pendingVerificationValue
+          ? "User verified successfully!"
+          : "User verification removed successfully!"
+      );
+
+      setShowVerifyDialog(false);
+    } catch (error: unknown) {
+      console.error("Error verifying user:", error);
+      const axiosError = error as {
+        response?: { data?: { message?: string; error?: string } };
+      };
+      toast.error(
+        axiosError?.response?.data?.message ||
+          axiosError?.response?.data?.error ||
+          "Failed to update verification status"
+      );
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleVerifyCancel = () => {
+    setShowVerifyDialog(false);
+    if (user) {
+      form.setValue("is_verified", user.is_verified);
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image size must be less than 5MB");
+        return;
+      }
+      setSelectedImage(file);
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+  };
+
   const onSubmit = async (data: FormValues) => {
     if (!user) return;
-    await onSave(user.id, data);
+
+    // Create payload
+    let payload: Record<string, any> = { ...data };
+
+    if (restrictRoles) {
+      // Staff users can only modify volunteer and member: omit elevated role fields
+      delete payload.is_admin_account;
+      delete payload.is_staff_account;
+      delete payload.is_field_worker;
+    }
+
+    // Add image if selected
+    if (selectedImage) {
+      payload.image = selectedImage;
+    }
+
+    await onSave(user.id, payload);
+  };
+
+  const handleSaveClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const isValid = await form.trigger();
+    if (!isValid) {
+      const errors = form.formState.errors;
+      console.log("Validation errors:", errors);
+
+      // Show specific error messages
+      Object.keys(errors).forEach((key) => {
+        const error = errors[key as keyof typeof errors];
+        if (error?.message) {
+          toast.error(`${key}: ${error.message}`);
+        }
+      });
+      return;
+    }
+
+    const formData = form.getValues();
+    await onSubmit(formData);
   };
 
   return (
@@ -195,6 +350,49 @@ export function EditUserDetailModal({
                     Required
                   </Badge>
                 </div>
+
+                {/* Profile Image Section */}
+                <div className="flex flex-col items-center justify-center gap-4 mb-6">
+                  <div className="relative group">
+                    <Avatar className="w-24 h-24 border-4 border-muted">
+                      <AvatarImage
+                        src={previewUrl || getUserImageUrl(user?.image)}
+                        alt="Profile"
+                        className="object-cover"
+                      />
+                      <AvatarFallback className="text-2xl">
+                        {user?.name?.charAt(0).toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    {(isAdmin() || isStaff()) && (
+                      <>
+                        <label
+                          htmlFor="picture-upload"
+                          className="absolute bottom-0 right-0 p-1.5 bg-primary text-primary-foreground rounded-full cursor-pointer hover:bg-primary/90 transition-colors shadow-sm"
+                        >
+                          <Camera className="w-4 h-4" />
+                          <span className="sr-only">Change Picture</span>
+                        </label>
+                        <input
+                          id="picture-upload"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleImageChange}
+                        />
+                      </>
+                    )}
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm font-medium">Profile Picture</p>
+                    {(isAdmin() || isStaff()) && (
+                      <p className="text-xs text-muted-foreground">
+                        Click icon to change (Max 5MB)
+                      </p>
+                    )}
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-7">
                   <FormField
                     control={form.control}
@@ -306,6 +504,40 @@ export function EditUserDetailModal({
 
                   <FormField
                     control={form.control}
+                    name="blood_group"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <Droplet className="h-4 w-4" />
+                          Blood Group
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="h-10">
+                              <SelectValue placeholder="Select blood group" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="O+">O+</SelectItem>
+                            <SelectItem value="O-">O-</SelectItem>
+                            <SelectItem value="A+">A+</SelectItem>
+                            <SelectItem value="A-">A-</SelectItem>
+                            <SelectItem value="B+">B+</SelectItem>
+                            <SelectItem value="B-">B-</SelectItem>
+                            <SelectItem value="AB+">AB+</SelectItem>
+                            <SelectItem value="AB-">AB-</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
                     name="profession"
                     render={({ field }) => (
                       <FormItem>
@@ -313,13 +545,23 @@ export function EditUserDetailModal({
                           <Briefcase className="h-4 w-4" />
                           Profession
                         </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter profession"
-                            {...field}
-                            className="h-10"
-                          />
-                        </FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="h-10">
+                              <SelectValue placeholder="Select profession" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {PROFESSIONS.map((profession) => (
+                              <SelectItem key={profession} value={profession}>
+                                {profession}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -329,7 +571,6 @@ export function EditUserDetailModal({
 
               <Separator className="my-6" />
 
-              {/* Address Information */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <MapPin className="h-5 w-5 text-muted-foreground" />
@@ -341,14 +582,16 @@ export function EditUserDetailModal({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-7">
                   <FormField
                     control={form.control}
-                    name="street"
+                    name="country"
                     render={({ field }) => (
-                      <FormItem className="md:col-span-2">
-                        <FormLabel>Street Address</FormLabel>
+                      <FormItem>
+                        <FormLabel>Country</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Enter street address"
+                            placeholder="Enter country"
                             {...field}
+                            value={"India"}
+                            readOnly
                           />
                         </FormControl>
                         <FormMessage />
@@ -356,28 +599,47 @@ export function EditUserDetailModal({
                     )}
                   />
 
+                  <div className="space-y-2">
+                    <StateSelect
+                      label="State"
+                      value={form.getValues("state") || ""}
+                      onValueChange={(value) => {
+                        form.setValue("state", value);
+                        form.setValue("district", "");
+                      }}
+                      onStateChange={(_, stateId) => {
+                        setSelectedStateId(stateId);
+                      }}
+                      countrySelected={true}
+                      error={form.formState.errors.state?.message}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <DistrictSelect
+                      label="District"
+                      value={form.getValues("district") || ""}
+                      onValueChange={(value) =>
+                        form.setValue("district", value)
+                      }
+                      stateSelected={!!form.getValues("state")}
+                      selectedStateId={selectedStateId}
+                      selectedStateName={form.getValues("state") || ""}
+                      error={form.formState.errors.district?.message}
+                    />
+                  </div>
+
                   <FormField
                     control={form.control}
                     name="sub_district"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Sub District</FormLabel>
+                        <FormLabel>Tehsil / Sub District</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter sub district" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="district"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>District</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter district" {...field} />
+                          <Input
+                            placeholder="Enter tehsil / sub district"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -400,34 +662,6 @@ export function EditUserDetailModal({
 
                   <FormField
                     control={form.control}
-                    name="state"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>State</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter state" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="country"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Country</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter country" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
                     name="postal_code"
                     render={({ field }) => (
                       <FormItem>
@@ -439,12 +673,28 @@ export function EditUserDetailModal({
                       </FormItem>
                     )}
                   />
+
+                  {/* <FormField
+                    control={form.control}
+                    name="street"
+                    render={({ field }) => (
+                      <FormItem className="md:col-span-2">
+                        <FormLabel>Street Address</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter street address"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  /> */}
                 </div>
               </div>
 
               <Separator className="my-6" />
 
-              {/* Government IDs */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <CreditCard className="h-5 w-5 text-muted-foreground" />
@@ -500,7 +750,6 @@ export function EditUserDetailModal({
 
               <Separator className="my-6" />
 
-              {/* User Roles */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <Shield className="h-5 w-5 text-muted-foreground" />
@@ -509,29 +758,31 @@ export function EditUserDetailModal({
                   </h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-7">
-                  <FormField
-                    control={form.control}
-                    name="is_volunteer"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border border-blue-200 bg-blue-50/50 dark:bg-blue-950/20 dark:border-blue-900 p-4 hover:shadow-sm transition-shadow">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            className="mt-0.5"
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel className="text-sm font-medium">
-                            Volunteer
-                          </FormLabel>
-                          <FormDescription className="text-xs">
-                            Can participate as a volunteer
-                          </FormDescription>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
+                  {!restrictRoles && (
+                    <FormField
+                      control={form.control}
+                      name="is_volunteer"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border border-blue-200 bg-blue-50/50 dark:bg-blue-950/20 dark:border-blue-900 p-4 hover:shadow-sm transition-shadow">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="mt-0.5"
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="text-sm font-medium">
+                              Volunteer
+                            </FormLabel>
+                            <FormDescription className="text-xs">
+                              Can participate as a volunteer
+                            </FormDescription>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
                   <FormField
                     control={form.control}
@@ -557,83 +808,88 @@ export function EditUserDetailModal({
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="is_staff_account"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border border-purple-200 bg-purple-50/50 dark:bg-purple-950/20 dark:border-purple-900 p-4 hover:shadow-sm transition-shadow">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            className="mt-0.5"
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel className="text-sm font-medium">
-                            Staff
-                          </FormLabel>
-                          <FormDescription className="text-xs">
-                            Elevated privileges
-                          </FormDescription>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
+                  {!restrictRoles && (
+                    <FormField
+                      control={form.control}
+                      name="is_staff_account"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border border-purple-200 bg-purple-50/50 dark:bg-purple-950/20 dark:border-purple-900 p-4 hover:shadow-sm transition-shadow">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="mt-0.5"
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="text-sm font-medium">
+                              Staff
+                            </FormLabel>
+                            <FormDescription className="text-xs">
+                              Elevated privileges
+                            </FormDescription>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
-                  <FormField
-                    control={form.control}
-                    name="is_field_worker"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border border-teal-200 bg-teal-50/50 dark:bg-teal-950/20 dark:border-teal-900 p-4 hover:shadow-sm transition-shadow">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            className="mt-0.5"
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel className="text-sm font-medium">
-                            Field Worker
-                          </FormLabel>
-                          <FormDescription className="text-xs">
-                            On-ground operations support
-                          </FormDescription>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
+                  {!restrictRoles && (
+                    <FormField
+                      control={form.control}
+                      name="is_field_worker"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border border-teal-200 bg-teal-50/50 dark:bg-teal-950/20 dark:border-teal-900 p-4 hover:shadow-sm transition-shadow">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="mt-0.5"
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="text-sm font-medium">
+                              Field Worker
+                            </FormLabel>
+                            <FormDescription className="text-xs">
+                              On-ground operations support
+                            </FormDescription>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
-                  <FormField
-                    control={form.control}
-                    name="is_admin_account"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border border-orange-200 bg-orange-50/50 dark:bg-orange-950/20 dark:border-orange-900 p-4 hover:shadow-sm transition-shadow">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            className="mt-0.5"
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel className="text-sm font-medium">
-                            Administrator
-                          </FormLabel>
-                          <FormDescription className="text-xs">
-                            Full system access
-                          </FormDescription>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
+                  {!restrictRoles && (
+                    <FormField
+                      control={form.control}
+                      name="is_admin_account"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border border-orange-200 bg-orange-50/50 dark:bg-orange-950/20 dark:border-orange-900 p-4 hover:shadow-sm transition-shadow">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="mt-0.5"
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="text-sm font-medium">
+                              Administrator
+                            </FormLabel>
+                            <FormDescription className="text-xs">
+                              Full system access
+                            </FormDescription>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  )}
                 </div>
               </div>
 
               <Separator className="my-6" />
 
-              {/* Account Status */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5 text-muted-foreground" />
@@ -642,38 +898,13 @@ export function EditUserDetailModal({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-7">
                   <FormField
                     control={form.control}
-                    name="is_active"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border-2 border-green-300 bg-green-50 dark:bg-green-950/30 dark:border-green-800 p-4 hover:shadow-md transition-all">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            className="mt-0.5 data-[state=checked]:bg-green-600"
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel className="text-sm font-semibold flex items-center gap-1">
-                            <CheckCircle2 className="h-4 w-4 text-green-600" />
-                            Active
-                          </FormLabel>
-                          <FormDescription className="text-xs">
-                            Account is active
-                          </FormDescription>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
                     name="is_verified"
                     render={({ field }) => (
                       <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border-2 border-blue-300 bg-blue-50 dark:bg-blue-950/30 dark:border-blue-800 p-4 hover:shadow-md transition-all">
                         <FormControl>
                           <Checkbox
                             checked={field.value}
-                            onCheckedChange={field.onChange}
+                            onCheckedChange={handleVerificationChange}
                             className="mt-0.5 data-[state=checked]:bg-blue-600"
                           />
                         </FormControl>
@@ -683,7 +914,7 @@ export function EditUserDetailModal({
                             Verified
                           </FormLabel>
                           <FormDescription className="text-xs">
-                            Identity verified
+                            Identity verified (requires confirmation)
                           </FormDescription>
                         </div>
                       </FormItem>
@@ -720,7 +951,7 @@ export function EditUserDetailModal({
           </Form>
         </div>
 
-        <div className="border-t pt-4 mt-2">
+        <div className="border-t sticky bottom-0 pt-4 mt-2 mb-4 bg-background">
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
               <AlertCircle className="h-4 w-4 inline mr-1" />
@@ -736,9 +967,9 @@ export function EditUserDetailModal({
                 Cancel
               </Button>
               <Button
-                type="submit"
+                type="button"
                 disabled={loading}
-                onClick={form.handleSubmit(onSubmit)}
+                onClick={handleSaveClick}
               >
                 {loading ? (
                   <>
@@ -756,6 +987,71 @@ export function EditUserDetailModal({
           </div>
         </div>
       </DialogContent>
+
+      <AlertDialog open={showVerifyDialog} onOpenChange={setShowVerifyDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-blue-600" />
+              {pendingVerificationValue ? "Verify User" : "Remove Verification"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingVerificationValue ? (
+                <>
+                  Are you sure you want to verify <strong>{user?.name}</strong>?
+                  <br />
+                  <br />
+                  <span className="text-sm">
+                    This will mark the user&apos;s identity as verified and may
+                    grant them additional privileges on the platform.
+                  </span>
+                </>
+              ) : (
+                <>
+                  Are you sure you want to remove verification status from{" "}
+                  <strong>{user?.name}</strong>?
+                  <br />
+                  <br />
+                  <span className="text-sm">
+                    This will mark the user as unverified and may restrict some
+                    features.
+                  </span>
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={handleVerifyCancel}
+              disabled={isVerifying}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleVerifyConfirm}
+              disabled={isVerifying}
+              className={
+                pendingVerificationValue
+                  ? "bg-blue-600 hover:bg-blue-700"
+                  : "bg-red-600 hover:bg-red-700"
+              }
+            >
+              {isVerifying ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  {pendingVerificationValue
+                    ? "Verify User"
+                    : "Remove Verification"}
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }

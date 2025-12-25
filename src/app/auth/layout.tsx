@@ -1,10 +1,11 @@
 import React from "react";
 import { Metadata } from "next";
 import Image from "next/image";
+import { IMAGE_BLUR_DATA_URL } from "@/lib/image-placeholder";
 import logo from "@/assets/logo/logo.png";
 
 export const metadata: Metadata = {
-  title: "Authentication - RSS Rashtriya Swayamsevak Sangh",
+  title: "Authentication - RSS RASHTRIYA SEVA SANGH",
   description:
     "Login or Register to join the RSS community and contribute to nation building",
 };
@@ -15,11 +16,11 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="h-screen overflow-hidden bg-gradient-to-br from-primary/5 via-background to-primary/10 flex">
+    <div className="min-h-screen overflow-y-auto bg-gradient-to-br from-primary/5 via-background to-primary/10 flex">
       <div className="hidden lg:flex lg:w-1/2 bg-primary text-primary-foreground relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/90" />
 
-        <div className="relative z-10 flex flex-col justify-center px-8 py-12">
+        <div className="relative z-10 flex flex-col justify-center px-6 xl:px-8 py-12">
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-primary-foreground/20 rounded-lg flex items-center justify-center">
@@ -28,15 +29,17 @@ export default function AuthLayout({
                     src={logo}
                     alt="राष्ट्रीय सेवा संघ Logo"
                     fill
-                    className="object-contain"
+                    className="object-contain bg-transparent"
                     priority
+                    placeholder="blur"
+                    blurDataURL={IMAGE_BLUR_DATA_URL}
                   />
                 </div>
               </div>
               <div>
-                <h1 className="text-lg font-bold">राष्ट्रीय स्वयंसेवक संघ</h1>
+                <h1 className="text-lg font-bold">राष्ट्रीय सेवा संघ</h1>
                 <p className="text-xs text-primary-foreground/80">
-                  Rashtriya Swayamsevak Sangh
+                  RASHTRIYA SEVA SANGH
                 </p>
               </div>
             </div>
