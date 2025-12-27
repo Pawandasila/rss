@@ -94,7 +94,7 @@ const AboutSection: React.FC = () => {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-apml-red to-orange-600">
                 Sanatan - <br />
               </span>
-              <span className="text-sm md:text-base lg:text-lg font-medium">
+              <span className="text-md md:text-lg lg:text-xl font-medium">
                 The Heartbeat of Bharat
               </span>
             </motion.h3>
