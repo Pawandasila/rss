@@ -17,17 +17,17 @@ import Link from "next/link";
 
 const Footer = () => {
   const LOCATIONS = [
-    "RSS Uttarakhand ()",
-    "RSS Uttar Pradesh ()",
-    "RSS Delhi ()",
-    "RSS Rajasthan ()",
-    "RSS Madhya Pradesh ()",
-    "RSS Chatthisgarh ()",
-    "RSS Tamil Nadu ()",
-    "RSS Jammu Kashmir ()",
-    "RSS Punjab ()",
-    "RSS Hariyana ()",
-    "RSS Himachal ()",
+    "RSS Uttarakhand (20129)",
+    "RSS Uttar Pradesh (22080)",
+    "RSS Delhi (5040)",
+    "RSS Rajasthan (1990)",
+    "RSS Madhya Pradesh (4190)",
+    "RSS Chatthisgarh (1290)",
+    "RSS Tamil Nadu (789)",
+    "RSS Jammu Kashmir (309)",
+    "RSS Punjab (1980)",
+    "RSS Hariyana (2609)",
+    "RSS Himachal (1301)",
     "More",
   ];
 
