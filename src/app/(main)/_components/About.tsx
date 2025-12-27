@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import hero01 from "@/assets/hero/hero-01.png";
 import SectionHeader from "@/components/common/SectionHeader";
 import Model from "@/components/common/Model";
+import { Button } from "@/components/ui/button";
 
 const AboutSection: React.FC = () => {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
@@ -104,6 +105,8 @@ const AboutSection: React.FC = () => {
               सांस्कृतिक मूल्यों, और वैदिक जीवन पद्धति की पुनर्स्थापना को केंद्र
               में रखा गया है
             </motion.p>
+
+            <Button className="md:hidden block">About Us</Button>
 
             <div className="grid grid-cols-3 gap-2 sm:gap-4 values-grid">
               {[
