@@ -1,7 +1,14 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import { Shield, Heart, Users, UserCircle, Play } from "lucide-react";
+import {
+  Shield,
+  Heart,
+  Users,
+  UserCircle,
+  Play,
+  ArrowUpRight,
+} from "lucide-react";
 import { motion } from "motion/react";
 import hero01 from "@/assets/hero/hero-01.png";
 import SectionHeader from "@/components/common/SectionHeader";
@@ -84,7 +91,7 @@ const AboutSection: React.FC = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="about-title text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-4 md:mb-8 leading-[1.1]"
             >
-              Sanatan - The{" "}
+              Sanatan - The
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-apml-red to-orange-600">
                 Heartbeat of Bharat
               </span>
@@ -106,7 +113,11 @@ const AboutSection: React.FC = () => {
               की इस महान यात्रा को सफल बना सकते हैं।
             </motion.p>
 
-            <Button className="md:hidden block">About Us</Button>
+            <div className="mt-12 text-center md:hidden">
+              <button className="inline-flex items-center gap-2 text-sm font-bold text-primary uppercase tracking-wider border border-primary px-8 py-3 rounded-lg hover:bg-primary hover:text-primary-foreground transition-all">
+                View More <ArrowUpRight size={16} />
+              </button>
+            </div>
 
             <div className="grid grid-cols-3 gap-2 sm:gap-4 values-grid">
               {[

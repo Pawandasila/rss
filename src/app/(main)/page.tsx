@@ -27,13 +27,13 @@ export default function Home() {
       <Hero />
       <Supporters />
       <AboutSection />
-      <ServicesSection />
-      <Team />
-      <BirthdaySection />
       <DivineMission />
-      <DonationList />
+      <ServicesSection />
       <ShikayatSection />
       <VyapariSection />
+      <Team />
+      <BirthdaySection />
+      <DonationList />
       <Blog />
       <GallerySection />
       <PressSection />
