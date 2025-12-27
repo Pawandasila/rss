@@ -16,7 +16,20 @@ import logo from "@/assets/logo/logo.png";
 import Link from "next/link";
 
 const Footer = () => {
-  const LOCATIONS = ["RSS Uttarakhand", "RSS Delhi"];
+  const LOCATIONS = [
+    "RSS Uttarakhand",
+    "RSS Uttar Pradesh",
+    "RSS Delhi",
+    "RSS Rajasthan",
+    "RSS Madhya Pradesh",
+    "RSS Chatthisgarh",
+    "RSS Tamil Nadu",
+    "RSS Jammu Kashmir",
+    "RSS Punjab",
+    "RSS Hariyana",
+    "RSS Himachal",
+    "More",
+  ];
 
   const QUICK_LINKS = [
     { name: "Vision & Mission", href: "/divine-mission" },
@@ -58,12 +71,12 @@ const Footer = () => {
             </div>
             <p className="text-sm leading-relaxed text-gray-500 max-w-sm">
               Dedicated to the mission of national reconstruction and character
-              building. Founded in 1925, we are the world's largest voluntary
+              building. Founded in 2024, we are the world's largest voluntary
               organization committed to Bharat's resurgence.
             </p>
             <div className="flex items-center gap-6">
               <div className="flex flex-col">
-                <span className="text-white font-black text-xl">1925</span>
+                <span className="text-white font-black text-xl">2024</span>
                 <span className="text-[10px] uppercase font-bold text-gray-600 tracking-widest">
                   Foundation
                 </span>

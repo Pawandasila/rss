@@ -68,7 +68,7 @@ const AboutSection: React.FC = () => {
               transition={{ delay: 0.5, type: "spring" }}
               className="absolute -bottom-10 -right-10 bg-apml-red text-white p-6 rounded-full shadow-2xl flex-col items-center justify-center w-36 h-36 border-[6px] border-white hidden md:flex z-20"
             >
-              <span className="text-4xl font-black tracking-tighter">1925</span>
+              <span className="text-4xl font-black tracking-tighter">2024</span>
               <span className="text-[10px] font-bold uppercase tracking-widest mt-1 opacity-90">
                 Est. Year
               </span>
