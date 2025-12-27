@@ -102,7 +102,7 @@ const Footer = () => {
           <div className="lg:col-span-2">
             <h4 className="text-white font-black text-sm uppercase tracking-widest mb-8 flex items-center gap-2">
               <div className="w-1.5 h-1.5 bg-apml-red rounded-full"></div>
-              About Sangh
+              About Us
             </h4>
             <ul className="space-y-4">
               {QUICK_LINKS.map((link) => (
