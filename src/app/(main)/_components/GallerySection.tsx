@@ -247,10 +247,6 @@ const GallerySection: React.FC = () => {
                   </div>
 
                   <div className="absolute inset-x-0 bottom-0 p-6 z-10 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                    <h3 className="text-white font-bold text-lg md:text-xl leading-tight">
-                      {item.title}
-                    </h3>
-
                     <div className="flex items-center gap-2 mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
                       <span className="text-[10px] text-white/70 font-bold uppercase tracking-widest">
                         {item.type === "video"
