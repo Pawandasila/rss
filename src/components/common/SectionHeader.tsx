@@ -26,35 +26,41 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.8, delay: 0.2 }}
-      className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 border-b border-border pb-4 md:pb-6 gap-4"
+      className="mb-8 md:mb-12 border-b border-border pb-4 md:pb-6 text-left"
     >
-      <div className="w-full md:w-auto">
-        <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest mb-2">
+      {/* Top row: Badge + View All Link */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">
           <BadgeIcon size={14} /> {badgeTitle}
         </div>
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-tight">
-          {title}
-        </h2>
-        {description && (
-          <p className="mt-3 text-muted-foreground max-w-2xl text-sm md:text-base lg:text-lg">
-            {description}
-          </p>
+        {(viewAll as string) && (
+          <Link
+            href={viewAllLink}
+            className="flex items-center gap-1.5 text-xs md:text-sm font-bold text-muted-foreground hover:text-primary transition-colors group px-2 py-1 md:px-3 md:py-1.5 rounded-lg hover:bg-primary/5 whitespace-nowrap"
+          >
+            {viewAll}{" "}
+            <ArrowUpRight
+              size={14}
+              className="group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform"
+            />
+          </Link>
         )}
-        <div className="w-16 h-1 bg-primary mt-3 rounded-full"></div>
       </div>
 
-      {(viewAll as string) && (
-        <Link
-          href={viewAllLink}
-          className="flex items-center gap-2 text-xs md:text-sm font-bold text-muted-foreground hover:text-primary transition-colors group px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-primary/5 whitespace-nowrap self-start md:self-auto"
-        >
-          {viewAll}{" "}
-          <ArrowUpRight
-            size={16}
-            className="group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform"
-          />
-        </Link>
+      {/* Title */}
+      <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-tight">
+        {title}
+      </h2>
+
+      {/* Description */}
+      {description && (
+        <p className="mt-3 text-muted-foreground max-w-2xl text-sm md:text-base lg:text-lg">
+          {description}
+        </p>
       )}
+
+      {/* Underline */}
+      <div className="w-16 h-1 bg-primary mt-3 rounded-full"></div>
     </motion.div>
   );
 };

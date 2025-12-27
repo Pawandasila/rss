@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Phone, MessageCircle, FileText, MailIcon } from "lucide-react";
+import { Phone, MessageCircle, FileText, MailIcon, Mail } from "lucide-react";
 import Link from "next/link";
 
 const StickySidebar: React.FC = () => {
@@ -46,34 +46,37 @@ const StickySidebar: React.FC = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-50 lg:hidden flex justify-between items-end px-8 py-2 pb-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-40 lg:hidden flex justify-between items-end px-6 py-1 pb-2">
         <Link
           href="tel:+91 94296 93593"
-          className="flex flex-col items-center gap-1 text-gray-500 hover:text-apml-red transition-colors w-16"
+          className="flex flex-col items-center gap-0.5 text-gray-500 hover:text-apml-red transition-colors w-14"
         >
-          <Phone size={22} />
-          <span className="text-[10px] font-bold uppercase tracking-wider">
+          <Phone size={18} />
+          <span className="text-[9px] font-bold uppercase tracking-wider">
             Call
           </span>
         </Link>
 
-        <button className="flex flex-col items-center gap-1 relative -top-6">
-          <div className="bg-apml-red text-white w-14 h-14 rounded-full shadow-xl shadow-red-200 flex items-center justify-center border-4 border-white transform active:scale-95 transition-transform">
-            <FileText size={24} strokeWidth={2.5} />
+        <button className="flex flex-col items-center gap-0.5 relative -top-4">
+          <div className="bg-apml-red text-white w-11 h-11 rounded-full shadow-lg shadow-red-200 flex items-center justify-center border-[3px] border-white transform active:scale-95 transition-transform">
+            <MailIcon size={20} strokeWidth={2.5} />
           </div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-apml-red mt-1">
-            Quote
-          </span>
+          <Link
+            href={"mailto:help@joinrss.org.in"}
+            className="text-[9px] font-bold uppercase tracking-wider text-apml-red"
+          >
+            Email
+          </Link>
         </button>
 
         <Link
           href="https://wa.me/9429693593"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex flex-col items-center gap-1 text-gray-500 hover:text-green-600 transition-colors w-16"
+          className="flex flex-col items-center gap-0.5 text-gray-500 hover:text-green-600 transition-colors w-14"
         >
-          <MessageCircle size={22} />
-          <span className="text-[10px] font-bold uppercase tracking-wider">
+          <MessageCircle size={18} />
+          <span className="text-[9px] font-bold uppercase tracking-wider">
             Chat
           </span>
         </Link>

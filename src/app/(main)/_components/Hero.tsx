@@ -633,7 +633,7 @@ const Hero = () => {
                 {/* Password Info */}
                 <p className="text-[10px] sm:text-xs text-gray-400 text-center mt-3">
                   पंजीकरण के बाद आपका पासवर्ड आपकी जन्म तिथि होगी (DDMMYYYY
-                  format में)
+                  प्रारूप में, जैसे: 5 जनवरी 2000 के लिए 05012000)
                 </p>
               </motion.div>
             )}

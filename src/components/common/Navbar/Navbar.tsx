@@ -164,17 +164,8 @@ const Header: React.FC = () => {
               aria-label="Mobile Navigation"
               id="mobile-menu"
             >
-              {/* Logo Section - Order 1 on Mobile */}
-              <div className="lg:col-span-1 order-1 lg:order-none flex flex-col items-center lg:items-start menu-item-stagger">
-                <div
-                  className="w-fit cursor-pointer"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Logo />
-                </div>
-
-                {/* Auth Buttons in Menu */}
-                <div className="flex flex-col sm:flex-row gap-3 mt-6 w-full sm:w-auto">
+              <div className="lg:col-span-1 order-1 mx-auto lg:order-none flex flex-col items-center lg:items-start menu-item-stagger">
+                <div className="flex flex-row mx-auto gap-3 mt-6 w-full">
                   <Link
                     href="/auth/login"
                     className="flex items-center justify-center gap-2 px-6 py-2.5 border-2 border-primary text-primary font-semibold text-sm rounded-full hover:bg-primary hover:text-white transition-all duration-300"
@@ -194,7 +185,6 @@ const Header: React.FC = () => {
                 </div>
               </div>
 
-              {/* Navigation Section - Order 2 on Mobile */}
               <nav
                 className="lg:col-span-3 lg:row-span-2 order-2 lg:order-none"
                 aria-label="Main Site Navigation"
@@ -252,9 +242,7 @@ const Header: React.FC = () => {
                   </h4>
                   <p className="text-xs text-gray-500 mt-2 leading-relaxed max-w-xs mx-auto lg:mx-0 font-medium">
                     Largest voluntary organization with over{" "}
-                    <span className="text-primary font-bold">
-                      50,000+ Shakhas
-                    </span>{" "}
+                    <span className="text-primary font-bold">15+ states</span>{" "}
                     conducting daily activities across Bharat.
                   </p>
                 </div>

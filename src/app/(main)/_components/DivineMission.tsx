@@ -85,7 +85,7 @@ const FeaturesSection: React.FC = () => {
   if (!displayMissions || displayMissions.length === 0) {
     return (
       <section className="py-12 md:py-20 bg-gray-50">
-        <div className="container mx-auto px-4 text-center">
+        <div className="w-full px-4 md:px-8 lg:px-16 xl:px-24 text-center">
           <SectionHeader
             title="Our Mission"
             badgeIcon={UserCircle}
@@ -108,7 +108,7 @@ const FeaturesSection: React.FC = () => {
 
   return (
     <section className="py-12 md:py-20 bg-gray-50" ref={containerRef}>
-      <div className="container mx-auto px-4">
+      <div className="w-full px-4 md:px-8 lg:px-16 xl:px-24">
         <SectionHeader
           title="Our Mission"
           badgeIcon={UserCircle}
