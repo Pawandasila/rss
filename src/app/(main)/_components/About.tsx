@@ -113,8 +113,8 @@ const AboutSection: React.FC = () => {
               की इस महान यात्रा को सफल बना सकते हैं।
             </motion.p>
 
-            <div className="mt-12 text-center md:hidden">
-              <button className="inline-flex items-center gap-2 text-sm font-bold text-primary uppercase tracking-wider border border-primary px-8 py-3 rounded-lg hover:bg-primary hover:text-primary-foreground transition-all">
+            <div className="mb-4 mt-4 text-center md:hidden">
+              <button className="inline-flex items-center gap-2 text-sm font-bold text-primary uppercase tracking-wider border border-primary px-4 py-2 rounded-lg hover:bg-primary hover:text-primary-foreground transition-all">
                 View More <ArrowUpRight size={16} />
               </button>
             </div>
