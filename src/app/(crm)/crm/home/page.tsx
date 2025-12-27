@@ -53,7 +53,7 @@ const HomeManagementPage: React.FC = () => {
     subtitle: "धर्म से राष्ट्र, राष्ट्र से विश्व - यही वैदिक दृष्टि है।",
     paragraph:
       "Join us in our sacred mission to revive Sanatan values, strengthen national unity, and build a Vedic Nation rooted in Dharma, Service, and Culture.",
-    stats: { members: "50K+", states: "15+", projects: "50+" },
+    stats: { members: "1Lakh+", states: "15+", projects: "50+" },
     ctaPrimaryText: "Join Now",
     ctaPrimaryLink: "/become-member",
     ctaSecondaryText: "Donate Now",

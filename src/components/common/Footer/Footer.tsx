@@ -17,17 +17,17 @@ import Link from "next/link";
 
 const Footer = () => {
   const LOCATIONS = [
-    "RSS Uttarakhand",
-    "RSS Uttar Pradesh",
-    "RSS Delhi",
-    "RSS Rajasthan",
-    "RSS Madhya Pradesh",
-    "RSS Chatthisgarh",
-    "RSS Tamil Nadu",
-    "RSS Jammu Kashmir",
-    "RSS Punjab",
-    "RSS Hariyana",
-    "RSS Himachal",
+    "RSS Uttarakhand ()",
+    "RSS Uttar Pradesh ()",
+    "RSS Delhi ()",
+    "RSS Rajasthan ()",
+    "RSS Madhya Pradesh ()",
+    "RSS Chatthisgarh ()",
+    "RSS Tamil Nadu ()",
+    "RSS Jammu Kashmir ()",
+    "RSS Punjab ()",
+    "RSS Hariyana ()",
+    "RSS Himachal ()",
     "More",
   ];
 
@@ -90,7 +90,7 @@ const Footer = () => {
               </div>
               <div className="w-px h-10 bg-gray-800"></div>
               <div className="flex flex-col">
-                <span className="text-white font-black text-xl">50K+</span>
+                <span className="text-white font-black text-xl">1Lack+</span>
                 <span className="text-[10px] uppercase font-bold text-gray-600 tracking-widest">
                   Members
                 </span>
@@ -148,14 +148,14 @@ const Footer = () => {
               <div className="space-y-4">
                 <div>
                   <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-600 mb-1">
-                    Delhi Office
+                    National Office
                   </span>
                   <span className="text-gray-400 text-sm leading-relaxed block">
                     D BLOCK, POCKET-5 (Flat No. 34), DDA Flat, CRPF Flat,
                     Bawana, New Delhi – 110040
                   </span>
                 </div>
-                <div>
+                {/* <div>
                   <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-600 mb-1">
                     Uttarakhand Office
                   </span>
@@ -172,7 +172,7 @@ const Footer = () => {
                     Shyam colony, Baloda bazar, near Asvsconstruction Pvt ltd
                     chattisgarh - 493332
                   </span>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

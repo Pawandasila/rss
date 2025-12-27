@@ -354,7 +354,7 @@ const Hero = () => {
                 </div>
                 <div className="hidden lg:flex items-center gap-3 bg-white/10 px-5 py-3 rounded-xl backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 cursor-default shadow-lg group">
                   <span className="text-sm font-bold uppercase tracking-wider text-white">
-                    50K+ Active Members
+                    1Lakh+ Active Members
                   </span>
                 </div>
               </div>
