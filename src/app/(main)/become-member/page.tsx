@@ -164,6 +164,22 @@ const BecomeMemberPage = () => {
         referred_by: refParam,
       }));
     }
+
+    // Prefill form from query params (from Hero registration)
+    const nameParam = searchParams.get("name");
+    const emailParam = searchParams.get("email");
+    const phoneParam = searchParams.get("phone");
+    const dobParam = searchParams.get("dob");
+
+    if (nameParam || emailParam || phoneParam || dobParam) {
+      setFormState((prev) => ({
+        ...prev,
+        ...(nameParam && { name: nameParam }),
+        ...(emailParam && { email: emailParam }),
+        ...(phoneParam && { phone: phoneParam }),
+        ...(dobParam && { dob: dobParam }),
+      }));
+    }
   }, [searchParams]);
 
   useEffect(() => {

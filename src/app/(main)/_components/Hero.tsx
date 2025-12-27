@@ -202,12 +202,21 @@ const Hero = () => {
       const result = await registerUser(registrationData);
 
       if (result.success) {
-        toast.success("पंजीकरण सफल! आपका पासवर्ड आपकी जन्म तिथि है (DDMMYYYY)");
+        toast.success("पंजीकरण सफल! अब कृपया अपनी सदस्यता पूरी करें");
+
+        // Build query params for become-member page
+        const params = new URLSearchParams({
+          name: joinForm.name.trim(),
+          email: joinForm.email.toLowerCase().trim(),
+          phone: joinForm.phone.trim(),
+          dob: format(joinForm.dateOfBirth, "yyyy-MM-dd"),
+        });
+
         setJoinForm({ name: "", email: "", phone: "", dateOfBirth: undefined });
 
         setTimeout(() => {
-          router.push("/auth/login");
-        }, 2000);
+          router.push(`/become-member?${params.toString()}`);
+        }, 1500);
       } else {
         toast.error(result.message || "पंजीकरण में त्रुटि हुई");
       }

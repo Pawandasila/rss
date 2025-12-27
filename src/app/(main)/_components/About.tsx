@@ -84,9 +84,9 @@ const AboutSection: React.FC = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="about-title text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-4 md:mb-8 leading-[1.1]"
             >
-              The Silent Force of <br />
+              Sanatan - The{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-apml-red to-orange-600">
-                National Resurgence
+                Heartbeat of Bharat
               </span>
             </motion.h3>
 
@@ -97,13 +97,13 @@ const AboutSection: React.FC = () => {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="text-gray-500 text-sm md:text-lg leading-relaxed mb-8 md:mb-10 font-medium max-w-lg"
             >
-              राष्ट्रीय सेवा संघ भारतवर्ष एक वैदिक सनातन धर्म पर आधारित
-              राष्ट्रीय, धार्मिक एवं सांस्कृतिक संगठन है, जिसकी स्थापना 28 फरवरी
-              2024 (विक्रमी संवत 2081, फाल्गुन कृष्ण चतुर्थी) को भारतवर्ष के
-              संत-महात्माओं एवं धर्मगुरुओं के आशीर्वाद से की गई। इस संघ की नींव
-              उस पवित्र उद्देश्य के साथ रखी गई है, जिसमें भारत की सनातन परंपरा,
-              सांस्कृतिक मूल्यों, और वैदिक जीवन पद्धति की पुनर्स्थापना को केंद्र
-              में रखा गया है
+              राष्ट्रीय सेवा संघ का लक्ष्य सेवा, समर्पण और राष्ट्रवाद के मूल
+              सिद्धांतों के आधार पर एक मजबूत और समृद्ध वैदिक भारत का निर्माण
+              करना है। हमारी कार्यप्रणाली संगठन,वैदिक शिक्षा और जमीनी सेवा के
+              माध्यम से समाज के हर वर्ग को सशक्त बनाने पर केंद्रित है। हमारे
+              उद्देश्यों, संचालन के तरीकों और भविष्य की विस्तृत योजनाओं को
+              जानकर, आप समझ सकते हैं कि कैसे हम सभी मिलकर वैदिक राष्ट्र निर्माण
+              की इस महान यात्रा को सफल बना सकते हैं।
             </motion.p>
 
             <Button className="md:hidden block">About Us</Button>
