@@ -90,7 +90,7 @@ const Footer = () => {
               </div>
               <div className="w-px h-10 bg-gray-800"></div>
               <div className="flex flex-col">
-                <span className="text-white font-black text-xl">1Lack+</span>
+                <span className="text-white font-black text-xl">1Lakh+</span>
                 <span className="text-[10px] uppercase font-bold text-gray-600 tracking-widest">
                   Members
                 </span>
@@ -184,7 +184,7 @@ const Footer = () => {
                 <span>Regional Centers</span>
                 <Globe size={14} className="text-apml-red" />
               </h4>
-              <div className="h-auto overflow-y-auto pr-2 custom-scrollbar grid grid-cols-1 gap-2">
+              <div className="h-44 overflow-y-scroll pr-2 custom-scrollbar grid grid-cols-1 gap-2">
                 {LOCATIONS.map((loc, i) => (
                   <Link
                     key={i}
