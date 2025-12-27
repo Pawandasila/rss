@@ -91,10 +91,10 @@ const AboutSection: React.FC = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="about-title text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-4 md:mb-8 leading-[1.1]"
             >
-              Sanatan - The
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-apml-red to-orange-600">
-                Heartbeat of Bharat
+                Sanatan - <br />
               </span>
+              The Heartbeat of Bharat
             </motion.h3>
 
             <motion.p
