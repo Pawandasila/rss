@@ -97,7 +97,7 @@ const TeamSection: React.FC = () => {
 
   if (loading) {
     return (
-      <section className="py-24 bg-gray-50 overflow-hidden min-h-[600px]">
+      <section className="py-12 sm:py-16 lg:py-24 bg-gray-50 overflow-hidden min-h-[400px] sm:min-h-[600px] lg:min-h-[800px]">
         <div className="container mx-auto px-4 flex justify-center items-center min-h-[400px]">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </div>
@@ -129,7 +129,7 @@ const TeamSection: React.FC = () => {
 
   return (
     <section
-      className="py-24 bg-gray-50 overflow-hidden min-h-[800px]"
+      className="py-12 sm:py-16 lg:py-24 bg-gray-50 overflow-hidden min-h-[400px] sm:min-h-[600px] lg:min-h-[800px]"
       ref={sectionRef}
     >
       <div className="container mx-auto px-4">
