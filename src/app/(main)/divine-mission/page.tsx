@@ -17,6 +17,7 @@ import {
 import { IMAGE_BLUR_DATA_URL } from "@/lib/image-placeholder";
 import { useMissionApi } from "@/module/crm/mission/hooks";
 import { buildMediaUrl } from "@/lib/media";
+import { stripHtml } from "@/lib/utils";
 import type { StaticImageData } from "next/image";
 
 const missionSectionData = {
@@ -269,11 +270,8 @@ const DivineMissionPage = () => {
                       <div className="flex-1 mb-4">
                         <div className="text-sm text-muted-foreground leading-relaxed">
                           {(() => {
-                            // Strip HTML tags for preview using a simple regex since we are truncating text
-                            const plainText = mission.description.replace(
-                              /<[^>]+>/g,
-                              ""
-                            );
+                            // Use stripHtml utility to clean tags and decode entities
+                            const plainText = stripHtml(mission.description);
                             const { text, isTruncated } = truncateText(
                               plainText,
                               15

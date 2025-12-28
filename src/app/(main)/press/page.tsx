@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { IMAGE_BLUR_DATA_URL } from "@/lib/image-placeholder";
 import { pressCategories } from "./pressData";
+import { stripHtml } from "@/lib/utils";
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -27,17 +28,6 @@ const formatDate = (dateString: string) => {
     month: "long",
     year: "numeric",
   }).format(date);
-};
-
-const stripHtml = (html: string): string => {
-  if (!html) return "";
-  return html
-    .replace(/<[^>]*>/g, "")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .trim();
 };
 
 const getCategoryIcon = (category: string) => {
