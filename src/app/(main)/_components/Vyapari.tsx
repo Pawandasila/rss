@@ -166,7 +166,7 @@ const VyapariSection: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="lg:w-1/2 vyapari-card-right flex"
           >
-            <div className="w-full bg-[#0F1115] text-white rounded-2xl md:rounded-[2rem] shadow-2xl p-6 md:p-10 lg:p-12 relative overflow-hidden flex flex-col justify-center border border-gray-800 group h-full">
+            <div className="w-full bg-[#0F1115] text-white rounded-2xl md:rounded-[2rem] shadow-2xl p-5 md:p-10 lg:p-12 relative overflow-hidden flex flex-col justify-center border border-gray-800 group h-full">
               {/* Background Images */}
               <div className="absolute top-0 right-0 w-[70%] h-full pointer-events-none transition-opacity duration-500 group-hover:opacity-40 opacity-20">
                 <div className="grid grid-cols-2 gap-4 transform -rotate-6 scale-125 -translate-y-12 translate-x-20">
@@ -187,65 +187,65 @@ const VyapariSection: React.FC = () => {
 
               <div className="relative z-10 flex flex-col h-full justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-orange-400 font-bold uppercase tracking-widest text-[10px] md:text-xs mb-4 md:mb-6 bg-orange-500/10 w-fit px-3 py-1 rounded-full border border-orange-500/20 backdrop-blur-md">
+                  <div className="flex items-center gap-2 text-orange-400 font-bold uppercase tracking-widest text-[9px] md:text-xs mb-4 md:mb-6 bg-orange-500/10 w-fit px-3 py-1 rounded-full border border-orange-500/20 backdrop-blur-md">
                     <Store size={14} /> 💼 व्यापारियों के लिए: राष्ट्र के साथ
                     अपना व्यापार बढ़ाएं
                   </div>
 
-                  <h3 className="text-3xl lg:text-5xl font-black mb-4 md:mb-6 leading-[1.1] tracking-tight text-white">
+                  <h3 className="text-2xl sm:text-3xl lg:text-5xl font-black mb-3 md:mb-6 leading-[1.1] tracking-tight text-white font-hind">
                     सनातनी व्यापारियों का <br />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-200">
                       सबसे बड़ा नेटवर्क
                     </span>
                   </h3>
 
-                  <p className="text-gray-400 text-sm md:text-lg mb-8 md:mb-10 max-w-lg leading-relaxed">
+                  <p className="text-gray-400 text-xs md:text-lg mb-6 md:mb-10 max-w-lg leading-relaxed font-hind">
                     करोड़ों जागरूक नागरिकों तक अपने उत्पादों और सेवाओं को
                     पहुँचाएँ। राष्ट्रीय सेवा संघ के इस मंच से जुड़कर अपने व्यवसाय
                     को एक नई पहचान और विस्तार दें।
                   </p>
                 </div>
 
-                <div className="space-y-3 md:space-y-4 mb-8 md:mb-10 relative">
-                  <div className="flex items-center gap-4 md:gap-5 p-3 md:p-4 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm group/feat cursor-default">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shrink-0 shadow-lg shadow-orange-900/40 group-hover/feat:scale-110 transition-transform">
-                      <BadgeCheck size={20} className="text-white" />
+                <div className="space-y-2 md:space-y-4 mb-8 md:mb-10 relative">
+                  <div className="flex items-center gap-3 md:gap-5 p-3 md:p-4 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm group/feat cursor-default">
+                    <div className="w-9 h-9 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shrink-0 shadow-lg shadow-orange-900/40 group-hover/feat:scale-110 transition-transform">
+                      <BadgeCheck className="w-5 h-5 md:w-6 md:h-6 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-white text-sm md:text-base mb-0.5">
+                      <h4 className="font-bold text-white text-xs md:text-base mb-0.5 font-hind">
                         सत्यापित स्वदेशी बैज (Verified Swadeshi Badge)
                       </h4>
-                      <p className="text-gray-400 text-[10px] md:text-xs leading-relaxed">
+                      <p className="text-gray-400 text-[9px] md:text-xs leading-relaxed font-hind">
                         हमारे विशेष सत्यापन बैज के साथ ग्राहकों का अटूट विश्वास
                         जीतें।
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 md:gap-5 p-3 md:p-4 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm group/feat cursor-default">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-900/40 group-hover/feat:scale-110 transition-transform">
-                      <MapPin size={20} className="text-white" />
+                  <div className="flex items-center gap-3 md:gap-5 p-3 md:p-4 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm group/feat cursor-default">
+                    <div className="w-9 h-9 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-900/40 group-hover/feat:scale-110 transition-transform">
+                      <MapPin className="w-5 h-5 md:w-6 md:h-6 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-white text-sm md:text-base mb-0.5">
+                      <h4 className="font-bold text-white text-xs md:text-base mb-0.5 font-hind">
                         हाइपर-लोकल विजिबिलिटी
                       </h4>
-                      <p className="text-gray-400 text-[10px] md:text-xs leading-relaxed">
+                      <p className="text-gray-400 text-[9px] md:text-xs leading-relaxed font-hind">
                         अपने पिनकोड में खोज करने वाले स्थानीय ग्राहकों की पहली
                         पसंद बनें।
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 md:gap-5 p-3 md:p-4 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm group/feat cursor-default">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shrink-0 shadow-lg shadow-green-900/40 group-hover/feat:scale-110 transition-transform">
-                      <Shield size={20} className="text-white" />
+                  <div className="flex items-center gap-3 md:gap-5 p-3 md:p-4 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm group/feat cursor-default">
+                    <div className="w-9 h-9 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shrink-0 shadow-lg shadow-green-900/40 group-hover/feat:scale-110 transition-transform">
+                      <Shield className="w-5 h-5 md:w-6 md:h-6 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-white text-sm md:text-base mb-0.5">
+                      <h4 className="font-bold text-white text-xs md:text-base mb-0.5 font-hind">
                         संगठित शक्ति
                       </h4>
-                      <p className="text-gray-400 text-[10px] md:text-xs leading-relaxed">
+                      <p className="text-gray-400 text-[9px] md:text-xs leading-relaxed font-hind">
                         राजनीतिक और व्यक्तिगत स्वार्थ से ऊपर उठकर निस्वार्थ भाव
                         से व्यापारिक हितों की रक्षा।
                       </p>
@@ -254,17 +254,19 @@ const VyapariSection: React.FC = () => {
                 </div>
 
                 <div className="mt-auto">
-                  <button className="w-full bg-white text-gray-900 py-3 md:py-4 px-6 md:px-8 rounded-xl font-black uppercase tracking-widest text-xs md:text-sm hover:bg-orange-50 transition-all shadow-[0_0_40px_rgba(255,255,255,0.1)] flex items-center justify-center gap-3 group">
-                    आज ही निःशुल्क पंजीकरण करें (Register Free Now)
+                  <button className="w-full bg-white text-gray-900 py-3 md:py-4 px-5 md:px-8 rounded-xl font-black uppercase tracking-widest text-[10px] md:text-sm hover:bg-orange-50 transition-all shadow-[0_0_40px_rgba(255,255,255,0.1)] flex items-center justify-center gap-2 md:gap-3 group">
+                    <span className="font-hind">
+                      आज ही निःशुल्क पंजीकरण करें (Register Free Now)
+                    </span>
                     <ArrowRight
-                      size={20}
-                      className="group-hover:translate-x-1 transition-transform text-orange-600"
+                      size={18}
+                      className="group-hover:translate-x-1 transition-transform text-orange-600 shrink-0"
                     />
                   </button>
-                  <p className="text-center text-[11px] text-gray-400 mt-4 font-bold uppercase tracking-wide">
+                  <p className="text-center text-[10px] text-gray-400 mt-3 md:mt-4 font-bold uppercase tracking-wide font-hind">
                     छोटे व्यापारियों और कुटीर उद्योगों के लिए कोई शुल्क नहीं।
                   </p>
-                  <p className="text-center text-[10px] text-orange-400/60 mt-2 font-medium italic">
+                  <p className="text-center text-[9px] text-orange-400/60 mt-1 md:mt-2 font-medium italic font-hind">
                     "धर्म के मार्ग पर चलने वाला व्यापार ही राष्ट्र की असली
                     उन्नति है।"
                   </p>

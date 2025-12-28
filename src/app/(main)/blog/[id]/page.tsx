@@ -136,7 +136,6 @@ export default function BlogPostPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Immersive Hero Header */}
       <section className="relative h-[60vh] md:h-[75vh] w-full overflow-hidden">
         {post.image ? (
           <Image

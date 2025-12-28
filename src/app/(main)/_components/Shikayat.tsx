@@ -100,17 +100,14 @@ const ShikayatSection: React.FC = () => {
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ duration: 0.8 }}
-              className="relative py-10"
+              className="relative py-4 md:py-10"
             >
-              {/* Decorative Background Elements */}
-              <div className="absolute top-1/2 left-0 w-72 h-72 bg-red-100 rounded-full blur-[100px] -z-10 opacity-30 transform -translate-y-1/2"></div>
-
-              <div className="flex flex-col gap-12 relative">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100">
-                    <ClipboardList className="text-red-600 w-8 h-8" />
+              <div className="flex flex-col gap-8 md:gap-12 relative">
+                <div className="flex items-center gap-3 md:gap-4 mb-2 md:mb-4">
+                  <div className="bg-white p-2 md:p-3 rounded-xl md:rounded-2xl shadow-sm border border-gray-100">
+                    <ClipboardList className="text-red-600 w-6 h-6 md:w-8 md:h-8" />
                   </div>
-                  <h3 className="text-2xl md:text-3xl font-black text-gray-900 border-b-4 border-red-500/20 pb-1">
+                  <h3 className="text-xl md:text-3xl font-black text-gray-900 border-b-4 border-red-500/20 pb-1 font-hind">
                     पोर्टल का उपयोग कैसे करें?
                   </h3>
                 </div>
@@ -120,19 +117,19 @@ const ShikayatSection: React.FC = () => {
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="flex gap-6 items-start group"
+                  className="flex gap-4 md:gap-6 items-start group"
                 >
-                  <div className="relative">
-                    <div className="w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center text-red-600 transition-transform duration-300 group-hover:scale-110 z-10 relative border border-gray-50">
-                      <MessageSquarePlus size={28} />
+                  <div className="relative shrink-0">
+                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white shadow-lg flex items-center justify-center text-red-600 transition-transform duration-300 group-hover:scale-110 z-10 relative border border-gray-50">
+                      <MessageSquarePlus className="w-6 h-6 md:w-7 md:h-7" />
                     </div>
                     <div className="absolute top-1/2 left-full w-24 h-0.5 bg-gradient-to-r from-red-200 to-transparent -z-10 hidden md:block"></div>
                   </div>
                   <div className="flex-1 pt-1">
-                    <h4 className="text-xl md:text-2xl font-black text-gray-900 mb-2">
+                    <h4 className="text-lg md:text-2xl font-black text-gray-900 mb-1 md:mb-2 font-hind">
                       शिकायत दर्ज करें (Submit Grievance)
                     </h4>
-                    <p className="text-gray-500 text-base md:text-lg font-medium leading-relaxed">
+                    <p className="text-gray-500 text-sm md:text-lg font-medium leading-relaxed font-hind">
                       अपनी समस्या का विवरण विस्तार से लिखें। हमारी टीम जल्द से
                       जल्द आपसे संपर्क करेगी।
                     </p>
@@ -144,19 +141,19 @@ const ShikayatSection: React.FC = () => {
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="flex gap-6 items-start translate-x-0 md:translate-x-12 group"
+                  className="flex gap-4 md:gap-6 items-start translate-x-0 md:translate-x-12 group"
                 >
-                  <div className="relative">
-                    <div className="w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center text-gray-700 transition-transform duration-300 group-hover:scale-110 z-10 relative border border-gray-50">
-                      <Search size={28} />
+                  <div className="relative shrink-0">
+                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white shadow-lg flex items-center justify-center text-gray-700 transition-transform duration-300 group-hover:scale-110 z-10 relative border border-gray-50">
+                      <Search className="w-6 h-6 md:w-7 md:h-7" />
                     </div>
                     <div className="absolute top-1/2 left-full w-24 h-0.5 bg-gradient-to-r from-gray-200 to-transparent -z-10 hidden lg:block"></div>
                   </div>
                   <div className="flex-1 pt-1">
-                    <h4 className="text-xl md:text-2xl font-black text-gray-900 mb-2">
+                    <h4 className="text-lg md:text-2xl font-black text-gray-900 mb-1 md:mb-2 font-hind">
                       ट्रैक करें (Track Complaint)
                     </h4>
-                    <p className="text-gray-500 text-base md:text-lg font-medium leading-relaxed">
+                    <p className="text-gray-500 text-sm md:text-lg font-medium leading-relaxed font-hind">
                       अपनी विशिष्ट टिकट आईडी के माध्यम से स्टेटस देखें और अद्यतन
                       जानकारी प्राप्त करें।
                     </p>
@@ -168,16 +165,16 @@ const ShikayatSection: React.FC = () => {
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.6 }}
-                  className="flex gap-6 items-start translate-x-0 md:translate-x-24 group"
+                  className="flex gap-4 md:gap-6 items-start translate-x-0 md:translate-x-24 group"
                 >
-                  <div className="w-16 h-16 rounded-full bg-gray-900 shadow-xl flex items-center justify-center text-white transition-transform duration-300 group-hover:scale-110 z-10 relative">
-                    <Scale size={28} />
+                  <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-gray-900 shadow-xl flex items-center justify-center text-white transition-transform duration-300 group-hover:scale-110 shrink-0 z-10 relative">
+                    <Scale className="w-6 h-6 md:w-7 md:h-7" />
                   </div>
                   <div className="flex-1 pt-1">
-                    <h4 className="text-xl md:text-2xl font-black text-gray-900 mb-2">
+                    <h4 className="text-lg md:text-2xl font-black text-gray-900 mb-1 md:mb-2 font-hind">
                       न्याय पाएँ (Get Resolution)
                     </h4>
-                    <p className="text-gray-500 text-base md:text-lg font-medium leading-relaxed">
+                    <p className="text-gray-500 text-sm md:text-lg font-medium leading-relaxed font-hind">
                       संगठन के माध्यम से उचित समाधान और मार्गदर्शन प्राप्त करें।
                       हम आपके साथ खड़े हैं।
                     </p>
@@ -190,10 +187,10 @@ const ShikayatSection: React.FC = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.8 }}
-                className="mt-16 flex justify-center md:justify-start translate-x-0 md:translate-x-32"
+                className="mt-12 md:mt-16 flex justify-center md:justify-start translate-x-0 md:translate-x-32"
               >
-                <button className="bg-red-600 text-white font-black uppercase tracking-widest text-xs py-5 px-10 rounded-full hover:bg-black transition-all duration-500 shadow-2xl hover:shadow-red-500/30 flex items-center gap-3">
-                  <span>शिकायत दर्ज करें</span>
+                <button className="bg-red-600 text-white font-black uppercase tracking-widest text-[10px] md:text-xs py-4 md:py-5 px-8 md:px-10 rounded-full hover:bg-black transition-all duration-500 shadow-2xl hover:shadow-red-500/30 flex items-center gap-3">
+                  <span className="font-hind">शिकायत दर्ज करें</span>
                   <Send size={16} />
                 </button>
               </motion.div>
