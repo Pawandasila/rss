@@ -161,7 +161,7 @@ const BirthdaySection: React.FC = () => {
                     />
 
                     {/* User Photo Overlay */}
-                    <div className="absolute top-[13.2%] right-[7.8%] w-[38.2%] h-[38.5%] overflow-hidden rounded-[1rem] md:rounded-[2.5rem] bg-gray-50">
+                    <div className="absolute top-[13.2%] right-[7.2%] w-[38.2%] h-[38.5%] overflow-hidden rounded-[1rem] md:rounded-[2rem] bg-gray-50">
                       {person.image ? (
                         <Image
                           src={buildMediaUrl(person.image) || ""}
