@@ -24,7 +24,7 @@ const StickySidebar: React.FC = () => {
             Call Us
           </div>
           <Link
-            href="tel:+91 94296 93593"
+            href="tel:94296 93593"
             className="w-12 h-12 bg-gray-900 text-white flex items-center justify-center rounded-l-lg shadow-[0_4px_10px_rgba(0,0,0,0.15)] hover:bg-gray-800 transition-colors relative z-10"
           >
             <Phone size={20} strokeWidth={2.5} />
@@ -48,7 +48,7 @@ const StickySidebar: React.FC = () => {
 
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-40 lg:hidden flex justify-between items-end px-6 py-1 pb-2">
         <Link
-          href="tel:+91 94296 93593"
+          href="tel:94296 93593"
           className="flex flex-col items-center gap-0.5 text-gray-500 hover:text-apml-red transition-colors w-14"
         >
           <Phone size={18} />

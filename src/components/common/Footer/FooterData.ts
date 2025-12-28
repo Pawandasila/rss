@@ -53,7 +53,7 @@ export const offices: OfficeInfo[] = [
 ];
 
 export const contactInfo = {
-  phone: "+91 94296 93593",
+  phone: "94296 93593",
   email: "help@joinrss.org.in",
 };
 

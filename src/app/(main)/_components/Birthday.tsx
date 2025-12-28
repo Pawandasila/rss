@@ -49,7 +49,7 @@ const BirthdaySection: React.FC = () => {
 
   return (
     <section
-      className="py-16 md:py-24 bg-orange-50/30 overflow-hidden border-t border-orange-100"
+      className="py-16 md:py-24 overflow-hidden border-t border-orange-100"
       ref={sectionRef}
     >
       <div className="w-full px-4 md:px-8 lg:px-16 xl:px-24">
@@ -120,7 +120,7 @@ const BirthdaySection: React.FC = () => {
             >
               {birthdays.map((person) => (
                 <SwiperSlide key={person.id}>
-                  <div className="relative w-full max-w-lg mx-auto aspect-[1/1.15] rounded-3xl overflow-hidden shadow-2xl group border border-orange-100/50">
+                  <div className="relative w-full max-w-lg mx-auto aspect-square rounded-3xl overflow-hidden shadow-2xl group border border-orange-100/50">
                     {/* Background Frame */}
                     <Image
                       src={birthdayFrame}
@@ -131,7 +131,7 @@ const BirthdaySection: React.FC = () => {
                     />
 
                     {/* User Photo Overlay */}
-                    <div className="absolute top-[13.2%] right-[7.2%] w-[38.2%] h-[38.5%] overflow-hidden rounded-[1rem] md:rounded-[2rem] bg-gray-50">
+                    <div className="absolute top-[19.8%] left-[32.6%] w-[34.8%] h-[36.8%] overflow-hidden rounded-[1.5rem] bg-gray-50">
                       {person.image ? (
                         <Image
                           src={buildMediaUrl(person.image) || ""}
@@ -146,22 +146,22 @@ const BirthdaySection: React.FC = () => {
                       )}
                     </div>
 
-                    {/* User Name Overlay - Fixed Position in Yellow Bar */}
-                    <div className="absolute top-[42%] left-[22%] w-[33%] h-[8%] flex items-center justify-start px-2 z-20">
-                      <h3 className="text-[14px] sm:text-base md:text-lg lg:text-xl xl:text-2xl font-black text-blue-900 tracking-tight leading-normal font-hind truncate py-0.5">
+                    {/* User Name Overlay - Below Photo */}
+                    <div className="absolute top-[55.5%] left-0 w-full h-[8%] flex items-center justify-center px-4 z-20">
+                      <h3 className="text-[14px] sm:text-base md:text-lg lg:text-xl xl:text-3xl font-black text-blue-900 tracking-tight leading-normal font-hind truncate drop-shadow-sm">
                         {person.name}
                       </h3>
                     </div>
 
-                    {/* Registration Number Overlay - Aligning with "पंजी सं :" */}
-                    <div className="absolute bottom-[28.5%] right-[10%] w-[40%] text-right pr-2 z-10">
+                    {/* Registration Number Value - Next to "पंजी सं :" */}
+                    <div className="absolute bottom-[11.5%] left-[25.5%] w-[25%] z-10">
                       <p className="text-[10px] sm:text-lg md:text-xl font-black text-gray-800 font-hind">
                         {person.user_id || "N/A"}
                       </p>
                     </div>
 
-                    {/* Birthday Date Overlay - Aligning with "जन्मदिवस :" */}
-                    <div className="absolute bottom-[23.5%] right-[10%] w-[30%] text-right pr-2">
+                    {/* Birthday Date Value - Next to "जन्मदिन :" */}
+                    <div className="absolute bottom-[11.5%] left-[66%] w-[25%] z-10">
                       <p className="text-[10px] sm:text-lg md:text-xl font-black text-gray-800 font-hind">
                         {format(new Date(person.dob), "dd MMMM", {
                           locale: hi,

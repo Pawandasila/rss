@@ -131,7 +131,7 @@ const HomeManagementPage: React.FC = () => {
       {
         type: "phone",
         label: "Phone Number",
-        value: "+91 94296 93593",
+        value: "94296 93593",
         icon: "📞",
         link: "tel:+919429693593",
       },

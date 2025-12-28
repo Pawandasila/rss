@@ -127,7 +127,7 @@ const ContactUsPage = () => {
               <h3 className="text-base sm:text-lg lg:text-xl font-bold text-foreground mb-2 sm:mb-3">फोन नंबर</h3>
               <p className="text-muted-foreground mb-2 sm:mb-4 text-xs sm:text-sm lg:text-base">सीधे हमसे बात करें</p>
               <Link href="tel:+919429693593" className="text-primary font-bold text-xs sm:text-base lg:text-lg hover:underline transition-colors break-all">
-                +91 94296 93593
+                94296 93593
               </Link>
             </div>
 

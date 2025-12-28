@@ -137,7 +137,7 @@ const Footer = () => {
                 <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-600">
                   Central Helpline
                 </span>
-                <span className="text-white font-bold">+91 94296 93593</span>
+                <span className="text-white font-bold">94296 93593</span>
               </div>
             </div>
 

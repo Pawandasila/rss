@@ -209,7 +209,7 @@ const Header: React.FC = () => {
                     className="text-xl sm:text-2xl font-semibold text-gray-800 hover:text-primary transition-colors cursor-pointer"
                     onClick={() => window.open("tel:+919429693593")}
                   >
-                    +91 94296 93593
+                    94296 93593
                   </div>
                   <div className="space-y-3 mt-4">
                     <div>
@@ -318,7 +318,7 @@ const Header: React.FC = () => {
               onClick={() => window.open("tel:+919429693593")}
               className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors bg-gray-100 px-3 py-1.5 rounded-full whitespace-nowrap text-gray-700"
             >
-              <Phone size={16} /> +91 94296 93593
+              <Phone size={16} /> 94296 93593
             </span>
             <Link
               href="/auth/login"

@@ -885,7 +885,7 @@ const Hero = () => {
               href="tel:+919429693593"
               className="font-bold text-primary text-sm block mt-1 hover:underline"
             >
-              +91 94296 93593
+              94296 93593
             </Link>
           </div>
         </div>

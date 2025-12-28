@@ -60,66 +60,46 @@ const Blog: React.FC = () => {
           viewAllLink="/blog"
         />
 
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          {blogs.map((blog, index) => {
-            return (
-              <Link key={blog.id} href={`/blog/${blog.id}`}>
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1, duration: 0.5 }}
-                  className="relative group overflow-hidden rounded-2xl h-[250px] md:h-[360px] shadow-lg border border-border bg-card cursor-pointer"
-                >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          {blogs.map((blog) => (
+            <Link
+              key={blog.id}
+              href={`/blog/${blog.id}`}
+              className="block group h-full"
+            >
+              <div className="flex flex-col h-full bg-white rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden">
+                {/* 16:9 Image Container */}
+                <div className="relative aspect-video overflow-hidden">
                   <Image
                     src={buildMediaUrl(blog.banner) || ""}
                     alt={blog.title}
                     fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-opacity duration-300 opacity-80 group-hover:opacity-100" />
+                </div>
 
-                  <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1, duration: 0.5 }}
-                    className="absolute inset-x-0 bottom-0 p-6 transform transition-transform duration-300 translate-y-2 group-hover:translate-y-0"
-                  >
-                    <motion.h3
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: index * 0.1, duration: 0.5 }}
-                      className="text-white text-sm md:text-xl font-bold leading-tight mb-2"
-                    >
-                      {blog.title}
-                    </motion.h3>
-                    <motion.p
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: index * 0.1, duration: 0.5 }}
-                      className="text-gray-300 text-xs md:text-sm mb-6 font-medium leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-300 h-0 group-hover:h-auto"
-                    >
-                      {blog.headline}
-                    </motion.p>
-                    <button className="bg-primary hover:bg-primary/90 text-white text-xs md:text-sm font-bold md:py-3 md:px-6 px-4 py-2 rounded-lg w-fit transition-all flex items-center justify-center gap-2 group-hover:shadow-[0_0_20px_rgba(227,30,36,0.4)]">
-                      <span>View blog</span> <ArrowRight size={14} />
-                    </button>
-                  </motion.div>
-                </motion.div>
-              </Link>
-            );
-          })}
-        </motion.div>
+                <div className="p-6 flex flex-col flex-1">
+                  <h3 className="text-lg md:text-xl font-black text-gray-900 leading-tight mb-3 font-hind line-clamp-2 group-hover:text-primary transition-colors duration-300">
+                    {blog.title}
+                  </h3>
+
+                  <p className="text-gray-600 text-sm font-medium leading-relaxed mb-6 font-hind line-clamp-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                    {blog.headline}
+                  </p>
+
+                  <div className="mt-auto flex items-center gap-2 text-primary text-xs md:text-sm font-bold uppercase tracking-wider group-hover:gap-3 transition-all duration-300">
+                    <span>Read More</span>
+                    <ArrowRight
+                      size={16}
+                      className="transition-transform group-hover:translate-x-1"
+                    />
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </motion.section>
   );

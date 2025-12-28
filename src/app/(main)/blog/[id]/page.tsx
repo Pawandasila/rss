@@ -135,259 +135,269 @@ export default function BlogPostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background py-14">
-      {/* Header */}
-      <div className="border-b bg-muted/30">
-        <div className="max-w-5xl mx-auto px-4 py-6">
-          <Link href="/blog">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              ब्लॉग पर वापस जाएं
-            </Button>
-          </Link>
-        </div>
-      </div>
-
-      {/* Hero Image */}
-      {post.image && (
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
-            <Image
-              src={post.image}
-              alt={post.title}
-              fill
-              className="object-cover"
-              placeholder="blur"
-              blurDataURL={IMAGE_BLUR_DATA_URL}
-              priority
-            />
-            {post.featured && (
-              <Badge className="absolute top-4 left-4 bg-primary text-white">
-                Featured
-              </Badge>
-            )}
+    <div className="min-h-screen bg-white">
+      <section className="relative h-[60vh] md:h-[75vh] w-full overflow-hidden">
+        {post.image ? (
+          <Image
+            src={post.image}
+            alt={post.title}
+            fill
+            className="object-cover"
+            priority
+            placeholder="blur"
+            blurDataURL={IMAGE_BLUR_DATA_URL}
+          />
+        ) : (
+          <div className="absolute inset-0 bg-primary/5 flex items-center justify-center">
+            <Images className="w-20 h-20 text-primary/20" />
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Main Content */}
-      <article className="max-w-4xl mx-auto px-4 py-8">
-        {/* Category Badge */}
-        <div className="mb-6">
-          <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-200 text-sm px-4 py-1">
-            <Tag className="w-3.5 h-3.5 mr-1.5" />
-            {post.category}
-          </Badge>
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
 
-        {/* Title */}
-        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-tight">
-          {post.title}
-        </h1>
+        <div className="absolute inset-x-0 bottom-0 z-10">
+          <div className="max-w-4xl mx-auto px-4 pb-12 md:pb-20">
+            <Link
+              href="/blog"
+              className="inline-flex items-center text-white/80 hover:text-white mb-8 transition-colors group"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+              <span className="text-sm font-bold uppercase tracking-widest">
+                Back to Blog
+              </span>
+            </Link>
 
-        {/* Meta Information */}
-        <div className="flex flex-wrap items-center gap-6 mb-8 pb-8 border-b">
-          {/* Author */}
-          <div className="flex items-center gap-3">
-            <Avatar className="w-12 h-12 border-2 border-primary/20">
-              <AvatarImage src={post.author.image} alt={post.author.name} />
-              <AvatarFallback className="bg-primary/10 text-primary">
-                {post.author.name.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-semibold text-sm flex items-center gap-1">
-                <User className="w-3.5 h-3.5" />
-                {post.author.name}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {post.author.role}
-              </p>
+            <div className="mb-6">
+              <Badge className="bg-primary text-white text-xs md:text-sm px-4 py-1.5 rounded-full border-none shadow-lg">
+                <Tag className="w-3.5 h-3.5 mr-2" />
+                {post.category}
+              </Badge>
+            </div>
+
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-8 font-hind drop-shadow-2xl">
+              {post.title}
+            </h1>
+
+            <div className="flex flex-wrap items-center gap-6 text-white/90">
+              <div className="flex items-center gap-3">
+                <Avatar className="w-10 h-10 border-2 border-primary">
+                  <AvatarImage src={post.author.image} alt={post.author.name} />
+                  <AvatarFallback className="bg-white/10 text-white">
+                    {post.author.name.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-bold text-sm">{post.author.name}</p>
+                  <p className="text-[10px] uppercase tracking-wider opacity-70">
+                    {post.author.role}
+                  </p>
+                </div>
+              </div>
+              <div className="h-8 w-px bg-white/20 hidden sm:block" />
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Calendar className="w-4 h-4 text-primary" />
+                {formatDate(post.date)}
+              </div>
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Clock className="w-4 h-4 text-primary" />
+                {post.readTime}
+              </div>
             </div>
           </div>
-
-          <Separator orientation="vertical" className="h-10 hidden sm:block" />
-
-          {/* Date */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Calendar className="w-4 h-4" />
-            {formatDate(post.date)}
-          </div>
-
-          {/* Read Time */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Clock className="w-4 h-4" />
-            {post.readTime} पढ़ने का समय
-          </div>
         </div>
+      </section>
 
-        {/* Actions */}
-        <div className="flex flex-wrap gap-3 mb-8">
-          <Button variant="outline" size="sm">
-            <Share2 className="w-4 h-4 mr-2" />
-            शेयर करें
-          </Button>
-          <Button variant="outline" size="sm">
-            <BookmarkPlus className="w-4 h-4 mr-2" />
-            सहेजें
-          </Button>
-
-          {/* Social Links - Only show if they exist */}
-          {post.facebook_link && (
-            <a
-              href={post.facebook_link}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button variant="outline" size="sm">
-                <Facebook className="w-4 h-4" />
-              </Button>
-            </a>
-          )}
-          {post.twitter_link && (
-            <a
-              href={post.twitter_link}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button variant="outline" size="sm">
-                <Twitter className="w-4 h-4" />
-              </Button>
-            </a>
-          )}
-          {post.instagram_link && (
-            <a
-              href={post.instagram_link}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button variant="outline" size="sm">
-                <Instagram className="w-4 h-4" />
-              </Button>
-            </a>
-          )}
-
-          {/* Default share buttons if no social links */}
-          {!hasSocialLinks && (
-            <>
-              <Button variant="outline" size="sm">
-                <Facebook className="w-4 h-4" />
-              </Button>
-              <Button variant="outline" size="sm">
-                <Twitter className="w-4 h-4" />
-              </Button>
-              <Button variant="outline" size="sm">
-                <Linkedin className="w-4 h-4" />
-              </Button>
-            </>
-          )}
-        </div>
-
-        {/* Excerpt */}
+      <article className="max-w-3xl mx-auto px-4 py-16 md:py-24">
         {post.excerpt && (
-          <div className="bg-muted/50 border-l-4 border-primary p-6 rounded-r-lg mb-8">
-            <p className="text-lg text-foreground italic leading-relaxed">
+          <div className="relative mb-16">
+            <div className="absolute -left-4 top-0 bottom-0 w-1 bg-primary rounded-full" />
+            <p className="text-xl md:text-2xl text-gray-700 font-hind font-medium leading-relaxed pl-6 italic">
               {post.excerpt}
             </p>
           </div>
         )}
 
-        {/* Content */}
-        <div
-          className="prose prose-lg max-w-none mb-12"
-          dangerouslySetInnerHTML={{ __html: post.content }}
-        />
+        <div className="blog-content-container">
+          <style jsx global>{`
+            .blog-content-container p {
+              margin-bottom: 2rem;
+              line-height: 1.9;
+              font-family: var(--font-hind), sans-serif;
+              font-size: 1.125rem;
+              color: #374151;
+            }
+            .blog-content-container h2 {
+              font-size: 1.875rem;
+              font-weight: 900;
+              margin-top: 3rem;
+              margin-bottom: 1.5rem;
+              font-family: var(--font-hind), sans-serif;
+              color: #111827;
+              line-height: 1.3;
+            }
+            .blog-content-container h3 {
+              font-size: 1.5rem;
+              font-weight: 800;
+              margin-top: 2.5rem;
+              margin-bottom: 1.25rem;
+              font-family: var(--font-hind), sans-serif;
+              color: #1f2937;
+            }
+            .blog-content-container ul,
+            .blog-content-container ol {
+              margin-bottom: 2rem;
+              padding-left: 1.5rem;
+            }
+            .blog-content-container li {
+              margin-bottom: 0.75rem;
+              line-height: 1.8;
+              font-family: var(--font-hind), sans-serif;
+              color: #4b5563;
+              font-size: 1.125rem;
+            }
+            .blog-content-container strong {
+              color: #111827;
+              font-weight: 800;
+            }
+            .blog-content-container img {
+              border-radius: 1.5rem;
+              margin: 3rem 0;
+              box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            }
+          `}</style>
+          <div
+            className="prose prose-primary max-w-none"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
+        </div>
 
-        {/* Image Gallery */}
+        <div className="mt-20 pt-10 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-4 text-gray-500 font-bold uppercase tracking-widest text-xs">
+            Share this article
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full hover:bg-blue-600 hover:text-white transition-all"
+              >
+                <Facebook className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full hover:bg-sky-500 hover:text-white transition-all"
+              >
+                <Twitter className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full hover:bg-green-600 hover:text-white transition-all"
+              >
+                <Share2 className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
         {post.images && post.images.length > 0 && (
-          <div className="mb-12">
-            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <Images className="w-5 h-5 text-primary" />
-              फोटो गैलरी
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="mt-24">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-12 h-1 w-primary bg-primary rounded-full" />
+              <h3 className="text-2xl font-black text-gray-900 font-hind">
+                फोटो गैलरी
+              </h3>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
               {post.images.map((img, index) => (
                 <div
                   key={img.id}
-                  className="relative aspect-video rounded-lg overflow-hidden cursor-pointer group"
+                  className="relative aspect-[4/3] rounded-3xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 group"
                   onClick={() => openLightbox(index)}
                 >
                   <Image
                     src={buildMediaUrl(img.image) || ""}
-                    alt={`Gallery image ${index + 1}`}
+                    alt={`Gallery ${index}`}
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    placeholder="blur"
-                    blurDataURL={IMAGE_BLUR_DATA_URL}
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                  <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/20 transition-colors duration-300 flex items-center justify-center">
+                    <Images className="text-white opacity-0 group-hover:opacity-100 transition-opacity scale-150" />
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        <Separator className="my-12" />
-
-        {/* Author Card */}
-        <div className="bg-muted/30 rounded-xl p-6 mb-12">
-          <div className="flex items-start gap-4">
-            <Avatar className="w-16 h-16 border-2 border-primary/20">
+        <div className="mt-24 p-8 md:p-12 bg-gray-50 rounded-[3rem] border border-gray-100 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0" />
+          <div className="flex flex-col md:flex-row items-center text-center md:text-left gap-8 relative z-10">
+            <Avatar className="w-24 h-24 md:w-32 md:h-32 border-4 border-white shadow-xl">
               <AvatarImage src={post.author.image} alt={post.author.name} />
-              <AvatarFallback className="bg-primary/10 text-primary text-xl">
+              <AvatarFallback className="bg-primary text-white text-3xl font-black">
                 {post.author.name.charAt(0)}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h3 className="font-bold text-lg mb-1">{post.author.name}</h3>
-              <p className="text-sm text-muted-foreground mb-3">
+              <h4 className="text-2xl font-black text-gray-900 mb-2 font-hind">
+                {post.author.name}
+              </h4>
+              <p className="text-primary font-bold uppercase tracking-[0.2em] text-xs mb-4">
                 {post.author.role}
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-gray-600 leading-relaxed font-hind">
                 राष्ट्रीय सेवा संघ के समर्पित सदस्य और लेखक। समाज सेवा और
-                राष्ट्र निर्माण में सक्रिय योगदान।
+                राष्ट्र निर्माण में सक्रिय योगदान देने हेतु संकल्पित। सनातन धर्म
+                एवं संस्कृति के प्रचार-प्रसार में संलग्न।
               </p>
             </div>
           </div>
         </div>
+      </article>
 
-        {/* Related Posts */}
-        {relatedPosts.length > 0 && (
-          <div>
-            <h2 className="text-2xl font-bold mb-6">संबंधित लेख</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {relatedPosts.length > 0 && (
+        <section className="bg-gray-50/50 py-24 border-t border-gray-100">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="flex items-center justify-between mb-12">
+              <h2 className="text-3xl font-black text-gray-900 font-hind">
+                संबंधित लेख
+              </h2>
+              <Link
+                href="/blog"
+                className="text-primary font-bold text-sm uppercase tracking-widest hover:underline"
+              >
+                View All Posts
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {relatedPosts.map((relatedPost) => (
                 <Link
                   key={relatedPost.id}
                   href={`/blog/${relatedPost.id}`}
-                  className="block group"
+                  className="group block"
                 >
-                  <div className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+                  <div className="bg-white rounded-[2rem] overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500">
                     <div className="relative aspect-video">
-                      {relatedPost.image ? (
-                        <Image
-                          src={relatedPost.image}
-                          alt={relatedPost.title}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-300"
-                          placeholder="blur"
-                          blurDataURL={IMAGE_BLUR_DATA_URL}
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                          <Images className="w-8 h-8 text-gray-300" />
-                        </div>
-                      )}
+                      <Image
+                        src={relatedPost.image}
+                        alt={relatedPost.title}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
                     </div>
-                    <div className="p-4">
-                      <Badge className="mb-2 text-xs" variant="secondary">
+                    <div className="p-6">
+                      <Badge
+                        variant="outline"
+                        className="mb-3 text-[10px] font-bold uppercase tracking-wider text-gray-400"
+                      >
                         {relatedPost.category}
                       </Badge>
-                      <h3 className="font-semibold text-sm mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                      <h3 className="font-black text-gray-900 group-hover:text-primary transition-colors line-clamp-2 md:text-lg font-hind mb-4">
                         {relatedPost.title}
                       </h3>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Calendar className="w-3 h-3" />
+                      <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                        <Calendar size={12} className="text-primary" />
                         {formatDate(relatedPost.date)}
                       </div>
                     </div>
@@ -396,47 +406,28 @@ export default function BlogPostPage() {
               ))}
             </div>
           </div>
-        )}
-      </article>
+        </section>
+      )}
 
-      {/* Bottom CTA */}
-      <div className="bg-primary/5 border-y py-12">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold mb-4">अधिक लेख पढ़ना चाहते हैं?</h2>
-          <p className="text-muted-foreground mb-6">
-            राष्ट्रीय सेवा संघ के सभी अपडेट और समाचार प्राप्त करें
-          </p>
-          <Link href="/blog">
-            <Button size="lg">
-              सभी लेख देखें
-              <ArrowLeft className="w-4 h-4 ml-2 rotate-180" />
-            </Button>
-          </Link>
-        </div>
-      </div>
-
-      {/* Lightbox Dialog */}
       {post.images && post.images.length > 0 && (
         <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-          <DialogContent className="max-w-4xl p-0 bg-black/95 border-none">
-            <div className="relative">
-              {/* Close button */}
+          <DialogContent className="max-w-5xl p-0 bg-black/95 border-none h-[80vh] flex items-center justify-center">
+            <div className="relative w-full h-full p-4">
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute top-4 right-4 z-50 text-white hover:bg-white/20"
+                className="absolute top-4 right-4 z-50 text-white hover:bg-white/20 rounded-full"
                 onClick={() => setLightboxOpen(false)}
               >
                 <X className="w-6 h-6" />
               </Button>
 
-              {/* Navigation buttons */}
               {post.images.length > 1 && (
                 <>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute left-4 top-1/2 -translate-y-1/2 z-50 text-white hover:bg-white/20"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 z-50 text-white bg-black/20 hover:bg-white/20 rounded-full h-12 w-12"
                     onClick={prevImage}
                   >
                     <ChevronLeft className="w-8 h-8" />
@@ -444,7 +435,7 @@ export default function BlogPostPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute right-4 top-1/2 -translate-y-1/2 z-50 text-white hover:bg-white/20"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 z-50 text-white bg-black/20 hover:bg-white/20 rounded-full h-12 w-12"
                     onClick={nextImage}
                   >
                     <ChevronRight className="w-8 h-8" />
@@ -452,18 +443,16 @@ export default function BlogPostPage() {
                 </>
               )}
 
-              {/* Image */}
-              <div className="relative w-full aspect-video">
+              <div className="relative w-full h-full">
                 <Image
                   src={buildMediaUrl(post.images[lightboxIndex]?.image) || ""}
-                  alt={`Gallery image ${lightboxIndex + 1}`}
+                  alt={`Gallery ${lightboxIndex}`}
                   fill
                   className="object-contain"
                 />
               </div>
 
-              {/* Counter */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm">
+              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/50 text-xs font-bold uppercase tracking-widest">
                 {lightboxIndex + 1} / {post.images.length}
               </div>
             </div>
