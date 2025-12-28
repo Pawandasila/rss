@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Check, CircleDashed, HeartHandshake } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import SectionHeader from "@/components/common/SectionHeader";
@@ -11,7 +12,7 @@ import { buildMediaUrl } from "@/lib/media";
 interface DisplayService {
   id: string | number;
   title: string;
-  icon: string | any; // Allow string (URL) or component
+  icon: string | any;
   image: string;
   description: string;
   features?: string[];
@@ -240,13 +241,15 @@ const ServicesSection: React.FC = () => {
                         ))}
                       </div>
 
-                      <motion.button
-                        className="border-2 border-white text-white bg-transparent hover:bg-white hover:text-apml-red transition-colors w-fit px-6 py-2.5 text-xs font-bold uppercase tracking-wider relative z-10 rounded"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        View More Details
-                      </motion.button>
+                      <Link href={`/services/${activeService.id}`}>
+                        <motion.button
+                          className="border-2 border-white text-white bg-transparent hover:bg-white hover:text-apml-red transition-colors w-fit px-6 py-2.5 text-xs font-bold uppercase tracking-wider relative z-10 rounded"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          View More Details
+                        </motion.button>
+                      </Link>
                     </motion.div>
                   </div>
 
@@ -298,12 +301,14 @@ const ServicesSection: React.FC = () => {
                           </motion.div>
                         ))}
                       </div>
-                      <motion.button
-                        className="border-2 border-white text-white bg-transparent hover:bg-white hover:text-apml-red transition-colors w-fit px-6 py-2 text-xs font-bold uppercase tracking-wider rounded"
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        View More
-                      </motion.button>
+                      <Link href={`/services/${activeService.id}`}>
+                        <motion.button
+                          className="border-2 border-white text-white bg-transparent hover:bg-white hover:text-apml-red transition-colors w-fit px-6 py-2 text-xs font-bold uppercase tracking-wider rounded"
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          View More
+                        </motion.button>
+                      </Link>
                     </div>
                   </motion.div>
                 </motion.div>

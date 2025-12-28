@@ -4,6 +4,25 @@ import { Service, CreateServicePayload, UpdateServicePayload } from "../types";
 import { toast } from "sonner";
 import useAxios from "@/hooks/use-axios";
 
+export function useService(id: number | null) {
+  const axios = useAxios();
+  const fetcher = (url: string) => axios.get(url).then((res) => res.data);
+
+  const {
+    data: service,
+    error: serviceError,
+    isLoading: isLoadingService,
+    mutate: mutateService,
+  } = useSWR<Service>(id ? `/admin/services/detail/${id}/` : null, fetcher);
+
+  return {
+    service,
+    isLoadingService,
+    serviceError,
+    mutateService,
+  };
+}
+
 export function useServiceApi() {
   const [isCreating, setIsCreating] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -56,7 +75,7 @@ export function useServiceApi() {
       if (payload.icon) formData.append("icon", payload.icon);
 
       const response = await axios.put(
-        `/admin/services/${payload.id}/`,
+        `/admin/services/detail/${payload.id}/`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -77,7 +96,7 @@ export function useServiceApi() {
   const deleteService = async (id: number): Promise<boolean> => {
     setIsDeleting(true);
     try {
-      await axios.delete(`/admin/services/${id}/`);
+      await axios.delete(`/admin/services/detail/${id}/`);
       await mutateServices();
       toast.success("Service deleted successfully");
       return true;

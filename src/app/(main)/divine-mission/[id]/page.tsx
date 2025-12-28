@@ -7,62 +7,24 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-// import { divineMissionData } from "../../_components/DivineMission/MissionInfo"; // Removed
 import {
   Heart,
   Users,
   ArrowLeft,
-  CheckCircle,
   Calendar,
   Clock,
-  TrendingUp,
   Share2,
   BookmarkPlus,
   Eye,
-  X,
-  Images,
 } from "lucide-react";
 import { IMAGE_BLUR_DATA_URL } from "@/lib/image-placeholder";
 import { useMissionApi } from "@/module/crm/mission/hooks";
 import { buildMediaUrl } from "@/lib/media";
 
-const getGalleryImages = () => [
-  {
-    id: 1,
-    url: "/live/divine-01.webp",
-    alt: "मिशन गतिविधि 1",
-  },
-  {
-    id: 2,
-    url: "/live/divine-02.webp",
-    alt: "मिशन गतिविधि 2",
-  },
-  {
-    id: 3,
-    url: "/live/divine-03.webp",
-    alt: "मिशन गतिविधि 3",
-  },
-  {
-    id: 4,
-    url: "/live/divine-04.webp",
-    alt: "मिशन गतिविधि 4",
-  },
-];
-
-const getMissionOutcomes = () => ({
-  beneficiaries: "1000+",
-  programs: "25+",
-  volunteers: "150+",
-  impact: "उच्च सामाजिक प्रभाव",
-});
-
 const MissionDetailPage = () => {
   const params = useParams();
   const router = useRouter();
   const missionId = parseInt(params.id as string);
-  const [selectedImage, setSelectedImage] = useState<number | null>(null);
-
-  // Fetch single mission details
   const { mission: fetchedMission, isLoadingMissions: isLoadingMission } =
     useMissionApi(missionId);
 
@@ -134,10 +96,7 @@ const MissionDetailPage = () => {
     );
   }
 
-  const galleryImages = getGalleryImages();
-  const outcomes = getMissionOutcomes();
-
-  const relatedMissions = (allMissions || []) // Use api missions logic
+  const relatedMissions = (allMissions || [])
     .filter((m) => m.id !== mission.id)
     .slice(0, 3)
     .map((m) => ({
@@ -208,18 +167,13 @@ const MissionDetailPage = () => {
                 </div>
 
                 <span className="text-gray-300">•</span>
-
-                <div className="flex items-center gap-1">
-                  <Eye className="w-4 h-4" />
-                  <span>2,547 बार देखा गया</span>
-                </div>
               </div>
 
               <div className="flex flex-wrap gap-3">
                 <Button
                   size="sm"
                   variant="outline"
-                  className="gap-2 hover:bg-gray-50"
+                  className="gap-2 hover:bg-gray-50 cursor-pointer hover:text-black"
                   onClick={handleShare}
                 >
                   <Share2 className="w-4 h-4" />
@@ -228,7 +182,7 @@ const MissionDetailPage = () => {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="gap-2 hover:bg-gray-50"
+                  className="gap-2 hover:bg-gray-50 cursor-pointer hover:text-black"
                   onClick={() => (window.location.href = "/donate-now")}
                 >
                   <BookmarkPlus className="w-4 h-4" />
@@ -270,87 +224,6 @@ const MissionDetailPage = () => {
               उनके जीवन में सकारात्मक बदलाव लाने का प्रयास करते हैं। संघ के
               समर्पित स्वयंसेवक इस मिशन को सफल बनाने में अपना योगदान देते हैं।
             </p>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-6 md:p-8 shadow-sm border border-orange-200">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <TrendingUp className="w-6 h-6 text-primary" />
-            अब तक का प्रभाव
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-primary mb-1">
-                {outcomes.beneficiaries}
-              </div>
-              <div className="text-sm text-gray-600">लाभार्थी</div>
-            </div>
-            <div className="bg-white rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-primary mb-1">
-                {outcomes.programs}
-              </div>
-              <div className="text-sm text-gray-600">कार्यक्रम</div>
-            </div>
-            <div className="bg-white rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-primary mb-1">
-                {outcomes.volunteers}
-              </div>
-              <div className="text-sm text-gray-600">स्वयंसेवक</div>
-            </div>
-            <div className="bg-white rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-primary mb-1">⭐</div>
-              <div className="text-sm text-gray-600">{outcomes.impact}</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <CheckCircle className="w-6 h-6 text-primary" />
-            प्रमुख उद्देश्य
-          </h2>
-          <div className="space-y-3">
-            {[
-              "समाज में सकारात्मक परिवर्तन लाना",
-              "जरूरतमंदों को सहायता प्रदान करना",
-              "सनातन धर्म और संस्कृति का संरक्षण",
-              "राष्ट्रीय एकता को मजबूत करना",
-              "समाज सेवा के प्रति जागरूकता बढ़ाना",
-            ].map((objective, index) => (
-              <div
-                key={index}
-                className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <span className="text-gray-700">{objective}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <Images className="w-6 h-6 text-primary" />
-            गैलरी
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {galleryImages.map((img, index) => (
-              <div
-                key={img.id}
-                className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group"
-                onClick={() => setSelectedImage(index)}
-              >
-                <Image
-                  src={img.url}
-                  alt={img.alt}
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-110"
-                  placeholder="blur"
-                  blurDataURL={IMAGE_BLUR_DATA_URL}
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-              </div>
-            ))}
           </div>
         </div>
 
@@ -453,32 +326,6 @@ const MissionDetailPage = () => {
           )}
         </div>
       </div>
-
-      {selectedImage !== null && (
-        <div
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
-          onClick={() => setSelectedImage(null)}
-        >
-          <Button
-            size="icon"
-            variant="ghost"
-            className="absolute top-4 right-4 text-white hover:bg-white/10"
-            onClick={() => setSelectedImage(null)}
-          >
-            <X className="w-6 h-6" />
-          </Button>
-          <div className="relative w-full h-full max-w-4xl max-h-[80vh]">
-            <Image
-              src={galleryImages[selectedImage].url}
-              alt={galleryImages[selectedImage].alt}
-              fill
-              className="object-contain"
-              placeholder="blur"
-              blurDataURL={IMAGE_BLUR_DATA_URL}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };

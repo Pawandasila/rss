@@ -26,7 +26,7 @@ export function useMissionApi(id?: number | null) {
     error: missionError,
     isLoading: isLoadingMission,
     mutate: mutateMission,
-  } = useSWR<Mission>(id ? `/admin/missions/${id}/` : null, fetcher);
+  } = useSWR<Mission>(id ? `/admin/missions/detail/${id}/` : null, fetcher);
 
   const createMission = async (
     payload: CreateMissionPayload
@@ -71,7 +71,7 @@ export function useMissionApi(id?: number | null) {
       if (payload.category) formData.append("category", payload.category);
 
       const response = await axios.put(
-        `/admin/missions/${payload.id}/`,
+        `/admin/missions/detail/${payload.id}/`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -92,7 +92,7 @@ export function useMissionApi(id?: number | null) {
   const deleteMission = async (id: number): Promise<boolean> => {
     setIsDeleting(true);
     try {
-      await axios.delete(`/admin/missions/${id}/`);
+      await axios.delete(`/admin/missions/detail/${id}/`);
       await mutateMissions();
       toast.success("Mission deleted successfully");
       return true;
