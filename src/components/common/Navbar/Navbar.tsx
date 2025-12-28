@@ -28,7 +28,7 @@ const MobileNavItem = ({ item }: { item: any }) => {
   return (
     <div className="menu-item-stagger">
       <div className="hidden lg:block space-y-4">
-        <h5 className="text-gray-400 font-bold uppercase tracking-widest text-xs border-b border-gray-100 pb-2">
+        <h5 className="text-gray-400 font-bold tracking-wider text-xs border-b border-gray-100 pb-2">
           {item.title}
         </h5>
         <ul className="space-y-2 text-sm font-medium text-gray-600">
@@ -172,15 +172,15 @@ const Header: React.FC = () => {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <LogIn size={18} />
-                    Login
+                    लॉगिन | Login
                   </Link>
                   <Link
-                    href="/auth/signup"
+                    href="/auth/become-member"
                     className="flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-white font-semibold rounded-full text-sm hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <UserPlus size={18} />
-                    Sign Up
+                    जुड़ें | Join Us
                   </Link>
                 </div>
               </div>
@@ -203,7 +203,7 @@ const Header: React.FC = () => {
               >
                 <div className="space-y-4">
                   <h4 className="text-primary font-bold text-lg mb-1">
-                    Contact
+                    संपर्क | Contact
                   </h4>
                   <div
                     className="text-xl sm:text-2xl font-semibold text-gray-800 hover:text-primary transition-colors cursor-pointer"
@@ -247,8 +247,8 @@ const Header: React.FC = () => {
                   </p>
                 </div>
                 <div>
-                  <h4 className="text-primary font-bold mb-4 text-sm uppercase tracking-widest">
-                    Connect
+                  <h4 className="text-primary font-bold mb-4 text-sm tracking-widest">
+                    जुड़ें | Connect
                   </h4>
                   <div className="flex justify-center lg:justify-start gap-6">
                     <Link href="https://www.facebook.com/joinrss">
@@ -325,7 +325,7 @@ const Header: React.FC = () => {
               className="flex items-center gap-2 px-4 py-2 text-primary font-semibold border-2 border-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300"
             >
               <LogIn size={16} />
-              Login
+              लॉगिन | Login
             </Link>
             <Menu
               size={28}

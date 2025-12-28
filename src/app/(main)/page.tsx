@@ -28,10 +28,10 @@ export default function Home() {
       <Supporters />
       <AboutSection />
       <DivineMission />
-      <ServicesSection />
+      <Team />
       <ShikayatSection />
       <VyapariSection />
-      <Team />
+      <ServicesSection />
       <BirthdaySection />
       <DonationList />
       <Blog />

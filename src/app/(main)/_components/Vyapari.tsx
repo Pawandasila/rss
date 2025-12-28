@@ -11,15 +11,22 @@ import {
   Utensils,
   Wrench,
   CircleDashed,
+  Shield,
 } from "lucide-react";
 import { motion } from "motion/react";
 import SectionHeader from "@/components/common/SectionHeader";
 import Image from "next/image";
 
 const CATEGORIES = [
-  { name: "Retail Stores", icon: ShoppingBag, count: "1.2k+" },
-  { name: "Home Services", icon: Wrench, count: "850+" },
-  { name: "Food & Dining", icon: Utensils, count: "2.4k+" },
+  {
+    name: "खुदरा स्टोर",
+    icon: ShoppingBag,
+    count: "1.2k+",
+    sub: "Retail Stores",
+  },
+  { name: "घरेलू सेवाएं", icon: Wrench, count: "850+", sub: "Home Services" },
+  { name: "खान-पान", icon: Utensils, count: "2.4k+", sub: "Food & Dining" },
+  { name: "वस्त्र एवं परिधान", icon: Store, count: "1.8k+", sub: "Apparel" },
 ];
 
 const BUSINESS_IMAGES = [
@@ -45,11 +52,10 @@ const VyapariSection: React.FC = () => {
     <section className="py-12 md:py-24 bg-orange-50/50 relative overflow-hidden w-full">
       <div className="w-full px-4 md:px-8 lg:px-16 xl:px-24 relative z-10">
         <SectionHeader
-          badgeTitle="Atmanirbhar Bharat Initiative"
+          badgeTitle="स्वदेशी हिंदू व्यापार नेटवर्क"
           badgeIcon={CircleDashed}
-          title="Swadeshi Vyapari Network"
-          viewAll="View All Blog"
-          // viewAllLink="#"
+          title="Swadeshi Hindu Business Network"
+          viewAll="View All Businesses"
         />
 
         <div className="flex flex-col lg:flex-row gap-6 md:gap-8 items-stretch">
@@ -82,19 +88,21 @@ const VyapariSection: React.FC = () => {
 
               <div className="relative z-10 flex flex-col h-full">
                 <div className="flex items-center gap-2 text-orange-600 font-bold uppercase tracking-widest text-[10px] md:text-xs mb-4 md:mb-6 bg-orange-50 w-fit px-3 py-1 rounded-full border border-orange-100">
-                  <Search size={14} /> Local Discovery
+                  <Search size={14} /> 🔍 अपनों को खोजें, अपनों को बढ़ाएं (Local
+                  Discovery)
                 </div>
 
                 <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-gray-900 mb-3 md:mb-4 tracking-tight leading-tight">
-                  Find Verified <br />
+                  सत्यापित हिंदू <br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-red-600">
-                    Swadeshi Businesses
+                    व्यवसायों से जुड़ें
                   </span>
                 </h3>
 
                 <p className="text-sm md:text-base text-gray-500 mb-6 md:mb-8 font-medium max-w-md leading-relaxed">
-                  Support local economy by connecting with trusted shops,
-                  service providers, and brands in your locality.
+                  अपने क्षेत्र के भरोसेमंद दुकानदारों, सेवा प्रदाताओं और स्वदेशी
+                  ब्रांडों का समर्थन करके राष्ट्र की अर्थव्यवस्था में योगदान
+                  दें।
                 </p>
 
                 {/* Search Bar */}
@@ -120,7 +128,7 @@ const VyapariSection: React.FC = () => {
                     </h4>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
                     {CATEGORIES.map((cat, idx) => (
                       <div
                         key={idx}
@@ -138,7 +146,7 @@ const VyapariSection: React.FC = () => {
                               {cat.name}
                             </div>
                             <div className="text-[10px] text-gray-400 font-bold hidden sm:block">
-                              {cat.count} Listed
+                              {cat.sub}
                             </div>
                           </div>
                         </div>
@@ -180,19 +188,21 @@ const VyapariSection: React.FC = () => {
               <div className="relative z-10 flex flex-col h-full justify-between">
                 <div>
                   <div className="flex items-center gap-2 text-orange-400 font-bold uppercase tracking-widest text-[10px] md:text-xs mb-4 md:mb-6 bg-orange-500/10 w-fit px-3 py-1 rounded-full border border-orange-500/20 backdrop-blur-md">
-                    <Store size={14} /> For Business Owners
+                    <Store size={14} /> 💼 व्यापारियों के लिए: राष्ट्र के साथ
+                    अपना व्यापार बढ़ाएं
                   </div>
 
                   <h3 className="text-3xl lg:text-5xl font-black mb-4 md:mb-6 leading-[1.1] tracking-tight text-white">
-                    Grow Your Business <br />
+                    सनातनी व्यापारियों का <br />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-200">
-                      With Nation
+                      सबसे बड़ा नेटवर्क
                     </span>
                   </h3>
 
                   <p className="text-gray-400 text-sm md:text-lg mb-8 md:mb-10 max-w-lg leading-relaxed">
-                    Join the largest network of nationalist businessmen. Promote
-                    your products to millions of aware citizens.
+                    करोड़ों जागरूक नागरिकों तक अपने उत्पादों और सेवाओं को
+                    पहुँचाएँ। राष्ट्रीय सेवा संघ के इस मंच से जुड़कर अपने व्यवसाय
+                    को एक नई पहचान और विस्तार दें।
                   </p>
                 </div>
 
@@ -202,27 +212,42 @@ const VyapariSection: React.FC = () => {
                       <BadgeCheck size={20} className="text-white" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-white text-sm md:text-lg mb-0.5">
-                        Verified Swadeshi Badge
+                      <h4 className="font-bold text-white text-sm md:text-base mb-0.5">
+                        सत्यापित स्वदेशी बैज (Verified Swadeshi Badge)
                       </h4>
                       <p className="text-gray-400 text-[10px] md:text-xs leading-relaxed">
-                        Earn the trust of customers with our exclusive
-                        verification badge.
+                        हमारे विशेष सत्यापन बैज के साथ ग्राहकों का अटूट विश्वास
+                        जीतें।
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-4 md:gap-5 p-3 md:p-4 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm group/feat cursor-default">
                     <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-900/40 group-hover/feat:scale-110 transition-transform">
-                      <TrendingUp size={20} className="text-white" />
+                      <MapPin size={20} className="text-white" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-white text-sm md:text-lg mb-0.5">
-                        Hyper-Local Visibility
+                      <h4 className="font-bold text-white text-sm md:text-base mb-0.5">
+                        हाइपर-लोकल विजिबिलिटी
                       </h4>
                       <p className="text-gray-400 text-[10px] md:text-xs leading-relaxed">
-                        Get discovered by customers searching specifically in
-                        your pincode.
+                        अपने पिनकोड में खोज करने वाले स्थानीय ग्राहकों की पहली
+                        पसंद बनें।
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4 md:gap-5 p-3 md:p-4 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm group/feat cursor-default">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shrink-0 shadow-lg shadow-green-900/40 group-hover/feat:scale-110 transition-transform">
+                      <Shield size={20} className="text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white text-sm md:text-base mb-0.5">
+                        संगठित शक्ति
+                      </h4>
+                      <p className="text-gray-400 text-[10px] md:text-xs leading-relaxed">
+                        राजनीतिक और व्यक्तिगत स्वार्थ से ऊपर उठकर निस्वार्थ भाव
+                        से व्यापारिक हितों की रक्षा।
                       </p>
                     </div>
                   </div>
@@ -230,14 +255,18 @@ const VyapariSection: React.FC = () => {
 
                 <div className="mt-auto">
                   <button className="w-full bg-white text-gray-900 py-3 md:py-4 px-6 md:px-8 rounded-xl font-black uppercase tracking-widest text-xs md:text-sm hover:bg-orange-50 transition-all shadow-[0_0_40px_rgba(255,255,255,0.1)] flex items-center justify-center gap-3 group">
-                    Register Free Now
+                    आज ही निःशुल्क पंजीकरण करें (Register Free Now)
                     <ArrowRight
                       size={20}
                       className="group-hover:translate-x-1 transition-transform text-orange-600"
                     />
                   </button>
-                  <p className="text-center text-[10px] text-gray-500 mt-4 font-medium uppercase tracking-wide">
-                    * No hidden charges for small businesses
+                  <p className="text-center text-[11px] text-gray-400 mt-4 font-bold uppercase tracking-wide">
+                    छोटे व्यापारियों और कुटीर उद्योगों के लिए कोई शुल्क नहीं।
+                  </p>
+                  <p className="text-center text-[10px] text-orange-400/60 mt-2 font-medium italic">
+                    "धर्म के मार्ग पर चलने वाला व्यापार ही राष्ट्र की असली
+                    उन्नति है।"
                   </p>
                 </div>
               </div>
