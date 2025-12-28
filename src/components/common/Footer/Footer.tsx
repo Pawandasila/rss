@@ -16,19 +16,18 @@ import logo from "@/assets/logo/logo.png";
 import Link from "next/link";
 
 const Footer = () => {
-  const LOCATIONS = [
-    "RSS Uttarakhand (20129)",
-    "RSS Uttar Pradesh (22080)",
-    "RSS Delhi (5040)",
-    "RSS Rajasthan (5187)",
-    "RSS Madhya Pradesh (8235)",
-    "RSS Chatthisgarh (1290)",
-    "RSS Tamil Nadu (789)",
-    "RSS Jammu Kashmir (309)",
-    "RSS Punjab (1980)",
-    "RSS Hariyana (2609)",
-    "RSS Himachal (1301)",
-    "More",
+  const ACTIVE_MEMBERS = [
+    { region: "Uttarakhand", count: "20,129" },
+    { region: "Uttar Pradesh", count: "22,080" },
+    { region: "Delhi", count: "5,040" },
+    { region: "Rajasthan", count: "5,187" },
+    { region: "Madhya Pradesh", count: "8,235" },
+    { region: "Chhattisgarh", count: "1,290" },
+    { region: "Tamil Nadu", count: "789" },
+    { region: "Jammu Kashmir", count: "309" },
+    { region: "Punjab", count: "1,980" },
+    { region: "Haryana", count: "2,609" },
+    { region: "Himachal", count: "1,301" },
   ];
 
   const QUICK_LINKS = [
@@ -181,19 +180,29 @@ const Footer = () => {
           <div className="lg:col-span-3">
             <div className="bg-gray-800/30 rounded-2xl p-6 border border-gray-800/50 backdrop-blur-sm h-full">
               <h4 className="text-white font-black text-sm uppercase tracking-widest mb-4 flex items-center justify-between">
-                <span>Regional Centers</span>
+                <span>Active Member</span>
                 <Globe size={14} className="text-apml-red" />
               </h4>
-              <div className="h-44 overflow-y-scroll pr-2 custom-scrollbar grid grid-cols-1 gap-2">
-                {LOCATIONS.map((loc, i) => (
-                  <Link
+              <div className="h-44 overflow-y-scroll pr-2 custom-scrollbar flex flex-col gap-2">
+                {ACTIVE_MEMBERS.map((item, i) => (
+                  <div
                     key={i}
-                    href="#"
-                    className="text-xs text-gray-500 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-lg transition-all border border-transparent hover:border-gray-700"
+                    className="flex justify-between items-center group/item hover:bg-white/5 px-3 py-2 rounded-lg transition-all border border-transparent hover:border-white/5"
                   >
-                    {loc}
-                  </Link>
+                    <span className="text-xs text-gray-500 group-hover/item:text-gray-300 font-medium font-hind">
+                      {item.region}
+                    </span>
+                    <span className="text-[10px] font-black bg-apml-red/10 text-apml-red px-2 py-0.5 rounded-full border border-apml-red/20 group-hover/item:bg-apml-red group-hover/item:text-white transition-all">
+                      {item.count}
+                    </span>
+                  </div>
                 ))}
+                <Link
+                  href="/locations"
+                  className="text-[10px] text-gray-600 hover:text-white text-center mt-2 font-bold uppercase tracking-widest hover:underline"
+                >
+                  View All regions
+                </Link>
               </div>
             </div>
           </div>
