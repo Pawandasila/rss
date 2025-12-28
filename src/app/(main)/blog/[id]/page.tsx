@@ -136,6 +136,7 @@ export default function BlogPostPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Immersive Hero Header */}
       <section className="relative h-[60vh] md:h-[75vh] w-full overflow-hidden">
         {post.image ? (
           <Image
@@ -153,95 +154,107 @@ export default function BlogPostPage() {
           </div>
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+        {/* Gradient Overlay for Readability */}
+        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black via-black/60 to-transparent z-[5]" />
 
-        <div className="absolute inset-x-0 bottom-0 z-10">
-          <div className="max-w-4xl mx-auto px-4 pb-12 md:pb-20">
-            <Link
-              href="/blog"
-              className="inline-flex items-center text-white/80 hover:text-white mb-8 transition-colors group"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
-              <span className="text-sm font-bold uppercase tracking-widest">
-                Back to Blog
-              </span>
-            </Link>
-
-            <div className="mb-6">
-              <Badge className="bg-primary text-white text-xs md:text-sm px-4 py-1.5 rounded-full border-none shadow-lg">
-                <Tag className="w-3.5 h-3.5 mr-2" />
+        {/* Content Overlay */}
+        <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-12 lg:p-20">
+          <div className="max-w-4xl">
+            <div className="mb-4">
+              <Badge className="bg-primary text-white text-[10px] md:text-sm px-4 py-1.5 rounded-full border-none shadow-xl">
+                <Tag className="w-3 md:w-4 h-3 md:h-4 mr-2" />
                 {post.category}
               </Badge>
             </div>
 
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-8 font-hind drop-shadow-2xl">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-6 md:mb-10 font-hind drop-shadow-2xl">
               {post.title}
             </h1>
 
-            <div className="flex flex-wrap items-center gap-6 text-white/90">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 md:gap-8 text-white/95">
               <div className="flex items-center gap-3">
-                <Avatar className="w-10 h-10 border-2 border-primary">
+                <Avatar className="w-10 h-10 md:w-14 md:h-14 border-2 border-primary shadow-xl">
                   <AvatarImage src={post.author.image} alt={post.author.name} />
-                  <AvatarFallback className="bg-white/10 text-white">
+                  <AvatarFallback className="bg-primary text-white text-xs md:text-sm">
                     {post.author.name.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-bold text-sm">{post.author.name}</p>
-                  <p className="text-[10px] uppercase tracking-wider opacity-70">
+                  <p className="font-black text-xs md:text-lg tracking-tight leading-none mb-1">
+                    {post.author.name}
+                  </p>
+                  <p className="text-[9px] md:text-xs uppercase tracking-[0.2em] font-bold opacity-80">
                     {post.author.role}
                   </p>
                 </div>
               </div>
+
               <div className="h-8 w-px bg-white/20 hidden sm:block" />
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <Calendar className="w-4 h-4 text-primary" />
-                {formatDate(post.date)}
-              </div>
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <Clock className="w-4 h-4 text-primary" />
-                {post.readTime}
+
+              <div className="flex items-center gap-5 text-[11px] md:text-sm font-bold tracking-widest uppercase">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-primary" />
+                  {formatDate(post.date)}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-primary" />
+                  {post.readTime}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <article className="max-w-3xl mx-auto px-4 py-16 md:py-24">
+      <article className="max-w-3xl mx-auto px-5 py-14 md:py-28">
         {post.excerpt && (
-          <div className="relative mb-16">
-            <div className="absolute -left-4 top-0 bottom-0 w-1 bg-primary rounded-full" />
-            <p className="text-xl md:text-2xl text-gray-700 font-hind font-medium leading-relaxed pl-6 italic">
+          <div className="relative mb-12 md:mb-16">
+            <div className="absolute -left-3 md:-left-4 top-0 bottom-0 w-1 bg-primary rounded-full" />
+            <p className="text-lg md:text-2xl text-gray-700 font-hind font-medium leading-relaxed pl-5 md:pl-6 italic">
               {post.excerpt}
             </p>
           </div>
         )}
 
-        <div className="blog-content-container">
+        <div className="blog-content-container overflow-hidden break-words">
           <style jsx global>{`
             .blog-content-container p {
               margin-bottom: 2rem;
               line-height: 1.9;
               font-family: var(--font-hind), sans-serif;
-              font-size: 1.125rem;
+              font-size: 1rem;
               color: #374151;
+              overflow-wrap: break-word;
+              word-wrap: break-word;
+              word-break: break-word;
+            }
+            @media (max-width: 768px) {
+              .blog-content-container p {
+                font-size: 1rem;
+                line-height: 1.7;
+                margin-bottom: 1.25rem;
+              }
+            }
+            .blog-content-container h2,
+            .blog-content-container h3,
+            .blog-content-container h4 {
+              font-family: var(--font-hind), sans-serif;
+              color: #111827;
+              line-height: 1.3;
+              overflow-wrap: break-word;
+              word-break: break-word;
             }
             .blog-content-container h2 {
               font-size: 1.875rem;
               font-weight: 900;
               margin-top: 3rem;
               margin-bottom: 1.5rem;
-              font-family: var(--font-hind), sans-serif;
-              color: #111827;
-              line-height: 1.3;
             }
             .blog-content-container h3 {
               font-size: 1.5rem;
               font-weight: 800;
               margin-top: 2.5rem;
               margin-bottom: 1.25rem;
-              font-family: var(--font-hind), sans-serif;
-              color: #1f2937;
             }
             .blog-content-container ul,
             .blog-content-container ol {
@@ -260,6 +273,8 @@ export default function BlogPostPage() {
               font-weight: 800;
             }
             .blog-content-container img {
+              max-width: 100%;
+              height: auto;
               border-radius: 1.5rem;
               margin: 3rem 0;
               box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
