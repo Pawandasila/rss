@@ -15,42 +15,12 @@ import SectionHeader from "@/components/common/SectionHeader";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const DUMMY_BIRTHDAYS = [
-  {
-    id: 1,
-    user_id: "RSS/DEL/2024/001",
-    name: "पवन दासिला",
-    dob: "1995-12-28",
-    image: null,
-  },
-  {
-    id: 2,
-    user_id: "RSS/UK/2024/045",
-    name: "राजेश कुमार",
-    dob: "1990-12-28",
-    image:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000",
-  },
-  {
-    id: 3,
-    user_id: "RSS/UP/2024/112",
-    name: "अमित शर्मा",
-    dob: "1988-12-28",
-    image:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1000",
-  },
-];
-
 const BirthdaySection: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
 
-  // For debugging, using dummy data instead of API
-  // const { birthdays: apiBirthdays, isLoading, isError } = useBirthdays();
-  const birthdays = DUMMY_BIRTHDAYS;
-  const isLoading = false;
-  const isError = false;
+  const { birthdays, isLoading, isError } = useBirthdays();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -73,9 +43,9 @@ const BirthdaySection: React.FC = () => {
     return () => ctx.revert();
   }, []);
 
-  // if (!isLoading && birthdays.length === 0) {
-  //   return null;
-  // }
+  if (!isLoading && birthdays.length === 0) {
+    return null;
+  }
 
   return (
     <section
