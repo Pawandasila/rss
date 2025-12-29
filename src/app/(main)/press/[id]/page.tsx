@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   Calendar,
   ArrowLeft,
@@ -16,9 +16,16 @@ import {
   Facebook,
   Twitter,
   Linkedin,
+  Images,
+  X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { IMAGE_BLUR_DATA_URL } from "@/lib/image-placeholder";
-import { usePressCoverage } from "@/module/crm/press/hooks/usePressCoverage";
+import {
+  usePressCoverage,
+  usePressItem,
+} from "@/module/crm/press/hooks/usePressCoverage";
 import { buildMediaUrl } from "@/lib/media";
 
 const formatDate = (dateString: string) => {
@@ -36,19 +43,50 @@ export default function PressDetailPage() {
   const router = useRouter();
   const pressId = parseInt(params.id as string);
 
-  const { pressItems, loading } = usePressCoverage();
+  const { pressItem, isLoadingItem } = usePressItem(pressId);
+  const { pressItems } = usePressCoverage();
 
-  const pressItem = useMemo(() => {
-    if (!pressItems || pressItems.length === 0) return null;
-    return pressItems.find((item) => item.id === pressId) || null;
-  }, [pressItems, pressId]);
+  // Lightbox state for gallery
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  const post = useMemo(() => {
+    if (!pressItem) return null;
+    return {
+      ...pressItem,
+      content:
+        pressItem.press_content?.content ||
+        pressItem.description ||
+        "<p>विवरण उपलब्ध नहीं है।</p>",
+      images: pressItem.images || [],
+    };
+  }, [pressItem]);
 
   const relatedItems = useMemo(() => {
-    if (!pressItems || !pressItem) return [];
-    return pressItems.filter((item) => item.id !== pressItem.id).slice(0, 3);
-  }, [pressItems, pressItem]);
+    if (!pressItems || !post) return [];
+    return pressItems.filter((item) => item.id !== post.id).slice(0, 3);
+  }, [pressItems, post]);
 
-  if (loading) {
+  const openLightbox = (index: number) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
+
+  const nextImage = () => {
+    if (post?.images) {
+      setLightboxIndex((prev) => (prev + 1) % post.images.length);
+    }
+  };
+
+  const prevImage = () => {
+    if (post?.images) {
+      setLightboxIndex(
+        (prev) => (prev - 1 + post.images.length) % post.images.length
+      );
+    }
+  };
+
+  if (isLoadingItem) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
@@ -56,18 +94,23 @@ export default function PressDetailPage() {
     );
   }
 
-  if (!pressItem) {
+  if (!post) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="bg-orange-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
             <Newspaper className="w-10 h-10 text-orange-500" />
           </div>
-          <h1 className="text-2xl font-bold mb-4">समाचार नहीं मिला</h1>
-          <p className="text-muted-foreground mb-6">
+          <h1 className="text-2xl font-bold mb-4 font-hind">
+            समाचार नहीं मिला
+          </h1>
+          <p className="text-muted-foreground mb-6 font-medium font-hind">
             यह समाचार लेख उपलब्ध नहीं है।
           </p>
-          <Button onClick={() => router.push("/press")}>
+          <Button
+            onClick={() => router.push("/press")}
+            className="rounded-full"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
             समाचार पर वापस जाएं
           </Button>
@@ -80,10 +123,10 @@ export default function PressDetailPage() {
     <div className="min-h-screen bg-white">
       {/* Immersive Hero Header */}
       <section className="relative h-[60vh] md:h-[75vh] w-full overflow-hidden">
-        {pressItem.image ? (
+        {post.image ? (
           <Image
-            src={buildMediaUrl(pressItem.image) || ""}
-            alt={pressItem.title}
+            src={buildMediaUrl(post.image) || ""}
+            alt={post.title}
             fill
             className="object-cover"
             priority
@@ -110,21 +153,21 @@ export default function PressDetailPage() {
             </div>
 
             <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-6 md:mb-10 font-hind drop-shadow-2xl">
-              {pressItem.title}
+              {post.title}
             </h1>
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 md:gap-8 text-white/95">
               <div className="flex items-center gap-5 text-[11px] md:text-sm font-bold tracking-widest uppercase">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-primary" />
-                  {formatDate(pressItem.published_at)}
+                  {formatDate(post.published_at)}
                 </div>
-                {pressItem.link && (
+                {post.link && (
                   <a
-                    href={pressItem.link}
+                    href={post.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 hover:text-primary transition-colors"
+                    className="flex items-center gap-2 hover:text-primary transition-colors hover:underline"
                   >
                     <ExternalLink className="w-4 h-4 text-primary" />
                     मूल लेख (Original Source)
@@ -156,6 +199,22 @@ export default function PressDetailPage() {
                 margin-bottom: 1.25rem;
               }
             }
+            .blog-content-container blockquote {
+              border-left: 5px solid var(--primary);
+              padding: 1.5rem 2rem;
+              margin: 3rem 0;
+              background: #fdf2f0;
+              border-radius: 0 1.5rem 1.5rem 0;
+              font-style: italic;
+              color: #1f2937;
+              font-size: 1.25rem;
+              line-height: 1.8;
+              position: relative;
+            }
+            .blog-content-container blockquote p {
+              margin-bottom: 0 !important;
+              font-weight: 700 !important;
+            }
             .blog-content-container h2,
             .blog-content-container h3,
             .blog-content-container h4 {
@@ -179,26 +238,70 @@ export default function PressDetailPage() {
             }
             .blog-content-container ul,
             .blog-content-container ol {
-              margin-bottom: 2rem;
+              margin-bottom: 2.5rem;
               padding-left: 1.5rem;
             }
             .blog-content-container li {
-              margin-bottom: 0.75rem;
+              margin-bottom: 1rem;
               line-height: 1.8;
               font-family: var(--font-hind), sans-serif;
               color: #4b5563;
               font-size: 1.125rem;
+              position: relative;
+            }
+            .blog-content-container ul li::before {
+              content: "•";
+              color: var(--primary);
+              font-weight: bold;
+              display: inline-block;
+              width: 1em;
+              margin-left: -1em;
+            }
+            .blog-content-container strong {
+              color: #111827;
+              font-weight: 800;
             }
             .blog-content-container img {
               max-width: 100%;
               height: auto;
-              border-radius: 1.5rem;
-              margin: 3rem 0;
-              box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+              border-radius: 2rem;
+              margin: 3.5rem 0;
+              box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.15);
             }
           `}</style>
-          <div dangerouslySetInnerHTML={{ __html: pressItem.description }} />
+          <div dangerouslySetInnerHTML={{ __html: post.content }} />
         </div>
+
+        {/* Image Gallery */}
+        {post.images && post.images.length > 0 && (
+          <div className="mt-24">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-12 h-1 w-primary bg-primary rounded-full" />
+              <h3 className="text-2xl font-black text-gray-900 font-hind">
+                समाचार गैलरी
+              </h3>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+              {post.images.map((img, index) => (
+                <div
+                  key={img.id}
+                  className="relative aspect-[4/3] rounded-3xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 group"
+                  onClick={() => openLightbox(index)}
+                >
+                  <Image
+                    src={buildMediaUrl(img.image) || ""}
+                    alt={`Gallery ${index}`}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/20 transition-colors duration-300 flex items-center justify-center">
+                    <Images className="text-white opacity-0 group-hover:opacity-100 transition-opacity scale-150" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Social Share Bar */}
         <div className="mt-20 pt-10 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6">
@@ -237,7 +340,7 @@ export default function PressDetailPage() {
           </div>
         </div>
 
-        {/* Related News Section */}
+        {/* Related News Grid */}
         {relatedItems.length > 0 && (
           <div className="mt-28">
             <div className="flex items-center justify-between mb-10">
@@ -298,6 +401,58 @@ export default function PressDetailPage() {
           </Link>
         </div>
       </div>
+
+      {/* Lightbox Dialog */}
+      {post.images && post.images.length > 0 && (
+        <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+          <DialogContent className="max-w-5xl p-0 bg-black/95 border-none h-[80vh] flex items-center justify-center">
+            <div className="relative w-full h-full p-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4 z-50 text-white hover:bg-white/20 rounded-full"
+                onClick={() => setLightboxOpen(false)}
+              >
+                <X className="w-6 h-6" />
+              </Button>
+
+              {post.images.length > 1 && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 z-50 text-white bg-black/20 hover:bg-white/20 rounded-full h-12 w-12"
+                    onClick={prevImage}
+                  >
+                    <ChevronLeft className="w-8 h-8" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 z-50 text-white bg-black/20 hover:bg-white/20 rounded-full h-12 w-12"
+                    onClick={nextImage}
+                  >
+                    <ChevronRight className="w-8 h-8" />
+                  </Button>
+                </>
+              )}
+
+              <div className="relative w-full h-full">
+                <Image
+                  src={buildMediaUrl(post.images[lightboxIndex]?.image) || ""}
+                  alt={`Gallery ${lightboxIndex}`}
+                  fill
+                  className="object-contain"
+                />
+              </div>
+
+              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/50 text-xs font-bold uppercase tracking-widest">
+                {lightboxIndex + 1} / {post.images.length}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

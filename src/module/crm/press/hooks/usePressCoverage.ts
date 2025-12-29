@@ -1,7 +1,30 @@
+import useSWR from "swr";
 import { useState, useCallback, useEffect } from "react";
 import useAxios from "@/hooks/use-axios";
 import { toast } from "sonner";
 import { PressCoverage, PressCoverageFormData } from "../types";
+
+export const usePressItem = (id: number | null) => {
+  const axios = useAxios();
+  const fetcher = (url: string) => axios.get(url).then((res) => res.data);
+
+  const {
+    data: pressItem,
+    error: pressError,
+    isLoading: isLoadingItem,
+    mutate: mutateItem,
+  } = useSWR<PressCoverage>(
+    id ? `/admin/press-coverage/detail/${id}/` : null,
+    fetcher
+  );
+
+  return {
+    pressItem,
+    isLoadingItem,
+    pressError,
+    mutateItem,
+  };
+};
 
 export const usePressCoverage = () => {
   const axios = useAxios();

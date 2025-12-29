@@ -234,49 +234,64 @@ export default function BlogPostPage() {
                 margin-bottom: 1.25rem;
               }
             }
-            .blog-content-container h2,
-            .blog-content-container h3,
-            .blog-content-container h4 {
-              font-family: var(--font-hind), sans-serif;
-              color: #111827;
-              line-height: 1.3;
-              overflow-wrap: break-word;
-              word-break: break-word;
+            .blog-content-container blockquote {
+              border-left: 5px solid var(--primary);
+              padding: 1.5rem 2rem;
+              margin: 3rem 0;
+              background: #fdf2f0;
+              border-radius: 0 1.5rem 1.5rem 0;
+              font-style: italic;
+              color: #1f2937;
+              font-size: 1.25rem;
+              line-height: 1.8;
+              position: relative;
             }
-            .blog-content-container h2 {
-              font-size: 1.875rem;
-              font-weight: 900;
-              margin-top: 3rem;
-              margin-bottom: 1.5rem;
+            .blog-content-container blockquote p {
+              margin-bottom: 0 !important;
+              font-weight: 700 !important;
             }
-            .blog-content-container h3 {
-              font-size: 1.5rem;
-              font-weight: 800;
-              margin-top: 2.5rem;
-              margin-bottom: 1.25rem;
+            @media (max-width: 768px) {
+              .blog-content-container blockquote {
+                padding: 1rem 1.5rem;
+                font-size: 1.1rem;
+                margin: 2rem 0;
+              }
             }
             .blog-content-container ul,
             .blog-content-container ol {
-              margin-bottom: 2rem;
+              margin-bottom: 2.5rem;
               padding-left: 1.5rem;
             }
             .blog-content-container li {
-              margin-bottom: 0.75rem;
+              margin-bottom: 1rem;
               line-height: 1.8;
               font-family: var(--font-hind), sans-serif;
               color: #4b5563;
               font-size: 1.125rem;
+              position: relative;
+            }
+            .blog-content-container ul li::before {
+              content: "•";
+              color: var(--primary);
+              font-weight: bold;
+              display: inline-block;
+              width: 1em;
+              margin-left: -1em;
             }
             .blog-content-container strong {
               color: #111827;
               font-weight: 800;
             }
+            .blog-content-container u {
+              text-decoration-color: var(--primary);
+              text-underline-offset: 4px;
+            }
             .blog-content-container img {
               max-width: 100%;
               height: auto;
-              border-radius: 1.5rem;
-              margin: 3rem 0;
-              box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+              border-radius: 2rem;
+              margin: 3.5rem 0;
+              box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.15);
             }
           `}</style>
           <div

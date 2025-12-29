@@ -1,3 +1,15 @@
+export interface MissionImage {
+  id: number;
+  image: string;
+  is_main: boolean;
+}
+
+export interface MissionContent {
+  id: number;
+  title: string;
+  content: string;
+}
+
 export interface Mission {
   id: number;
   title: string;
@@ -7,6 +19,8 @@ export interface Mission {
   icon?: string;
   category?: string;
   created_at: string;
+  images?: MissionImage[];
+  mission_content?: MissionContent[];
 }
 
 export interface CreateMissionPayload {
