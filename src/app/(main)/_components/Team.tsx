@@ -134,9 +134,9 @@ const TeamSection: React.FC = () => {
     >
       <div className="container mx-auto px-4">
         <SectionHeader
-          badgeTitle="The Visionaries"
+          badgeTitle="नेतृत्व एवं मार्गदर्शन"
           badgeIcon={CircleDashed}
-          title="Key Initiatives"
+          title="Our core Team"
           viewAll="View All Members"
           viewAllLink="/team"
         />

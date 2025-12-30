@@ -8,7 +8,6 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useBirthdays } from "@/module/crm/birthday";
 import { buildMediaUrl } from "@/lib/media";
-import birthdayFrame from "@/assets/birthday/frame.png";
 import { format } from "date-fns";
 import { hi } from "date-fns/locale";
 import SectionHeader from "@/components/common/SectionHeader";
@@ -120,54 +119,89 @@ const BirthdaySection: React.FC = () => {
             >
               {birthdays.map((person) => (
                 <SwiperSlide key={person.id}>
-                  <div className="relative w-full max-w-lg mx-auto aspect-square rounded-3xl overflow-hidden shadow-2xl group border border-orange-100/50">
-                    {/* Background Frame */}
-                    <Image
-                      src={birthdayFrame}
-                      alt="Birthday Frame"
-                      fill
-                      className="object-fill"
-                      priority
-                    />
+                  <div className="relative w-full max-w-lg mx-auto aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl group border border-orange-200/50 bg-gradient-to-b from-orange-50 to-white">
+                    {/* Premium Background Frame */}
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-orange-100/40 via-transparent to-transparent opacity-60" />
 
-                    {/* User Photo Overlay */}
-                    <div className="absolute top-[19.8%] left-[32.6%] w-[34.8%] h-[36.8%] overflow-hidden rounded-[1.5rem] bg-gray-50">
-                      {person.image ? (
-                        <Image
-                          src={buildMediaUrl(person.image) || ""}
-                          alt={person.name}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                          <User className="w-1/2 h-1/2 text-gray-400" />
+                    {/* Decorative Saffron Arches */}
+                    <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-orange-500/10 to-transparent" />
+                    <div className="absolute -top-12 -left-12 w-48 h-48 bg-orange-400/10 rounded-full blur-3xl animate-pulse" />
+                    <div className="absolute -top-12 -right-12 w-48 h-48 bg-orange-400/10 rounded-full blur-3xl animate-pulse delay-700" />
+
+                    {/* Content Container */}
+                    <div className="relative h-full flex flex-col items-center pt-10 pb-8 px-6">
+                      {/* Badge / Header */}
+                      <div className="mb-6 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
+                        <span className="text-xs font-bold text-primary uppercase tracking-[0.2em] font-hind">
+                          जन्मदिन की शुभकामनाएँ
+                        </span>
+                      </div>
+
+                      {/* User Photo with Double Border Frame */}
+                      <div className="relative group/photo">
+                        <div className="absolute -inset-4 bg-gradient-to-tr from-primary via-orange-300 to-primary/40 rounded-full opacity-20 group-hover/photo:opacity-40 transition-opacity duration-500 blur-sm" />
+                        <div className="relative w-48 h-48 sm:w-56 sm:h-56 rounded-full p-2 bg-gradient-to-tr from-primary/30 to-orange-200 border border-white shadow-xl overflow-hidden">
+                          <div className="w-full h-full rounded-full overflow-hidden bg-white relative">
+                            {person.image ? (
+                              <Image
+                                src={buildMediaUrl(person.image) || ""}
+                                alt={person.name}
+                                fill
+                                className="object-cover group-hover/photo:scale-110 transition-transform duration-700"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-gray-50 text-orange-200">
+                                <User size={80} strokeWidth={1} />
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      )}
+
+                        {/* Decorative Icon */}
+                        <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-white rounded-2xl shadow-lg border border-orange-100 flex items-center justify-center text-primary animate-bounce duration-[3000ms]">
+                          <Cake size={24} />
+                        </div>
+                      </div>
+
+                      {/* Information Section */}
+                      <div className="mt-8 text-center space-y-4 w-full">
+                        <div className="space-y-1">
+                          <h3 className="text-2xl sm:text-3xl font-black text-slate-900 font-hind tracking-tight">
+                            {person.name}
+                          </h3>
+                          <div className="h-1 w-12 bg-primary/20 mx-auto rounded-full" />
+                        </div>
+
+                        {/* Details Grid */}
+                        <div className="grid grid-cols-2 gap-4 mt-6">
+                          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-3 border border-orange-100/50 shadow-sm">
+                            <span className="block text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1 font-hind">
+                              पंजी सं :
+                            </span>
+                            <span className="text-sm sm:text-base font-bold text-slate-700 font-hind">
+                              {person.user_id || "N/A"}
+                            </span>
+                          </div>
+
+                          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-3 border border-orange-100/50 shadow-sm">
+                            <span className="block text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1 font-hind">
+                              जन्मदिन :
+                            </span>
+                            <span className="text-sm sm:text-base font-bold text-slate-700 font-hind">
+                              {format(new Date(person.dob), "dd MMMM", {
+                                locale: hi,
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
-                    {/* User Name Overlay - Below Photo */}
-                    <div className="absolute top-[55.5%] left-0 w-full h-[8%] flex items-center justify-center px-4 z-20">
-                      <h3 className="text-[14px] sm:text-base md:text-lg lg:text-xl xl:text-3xl font-black text-blue-900 tracking-tight leading-normal font-hind truncate drop-shadow-sm">
-                        {person.name}
-                      </h3>
-                    </div>
-
-                    {/* Registration Number Value - Next to "पंजी सं :" */}
-                    <div className="absolute bottom-[11.5%] left-[25.5%] w-[25%] z-10">
-                      <p className="text-[10px] sm:text-lg md:text-xl font-black text-gray-800 font-hind">
-                        {person.user_id || "N/A"}
-                      </p>
-                    </div>
-
-                    {/* Birthday Date Value - Next to "जन्मदिन :" */}
-                    <div className="absolute bottom-[11.5%] left-[66%] w-[25%] z-10">
-                      <p className="text-[10px] sm:text-lg md:text-xl font-black text-gray-800 font-hind">
-                        {format(new Date(person.dob), "dd MMMM", {
-                          locale: hi,
-                        })}
-                      </p>
-                    </div>
+                    {/* Subtle Corner Decorations */}
+                    <div className="absolute top-4 left-4 w-12 h-12 border-t-2 border-l-2 border-primary/20 rounded-tl-2xl" />
+                    <div className="absolute top-4 right-4 w-12 h-12 border-t-2 border-r-2 border-primary/20 rounded-tr-2xl" />
+                    <div className="absolute bottom-4 left-4 w-12 h-12 border-b-2 border-l-2 border-primary/20 rounded-bl-2xl" />
+                    <div className="absolute bottom-4 right-4 w-12 h-12 border-b-2 border-r-2 border-primary/20 rounded-br-2xl" />
                   </div>
                 </SwiperSlide>
               ))}

@@ -461,56 +461,92 @@ const Hero = () => {
         transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
         className="w-full px-4 md:px-8 lg:px-16 xl:px-24 relative z-30 -mt-12 sm:-mt-20 lg:-mt-30 mb-8 sm:mb-12 lg:mb-16"
       >
-        <div className="bg-white rounded-t-xl rounded-b-lg shadow-[0_20px_50px_rgba(0,0,0,0.15)] mx-auto border-t-4 border-accent w-full overflow-hidden relative">
-          {/* Tabs */}
-          <div className="flex text-xs sm:text-sm font-bold text-center border-b border-gray-100">
+        <div className="bg-white rounded-t-3xl rounded-b-2xl shadow-[0_30px_60px_rgba(0,0,0,0.12)] mx-auto border-t-[6px] border-primary w-full overflow-hidden relative group/container hover:shadow-[0_40px_80px_rgba(0,0,0,0.15)] transition-all duration-500">
+          <div className="flex text-xs sm:text-sm font-bold text-center border-b border-gray-100 lg:hidden shadow-sm">
             <button
               onClick={() => setActiveTab("join")}
-              className={`py-3 px-4 sm:py-4 sm:px-8 flex-1 lg:flex-none lg:min-w-[180px] uppercase tracking-wide flex items-center justify-center gap-1.5 sm:gap-2 relative overflow-hidden transition-all ${
+              className={`py-4 px-6 flex-1 uppercase tracking-widest flex items-center justify-center gap-2 transition-all duration-300 relative ${
                 activeTab === "join"
-                  ? "text-white bg-primary"
-                  : "text-gray-500 hover:text-primary hover:bg-gray-50"
+                  ? "text-primary bg-primary/5 font-black"
+                  : "text-gray-400 hover:text-primary hover:bg-gray-50"
               }`}
             >
-              <UserPlus size={16} className="sm:w-[18px] sm:h-[18px]" />
-              <span className="text-[11px] sm:text-sm">Join Now</span>
+              <UserPlus
+                size={18}
+                className={activeTab === "join" ? "animate-pulse" : ""}
+              />
+              <span>Join Now</span>
+              {activeTab === "join" && (
+                <motion.div
+                  layoutId="activeTabUnderline"
+                  className="absolute bottom-0 left-0 right-0 h-1 bg-primary"
+                />
+              )}
             </button>
             <button
               onClick={() => setActiveTab("donate")}
-              className={`py-3 px-4 sm:py-4 sm:px-8 flex-1 lg:flex-none lg:min-w-[180px] uppercase tracking-wide flex items-center justify-center gap-1.5 sm:gap-2 relative overflow-hidden transition-all ${
+              className={`py-4 px-6 flex-1 uppercase tracking-widest flex items-center justify-center gap-2 transition-all duration-300 relative ${
                 activeTab === "donate"
-                  ? "text-white bg-primary"
-                  : "text-gray-500 hover:text-primary hover:bg-gray-50"
+                  ? "text-primary bg-primary/5 font-black"
+                  : "text-gray-400 hover:text-primary hover:bg-gray-50"
               }`}
             >
-              <Heart size={16} className="sm:w-[18px] sm:h-[18px]" />
-              <span className="text-[11px] sm:text-sm">Donate Now</span>
+              <Heart
+                size={18}
+                className={activeTab === "donate" ? "animate-pulse" : ""}
+              />
+              <span>Donate Now</span>
+              {activeTab === "donate" && (
+                <motion.div
+                  layoutId="activeTabUnderline"
+                  className="absolute bottom-0 left-0 right-0 h-1 bg-primary"
+                />
+              )}
             </button>
           </div>
 
-          <div className="p-4 sm:p-5 lg:p-8 bg-white min-h-[100px] sm:min-h-[120px] transition-all">
-            {/* JOIN FORM */}
-            {activeTab === "join" && (
+          <div className="lg:grid lg:grid-cols-2 lg:divide-x lg:divide-gray-100 divide-y lg:divide-y-0">
+            {/* JOIN FORM SECTION */}
+            <div
+              className={cn(
+                "p-6 sm:p-8 lg:p-10 transition-all duration-500",
+                activeTab !== "join" && "hidden lg:block",
+                "bg-white"
+              )}
+            >
+              {/* Desktop Header */}
+              <div className="hidden lg:flex items-center gap-3 mb-8">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
+                  <UserPlus size={24} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black text-slate-900 font-hind tracking-tight uppercase">
+                    Become a Member
+                  </h2>
+                  <p className="text-xs text-slate-400 font-medium tracking-wide">
+                    Join our community today
+                  </p>
+                </div>
+              </div>
+
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
               >
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   {/* Name Field */}
-                  <div className="space-y-1.5 sm:space-y-2">
-                    <label className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] ml-1">
                       पूरा नाम
                     </label>
-                    <div className="flex items-center bg-white border border-gray-300 rounded-lg p-2 sm:p-2.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-red-100 transition-all shadow-sm hover:border-gray-400 group">
-                      <UserPlus
-                        size={18}
-                        className="text-gray-400 group-focus-within:text-primary transition-colors flex-shrink-0"
-                      />
-                      <div className="w-px h-5 sm:h-6 bg-gray-200 mx-2 sm:mx-3"></div>
+                    <div className="relative group/input">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within/input:text-primary transition-colors">
+                        <User size={18} strokeWidth={2.5} />
+                      </div>
                       <input
                         type="text"
-                        aria-label="Full Name"
                         placeholder="Enter Full Name"
                         value={joinForm.name}
                         onChange={(e) =>
@@ -519,25 +555,22 @@ const Hero = () => {
                             name: e.target.value,
                           }))
                         }
-                        className="bg-transparent border-none text-gray-800 text-xs sm:text-sm w-full focus:outline-none placeholder-gray-400 font-medium"
+                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/10 focus:border-primary outline-none transition-all placeholder:text-slate-300"
                       />
                     </div>
                   </div>
 
                   {/* Email Field */}
-                  <div className="space-y-1.5 sm:space-y-2">
-                    <label className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] ml-1">
                       ईमेल
                     </label>
-                    <div className="flex items-center bg-white border border-gray-300 rounded-lg p-2 sm:p-2.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-red-100 transition-all shadow-sm hover:border-gray-400 group">
-                      <Mail
-                        size={18}
-                        className="text-gray-400 group-focus-within:text-primary transition-colors flex-shrink-0"
-                      />
-                      <div className="w-px h-5 sm:h-6 bg-gray-200 mx-2 sm:mx-3"></div>
+                    <div className="relative group/input">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within/input:text-primary transition-colors">
+                        <Mail size={18} strokeWidth={2.5} />
+                      </div>
                       <input
                         type="email"
-                        aria-label="Email"
                         placeholder="example@mail.com"
                         value={joinForm.email}
                         onChange={(e) =>
@@ -546,25 +579,22 @@ const Hero = () => {
                             email: e.target.value,
                           }))
                         }
-                        className="bg-transparent border-none text-gray-800 text-xs sm:text-sm w-full focus:outline-none placeholder-gray-400 font-medium"
+                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/10 focus:border-primary outline-none transition-all placeholder:text-slate-300"
                       />
                     </div>
                   </div>
 
                   {/* Phone Field */}
-                  <div className="space-y-1.5 sm:space-y-2">
-                    <label className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] ml-1">
                       मोबाइल नं.
                     </label>
-                    <div className="flex items-center bg-white border border-gray-300 rounded-lg p-2 sm:p-2.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-red-100 transition-all shadow-sm hover:border-gray-400 group">
-                      <Phone
-                        size={18}
-                        className="text-gray-400 group-focus-within:text-primary transition-colors flex-shrink-0"
-                      />
-                      <div className="w-px h-5 sm:h-6 bg-gray-200 mx-2 sm:mx-3"></div>
+                    <div className="relative group/input">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within/input:text-primary transition-colors">
+                        <Phone size={18} strokeWidth={2.5} />
+                      </div>
                       <input
                         type="tel"
-                        aria-label="Mobile Number"
                         placeholder="9876543210"
                         maxLength={10}
                         value={joinForm.phone}
@@ -574,14 +604,14 @@ const Hero = () => {
                             phone: formatPhoneNumber(e.target.value),
                           }))
                         }
-                        className="bg-transparent border-none text-gray-800 text-xs sm:text-sm w-full focus:outline-none placeholder-gray-400 font-medium"
+                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/10 focus:border-primary outline-none transition-all placeholder:text-slate-300"
                       />
                     </div>
                   </div>
 
-                  {/* Date of Birth Field */}
-                  <div className="space-y-1.5 sm:space-y-2">
-                    <label className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">
+                  {/* DOB Field */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] ml-1">
                       जन्म तिथि
                     </label>
                     <Popover>
@@ -589,11 +619,11 @@ const Hero = () => {
                         <Button
                           variant="outline"
                           className={cn(
-                            "w-full h-9 sm:h-10 justify-start text-left font-medium text-xs sm:text-sm border-gray-300 hover:border-gray-400",
-                            !joinForm.dateOfBirth && "text-gray-400"
+                            "w-full h-[46px] justify-start text-left font-medium text-sm rounded-xl border-slate-200 bg-slate-50 hover:bg-slate-100 py-3",
+                            !joinForm.dateOfBirth && "text-slate-300"
                           )}
                         >
-                          <CalendarIcon className="mr-2 h-4 w-4 text-gray-400" />
+                          <CalendarIcon className="mr-2 h-4 w-4 text-slate-400" />
                           {joinForm.dateOfBirth ? (
                             format(joinForm.dateOfBirth, "dd/MM/yyyy")
                           ) : (
@@ -601,7 +631,10 @@ const Hero = () => {
                           )}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent
+                        className="w-auto p-0 rounded-2xl border-none shadow-2xl"
+                        align="start"
+                      >
                         <Calendar
                           mode="single"
                           captionLayout="dropdown"
@@ -612,102 +645,124 @@ const Hero = () => {
                               dateOfBirth: date,
                             }))
                           }
+                          className="rounded-2xl"
                         />
                       </PopoverContent>
                     </Popover>
                   </div>
                 </div>
 
-                {/* Submit Button */}
-                <div className="mt-4 flex justify-center lg:justify-end">
+                <div className="space-y-4 pt-2">
                   <button
                     onClick={handleJoinSubmit}
                     disabled={isSubmitting}
-                    className="bg-primary text-white font-bold py-3 sm:py-3.5 px-8 sm:px-12 rounded-lg hover:bg-red-700 transition w-full lg:w-auto shadow-lg uppercase text-xs sm:text-sm tracking-wide transform hover:-translate-y-0.5 active:translate-y-0 whitespace-nowrap lg:min-w-[200px] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full bg-primary text-white font-black py-4 px-8 rounded-2xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/20 uppercase text-sm tracking-widest flex items-center justify-center gap-3 disabled:opacity-70 group/btn active:scale-[0.98]"
                   >
                     {isSubmitting ? (
-                      <>
-                        <Loader2 size={16} className="animate-spin" />
-                        पंजीकरण हो रहा है...
-                      </>
+                      <Loader2 size={20} className="animate-spin" />
                     ) : (
                       <>
-                        <UserPlus size={16} />
-                        पंजीकरण करें
+                        <span>पंजीकरण करें</span>
+                        <ArrowRight
+                          size={20}
+                          className="group-hover/btn:translate-x-1 transition-transform"
+                        />
                       </>
                     )}
                   </button>
+                  <p className="text-[10px] text-slate-400 text-center font-medium leading-relaxed max-w-[280px] mx-auto">
+                    Note: Your DOB (DDMMYYYY) will be your initial password.
+                    e.g. 05012000 for Jan 5, 2000.
+                  </p>
                 </div>
-
-                {/* Password Info */}
-                <p className="text-[10px] sm:text-xs text-gray-400 text-center mt-3">
-                  पंजीकरण के बाद आपका पासवर्ड आपकी जन्म तिथि होगी (DDMMYYYY
-                  प्रारूप में, जैसे: 5 जनवरी 2000 के लिए 05012000)
-                </p>
               </motion.div>
-            )}
+            </div>
 
-            {/* DONATE FORM */}
-            {activeTab === "donate" && (
+            {/* DONATE FORM SECTION */}
+            <div
+              className={cn(
+                "p-6 sm:p-8 lg:p-10 transition-all duration-500",
+                activeTab !== "donate" && "hidden lg:block",
+                "bg-gray-50/30"
+              )}
+            >
+              {/* Desktop Header */}
+              <div className="hidden lg:flex items-center gap-3 mb-8">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
+                  <Heart size={24} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black text-slate-900 font-hind tracking-tight uppercase">
+                    Support Mission
+                  </h2>
+                  <p className="text-xs text-slate-400 font-medium tracking-wide">
+                    Contribution for a better Nation
+                  </p>
+                </div>
+              </div>
+
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className="space-y-4 sm:space-y-5"
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
               >
-                {/* Amount Selection */}
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 sm:p-4">
-                  <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-3 text-center">
-                    दान राशि चुनें
-                  </h3>
-                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                    {impactAmounts.map((item, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => handleAmountSelect(item.amount)}
-                        className={`p-2 sm:p-3 rounded-lg border transition-all text-center ${
-                          selectedAmount === item.amount
-                            ? "border-primary bg-primary/10 shadow-md"
-                            : "border-orange-300 bg-white hover:border-primary hover:shadow-sm"
-                        }`}
-                      >
-                        <p className="text-sm sm:text-lg font-black text-primary">
-                          {item.label}
-                        </p>
-                        <p className="text-[8px] sm:text-[10px] text-gray-500 leading-tight hidden sm:block">
-                          {item.desc}
-                        </p>
-                      </button>
-                    ))}
+                {/* Amount Selection Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-3 gap-3">
+                  {impactAmounts.map((item, index) => (
                     <button
-                      type="button"
-                      onClick={() => handleAmountSelect(-1)}
-                      className={`p-2 sm:p-3 rounded-lg border transition-all flex flex-col items-center justify-center ${
-                        isCustomAmount
-                          ? "border-primary bg-primary/10 shadow-md"
-                          : "border-orange-300 bg-white hover:border-primary hover:shadow-sm"
-                      }`}
+                      key={index}
+                      onClick={() => handleAmountSelect(item.amount)}
+                      className={cn(
+                        "p-3 rounded-2xl border transition-all text-center relative overflow-hidden group/amt",
+                        selectedAmount === item.amount
+                          ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
+                          : "border-slate-200 bg-white hover:border-primary/50 text-slate-600"
+                      )}
                     >
-                      <Gift className="h-4 w-4 sm:h-5 sm:w-5 text-primary mb-1" />
-                      <p className="text-xs sm:text-sm font-bold text-primary">
-                        Custom
+                      <p className="text-sm font-black font-hind leading-none mb-1">
+                        {item.label}
+                      </p>
+                      <p
+                        className={cn(
+                          "text-[9px] font-bold uppercase tracking-wider leading-none",
+                          selectedAmount === item.amount
+                            ? "text-white/80"
+                            : "text-slate-400"
+                        )}
+                      >
+                        {item.desc}
                       </p>
                     </button>
-                  </div>
+                  ))}
+                  <button
+                    onClick={() => handleAmountSelect(-1)}
+                    className={cn(
+                      "p-3 rounded-2xl border transition-all flex flex-col items-center justify-center gap-1",
+                      isCustomAmount
+                        ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
+                        : "border-slate-200 bg-white hover:border-primary/50 text-slate-600"
+                    )}
+                  >
+                    <Gift size={16} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">
+                      Custom
+                    </span>
+                  </button>
                 </div>
 
-                {/* Custom Amount Input */}
                 {isCustomAmount && (
-                  <div className="flex justify-center">
-                    <div className="relative w-full max-w-xs">
-                      <IndianRupee className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        className="pl-10 h-11 text-center text-lg font-semibold border-2 focus-ring rounded-lg"
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                  >
+                    <div className="relative group/input">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within/input:text-primary transition-colors">
+                        <IndianRupee size={18} strokeWidth={2.5} />
+                      </div>
+                      <input
                         type="number"
-                        placeholder="राशि दर्ज करें"
-                        min={1}
-                        max={500000}
+                        placeholder="अपनी राशि दर्ज करें"
                         value={donationForm.amount || ""}
                         onChange={(e) =>
                           setDonationForm((prev) => ({
@@ -715,23 +770,18 @@ const Hero = () => {
                             amount: parseInt(e.target.value) || 0,
                           }))
                         }
+                        className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-black focus:ring-2 focus:ring-primary/10 focus:border-primary outline-none transition-all"
                       />
                     </div>
-                  </div>
+                  </motion.div>
                 )}
 
-                {/* Form Fields */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                  {/* Name */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">
-                      पूरा नाम *
-                    </label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        className="pl-10 h-10 text-sm"
-                        placeholder="Enter your name"
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="relative group/input">
+                      <input
+                        type="text"
+                        placeholder="Your Name"
                         value={donationForm.name}
                         onChange={(e) =>
                           setDonationForm((prev) => ({
@@ -739,20 +789,13 @@ const Hero = () => {
                             name: e.target.value,
                           }))
                         }
+                        className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:border-primary outline-none transition-all"
                       />
                     </div>
-                  </div>
-
-                  {/* Phone */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">
-                      मोबाइल नं. *
-                    </label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        className="pl-10 h-10 text-sm"
-                        placeholder="9876543210"
+                    <div className="relative group/input">
+                      <input
+                        type="tel"
+                        placeholder="Phone Number"
                         maxLength={10}
                         value={donationForm.phone}
                         onChange={(e) =>
@@ -761,122 +804,74 @@ const Hero = () => {
                             phone: formatPhoneNumber(e.target.value),
                           }))
                         }
+                        className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:border-primary outline-none transition-all"
                       />
                     </div>
                   </div>
 
-                  {/* Email */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">
-                      ईमेल *
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        className="pl-10 h-10 text-sm"
-                        type="email"
-                        placeholder="example@mail.com"
-                        value={donationForm.email}
-                        onChange={(e) =>
-                          setDonationForm((prev) => ({
-                            ...prev,
-                            email: e.target.value,
-                          }))
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* State & District */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <StateSelect
-                    label="राज्य"
-                    placeholder="राज्य चुनें"
-                    value={donationForm.state}
-                    onStateChange={(stateName, stateId) => {
-                      setDonationForm((prev) => ({
-                        ...prev,
-                        state: stateName,
-                        district: "",
-                      }));
-                      if (stateId) {
-                        fetchDistricts(stateId);
+                  <div className="grid grid-cols-2 gap-4">
+                    <StateSelect
+                      value={donationForm.state}
+                      onStateChange={(stateName, stateId) => {
+                        setDonationForm((prev) => ({
+                          ...prev,
+                          state: stateName,
+                          district: "",
+                        }));
+                        if (stateId) fetchDistricts(stateId);
+                      }}
+                      className="w-full"
+                    />
+                    <DistrictSelect
+                      value={donationForm.district}
+                      onValueChange={(val) =>
+                        setDonationForm((prev) => ({ ...prev, district: val }))
                       }
-                    }}
-                    className="w-full"
-                  />
-                  <DistrictSelect
-                    label="जिला"
-                    placeholder="जिला चुनें"
-                    value={donationForm.district}
-                    onValueChange={(value) =>
-                      setDonationForm((prev) => ({ ...prev, district: value }))
-                    }
-                    stateSelected={!!donationForm.state}
-                    selectedStateId={
-                      states.find((s) => s.name === donationForm.state)?.id
-                    }
-                    selectedStateName={donationForm.state}
-                    className="w-full"
-                  />
-                </div>
+                      stateSelected={!!donationForm.state}
+                      selectedStateId={
+                        states.find((s) => s.name === donationForm.state)?.id
+                      }
+                      selectedStateName={donationForm.state}
+                      className="w-full"
+                    />
+                  </div>
 
-                {/* Security Badge */}
-                <div className="bg-gray-50 p-2.5 rounded-lg border flex items-center justify-center gap-2">
-                  <Shield className="h-3.5 w-3.5 text-primary" />
-                  <span className="text-[10px] sm:text-xs font-medium text-gray-600">
-                    100% Secure Payment
-                  </span>
-                  <Badge
-                    variant="secondary"
-                    className="bg-primary/10 text-primary text-[10px]"
-                  >
-                    SSL
-                  </Badge>
-                  <Lock className="h-3 w-3 text-gray-400" />
-                </div>
-
-                {/* Submit Button */}
-                <div className="flex justify-center">
-                  <Button
+                  <button
                     onClick={handleDonationSubmit}
                     disabled={isProcessing}
-                    className="w-full lg:w-auto lg:min-w-[250px] h-11 sm:h-12 text-sm sm:text-base font-semibold"
+                    className="w-full bg-slate-900 text-white font-black py-4 px-8 rounded-2xl hover:bg-slate-800 transition-all shadow-xl hover:shadow-slate-200 uppercase text-sm tracking-widest flex items-center justify-center gap-3 disabled:opacity-70 group/btn active:scale-[0.98]"
                   >
                     {isProcessing ? (
-                      <>
-                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                        <span className="text-xs sm:text-sm">
-                          {currentStep === "creating-order" &&
-                            "Creating Order..."}
-                          {currentStep === "waiting-payment" &&
-                            "Opening Payment..."}
-                          {currentStep === "verifying" && "Verifying..."}
-                          {!currentStep && "Processing..."}
-                        </span>
-                      </>
+                      <Loader2 size={20} className="animate-spin" />
                     ) : (
                       <>
-                        <Heart className="h-5 w-5 mr-2" />
+                        <Heart size={20} className="fill-white" />
                         <span>
-                          Donate{" "}
-                          {donationForm.amount > 0
-                            ? formatCurrency(donationForm.amount)
-                            : "Now"}
+                          दान करें{" "}
+                          {donationForm.amount > 0 && `₹${donationForm.amount}`}
                         </span>
                       </>
                     )}
-                  </Button>
-                </div>
+                  </button>
 
-                {donationError && (
-                  <p className="text-xs text-red-500 text-center">
-                    {donationError}
-                  </p>
-                )}
+                  <div className="flex items-center justify-center gap-4 py-2 border-t border-slate-100">
+                    <div className="flex items-center gap-1.5 opacity-50">
+                      <Shield size={12} />
+                      <span className="text-[10px] font-bold uppercase tracking-tighter">
+                        Secure
+                      </span>
+                    </div>
+                    <div className="w-px h-3 bg-slate-200" />
+                    <div className="flex items-center gap-1.5 opacity-50">
+                      <Lock size={12} />
+                      <span className="text-[10px] font-bold uppercase tracking-tighter">
+                        SSL Encrypted
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </motion.div>
-            )}
+            </div>
           </div>
 
           <div className="lg:hidden bg-orange-50 p-3 text-center text-xs text-gray-600 border-t border-gray-200">

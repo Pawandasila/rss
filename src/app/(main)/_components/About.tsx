@@ -94,7 +94,7 @@ const AboutSection: React.FC = () => {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-apml-red to-orange-600">
                 Sanatan - <br />
               </span>
-              <span className="text-md md:text-lg lg:text-xl font-medium">
+              <span className="text-[22px] font-medium">
                 The Heartbeat of Bharat
               </span>
             </motion.h3>
@@ -104,7 +104,7 @@ const AboutSection: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-gray-500 text-sm md:text-lg leading-relaxed mb-8 md:mb-10 font-medium max-w-lg"
+              className="text-gray-500 text-sm md:text-lg  leading-relaxed mb-8 md:mb-10 font-medium max-w-lg"
             >
               राष्ट्रीय सेवा संघ का लक्ष्य सेवा, समर्पण और राष्ट्रवाद के मूल
               सिद्धांतों के आधार पर एक मजबूत और समृद्ध वैदिक भारत का निर्माण
