@@ -23,6 +23,7 @@ import {
   Linkedin,
   Images,
   X,
+  Plus,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -136,7 +137,7 @@ export default function BlogPostPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <section className="relative h-[60vh] md:h-[75vh] w-full overflow-hidden">
+      <section className="relative h-[50vh] md:h-[65vh] w-full overflow-hidden">
         {post.image ? (
           <Image
             src={post.image}
@@ -154,50 +155,57 @@ export default function BlogPostPage() {
         )}
 
         {/* Gradient Overlay for Readability */}
-        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black via-black/60 to-transparent z-[5]" />
+        <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-black/90 via-black/40 to-transparent z-[5]" />
 
         {/* Content Overlay */}
-        <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-12 lg:p-20">
-          <div className="max-w-4xl">
-            <div className="mb-4">
-              <Badge className="bg-primary text-white text-[10px] md:text-sm px-4 py-1.5 rounded-full border-none shadow-xl">
+        <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-12 lg:p-24">
+          <div className="max-w-6xl mx-auto w-full">
+            <div className="mb-4 md:mb-6">
+              <Badge className="bg-primary/90 backdrop-blur-md text-white text-[10px] md:text-sm px-4 py-1.5 rounded-full border-none shadow-lg">
                 <Tag className="w-3 md:w-4 h-3 md:h-4 mr-2" />
                 {post.category}
               </Badge>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-6 md:mb-10 font-hind drop-shadow-2xl">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-white leading-[1.1] mb-8 md:mb-12 font-hind drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] max-w-5xl">
               {post.title}
             </h1>
 
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 md:gap-8 text-white/95">
-              <div className="flex items-center gap-3">
-                <Avatar className="w-10 h-10 md:w-14 md:h-14 border-2 border-primary shadow-xl">
+            <div className="flex flex-wrap items-center gap-6 md:gap-10 text-white/90">
+              <div className="flex items-center gap-4 group cursor-pointer">
+                <Avatar className="w-12 h-12 md:w-16 md:h-16 border-2 border-primary/50 shadow-2xl transition-transform group-hover:scale-110 duration-300">
                   <AvatarImage src={post.author.image} alt={post.author.name} />
-                  <AvatarFallback className="bg-primary text-white text-xs md:text-sm">
+                  <AvatarFallback className="bg-primary text-white text-base md:text-xl font-bold">
                     {post.author.name.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-black text-xs md:text-lg tracking-tight leading-none mb-1">
+                  <p className="font-extrabold text-sm md:text-xl tracking-tight leading-none mb-1.5">
                     {post.author.name}
                   </p>
-                  <p className="text-[9px] md:text-xs uppercase tracking-[0.2em] font-bold opacity-80">
-                    {post.author.role}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                    <p className="text-[9px] md:text-xs uppercase tracking-[0.2em] font-black opacity-70">
+                      {post.author.role}
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              <div className="h-8 w-px bg-white/20 hidden sm:block" />
+              <div className="h-10 w-px bg-white/30 hidden sm:block" />
 
-              <div className="flex items-center gap-5 text-[11px] md:text-sm font-bold tracking-widest uppercase">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-primary" />
-                  {formatDate(post.date)}
+              <div className="flex items-center gap-8 text-[11px] md:text-sm font-black tracking-widest uppercase">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-md">
+                    <Calendar className="w-4 h-4 text-primary" />
+                  </div>
+                  <span className="opacity-90">{formatDate(post.date)}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-primary" />
-                  {post.readTime}
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-md">
+                    <Clock className="w-4 h-4 text-primary" />
+                  </div>
+                  <span className="opacity-90">{post.readTime}</span>
                 </div>
               </div>
             </div>
@@ -205,238 +213,215 @@ export default function BlogPostPage() {
         </div>
       </section>
 
-      <article className="max-w-3xl mx-auto px-5 py-14 md:py-28">
-        {post.excerpt && (
-          <div className="relative mb-12 md:mb-16">
-            <div className="absolute -left-3 md:-left-4 top-0 bottom-0 w-1 bg-primary rounded-full" />
-            <p className="text-lg md:text-2xl text-gray-700 font-hind font-medium leading-relaxed pl-5 md:pl-6 italic">
-              {post.excerpt}
-            </p>
-          </div>
-        )}
+      <div className="max-w-6xl mx-auto px-5 py-12 md:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          {/* Main Content Area */}
+          <div className="lg:col-span-8">
+            {post.excerpt && (
+              <div className="relative mb-12 md:mb-16">
+                <div className="absolute -left-4 top-0 bottom-0 w-1.5 bg-primary rounded-full" />
+                <p className="text-xl md:text-2xl text-gray-800 font-hind font-bold leading-relaxed pl-6 italic">
+                  {post.excerpt}
+                </p>
+              </div>
+            )}
 
-        <div className="blog-content-container overflow-hidden break-words">
-          <style jsx global>{`
-            .blog-content-container p {
-              margin-bottom: 2rem;
-              line-height: 1.9;
-              font-family: var(--font-hind), sans-serif;
-              font-size: 1rem;
-              color: #374151;
-              overflow-wrap: break-word;
-              word-wrap: break-word;
-              word-break: break-word;
-            }
-            @media (max-width: 768px) {
-              .blog-content-container p {
-                font-size: 1rem;
-                line-height: 1.7;
-                margin-bottom: 1.25rem;
-              }
-            }
-            .blog-content-container blockquote {
-              border-left: 5px solid var(--primary);
-              padding: 1.5rem 2rem;
-              margin: 3rem 0;
-              background: #fdf2f0;
-              border-radius: 0 1.5rem 1.5rem 0;
-              font-style: italic;
-              color: #1f2937;
-              font-size: 1.25rem;
-              line-height: 1.8;
-              position: relative;
-            }
-            .blog-content-container blockquote p {
-              margin-bottom: 0 !important;
-              font-weight: 700 !important;
-            }
-            @media (max-width: 768px) {
-              .blog-content-container blockquote {
-                padding: 1rem 1.5rem;
-                font-size: 1.1rem;
-                margin: 2rem 0;
-              }
-            }
-            .blog-content-container ul,
-            .blog-content-container ol {
-              margin-bottom: 2.5rem;
-              padding-left: 1.5rem;
-            }
-            .blog-content-container li {
-              margin-bottom: 1rem;
-              line-height: 1.8;
-              font-family: var(--font-hind), sans-serif;
-              color: #4b5563;
-              font-size: 1.125rem;
-              position: relative;
-            }
-            .blog-content-container ul li::before {
-              content: "•";
-              color: var(--primary);
-              font-weight: bold;
-              display: inline-block;
-              width: 1em;
-              margin-left: -1em;
-            }
-            .blog-content-container strong {
-              color: #111827;
-              font-weight: 800;
-            }
-            .blog-content-container u {
-              text-decoration-color: var(--primary);
-              text-underline-offset: 4px;
-            }
-            .blog-content-container img {
-              max-width: 100%;
-              height: auto;
-              border-radius: 2rem;
-              margin: 3.5rem 0;
-              box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.15);
-            }
-          `}</style>
-          <div
-            className="prose prose-primary max-w-none"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
-        </div>
+            <article className="blog-content-container overflow-hidden break-words">
+              <style jsx global>{`
+                .blog-content-container p {
+                  margin-bottom: 2rem;
+                  line-height: 1.9;
+                  font-family: var(--font-hind), sans-serif;
+                  font-size: 1.125rem;
+                  color: #1f2937;
+                  overflow-wrap: break-word;
+                }
+                @media (max-width: 768px) {
+                  .blog-content-container p {
+                    font-size: 1.05rem;
+                    line-height: 1.8;
+                    margin-bottom: 1.5rem;
+                  }
+                }
+                .blog-content-container strong {
+                  color: #111827;
+                  font-weight: 800;
+                  font-size: 1.1em;
+                }
+                .blog-content-container h2 {
+                  font-size: 1.75rem;
+                  font-weight: 900;
+                  color: #111827;
+                  margin: 2.5rem 0 1.5rem;
+                  font-family: var(--font-hind), sans-serif;
+                }
+                .blog-content-container img {
+                  border-radius: 1.5rem;
+                  margin: 3rem 0;
+                  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+                }
+              `}</style>
+              <div
+                className="prose prose-lg prose-primary max-w-none prose-img:rounded-2xl"
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              />
+            </article>
 
-        <div className="mt-20 pt-10 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4 text-gray-500 font-bold uppercase tracking-widest text-xs">
-            Share this article
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full hover:bg-blue-600 hover:text-white transition-all"
-              >
-                <Facebook className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full hover:bg-sky-500 hover:text-white transition-all"
-              >
-                <Twitter className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full hover:bg-green-600 hover:text-white transition-all"
-              >
-                <Share2 className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {post.images && post.images.length > 0 && (
-          <div className="mt-24">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-1 w-primary bg-primary rounded-full" />
-              <h3 className="text-2xl font-black text-gray-900 font-hind">
-                फोटो गैलरी
-              </h3>
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
-              {post.images.map((img, index) => (
-                <div
-                  key={img.id}
-                  className="relative aspect-[4/3] rounded-3xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 group"
-                  onClick={() => openLightbox(index)}
-                >
-                  <Image
-                    src={buildMediaUrl(img.image) || ""}
-                    alt={`Gallery ${index}`}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/20 transition-colors duration-300 flex items-center justify-center">
-                    <Images className="text-white opacity-0 group-hover:opacity-100 transition-opacity scale-150" />
-                  </div>
+            {/* Gallery Section */}
+            {post.images && post.images.length > 0 && (
+              <div className="mt-20">
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="w-12 h-1.5 bg-primary rounded-full" />
+                  <h3 className="text-2xl font-black text-gray-900 font-hind">
+                    फोटो गैलरी
+                  </h3>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="mt-24 p-8 md:p-12 bg-gray-50 rounded-[3rem] border border-gray-100 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0" />
-          <div className="flex flex-col md:flex-row items-center text-center md:text-left gap-8 relative z-10">
-            <Avatar className="w-24 h-24 md:w-32 md:h-32 border-4 border-white shadow-xl">
-              <AvatarImage src={post.author.image} alt={post.author.name} />
-              <AvatarFallback className="bg-primary text-white text-3xl font-black">
-                {post.author.name.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <h4 className="text-2xl font-black text-gray-900 mb-2 font-hind">
-                {post.author.name}
-              </h4>
-              <p className="text-primary font-bold uppercase tracking-[0.2em] text-xs mb-4">
-                {post.author.role}
-              </p>
-              <p className="text-gray-600 leading-relaxed font-hind">
-                राष्ट्रीय सेवा संघ के समर्पित सदस्य और लेखक। समाज सेवा और
-                राष्ट्र निर्माण में सक्रिय योगदान देने हेतु संकल्पित। सनातन धर्म
-                एवं संस्कृति के प्रचार-प्रसार में संलग्न।
-              </p>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      {relatedPosts.length > 0 && (
-        <section className="bg-gray-50/50 py-24 border-t border-gray-100">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="flex items-center justify-between mb-12">
-              <h2 className="text-3xl font-black text-gray-900 font-hind">
-                संबंधित लेख
-              </h2>
-              <Link
-                href="/blog"
-                className="text-primary font-bold text-sm uppercase tracking-widest hover:underline"
-              >
-                View All Posts
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {relatedPosts.map((relatedPost) => (
-                <Link
-                  key={relatedPost.id}
-                  href={`/blog/${relatedPost.id}`}
-                  className="group block"
-                >
-                  <div className="bg-white rounded-[2rem] overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500">
-                    <div className="relative aspect-video">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                  {post.images.map((img, index) => (
+                    <div
+                      key={img.id}
+                      className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all duration-500 group"
+                      onClick={() => openLightbox(index)}
+                    >
                       <Image
-                        src={relatedPost.image}
-                        alt={relatedPost.title}
+                        src={buildMediaUrl(img.image) || ""}
+                        alt={`Gallery ${index}`}
                         fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
                       />
-                    </div>
-                    <div className="p-6">
-                      <Badge
-                        variant="outline"
-                        className="mb-3 text-[10px] font-bold uppercase tracking-wider text-gray-400"
-                      >
-                        {relatedPost.category}
-                      </Badge>
-                      <h3 className="font-black text-gray-900 group-hover:text-primary transition-colors line-clamp-2 md:text-lg font-hind mb-4">
-                        {relatedPost.title}
-                      </h3>
-                      <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                        <Calendar size={12} className="text-primary" />
-                        {formatDate(relatedPost.date)}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-500 flex items-center justify-center">
+                        <Plus
+                          size={32}
+                          className="text-white opacity-0 group-hover:opacity-100 transition-all duration-500 transform scale-50 group-hover:scale-100"
+                        />
                       </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Author Card */}
+            <div className="mt-20 p-8 md:p-10 bg-gray-50 rounded-[2.5rem] border border-gray-100 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0" />
+              <div className="flex flex-col md:flex-row items-center text-center md:text-left gap-8 relative z-10">
+                <Avatar className="w-24 h-24 md:w-32 md:h-32 border-4 border-white shadow-2xl">
+                  <AvatarImage src={post.author.image} alt={post.author.name} />
+                  <AvatarFallback className="bg-primary text-white text-3xl font-black">
+                    {post.author.name.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <h4 className="text-2xl font-black text-gray-900 mb-2 font-hind">
+                    {post.author.name}
+                  </h4>
+                  <p className="text-primary font-bold uppercase tracking-[0.2em] text-xs mb-4">
+                    {post.author.role}
+                  </p>
+                  <p className="text-gray-600 leading-relaxed font-hind text-base">
+                    राष्ट्रीय सेवा संघ के समर्पित सदस्य और लेखक। समाज सेवा और
+                    राष्ट्र निर्माण में सक्रिय योगदान देने हेतु संकल्पित। सनातन
+                    धर्म एवं संस्कृति के प्रचार-प्रसार में संलग्न।
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-        </section>
-      )}
+
+          {/* Sidebar Area */}
+          <aside className="lg:col-span-4 space-y-12">
+            {/* Social Share Sticky */}
+            <div className="p-6 bg-white rounded-3xl border border-gray-100 shadow-sm">
+              <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">
+                Share Story
+              </h4>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="rounded-xl hover:bg-blue-600 hover:text-white transition-all size-11 shadow-sm"
+                >
+                  <Facebook className="w-5 h-5" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="rounded-xl hover:bg-sky-500 hover:text-white transition-all size-11 shadow-sm"
+                >
+                  <Twitter className="w-5 h-5" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="rounded-xl hover:bg-green-600 hover:text-white transition-all size-11 shadow-sm"
+                >
+                  <Share2 className="w-5 h-5" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Recent Posts - News Style */}
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-8 h-1 bg-primary rounded-full" />
+                <h3 className="text-xl font-black text-gray-900 font-hind">
+                  Recent Posts
+                </h3>
+              </div>
+              <div className="space-y-6">
+                {allBlogs
+                  ?.slice(0, 5)
+                  .filter((b) => b.id !== post.id)
+                  .map((b) => (
+                    <Link
+                      key={b.id}
+                      href={`/blog/${b.id}`}
+                      className="group flex gap-4"
+                    >
+                      <div className="relative size-20 flex-shrink-0 rounded-xl overflow-hidden shadow-sm">
+                        <Image
+                          src={b.banner ? buildMediaUrl(b.banner) || "" : ""}
+                          alt={b.title}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-sm font-bold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 font-hind leading-snug mb-2">
+                          {b.title}
+                        </h4>
+                        <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-tight">
+                          <Calendar size={10} className="text-primary" />
+                          {formatDate(b.timestamp)}
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+              </div>
+              <Link href="/blog" className="mt-8 block">
+                <Button className="w-full bg-gray-900 hover:bg-primary text-white font-black uppercase tracking-widest text-xs py-6 rounded-2xl transition-all shadow-lg hover:shadow-primary/20 group">
+                  View All Blogs
+                  <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            </div>
+
+            {/* Category Badge Cloud */}
+            <div className="p-8 bg-primary/5 rounded-[2rem] border border-primary/10">
+              <h4 className="text-xs font-black uppercase tracking-widest text-primary mb-6">
+                Popular Topic
+              </h4>
+              <Badge className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md">
+                {post.category}
+              </Badge>
+              <p className="mt-4 text-xs text-primary/60 font-medium leading-relaxed">
+                Stay updated with our latest activities and updates from the{" "}
+                {post.category} section.
+              </p>
+            </div>
+          </aside>
+        </div>
+      </div>
 
       {post.images && post.images.length > 0 && (
         <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
