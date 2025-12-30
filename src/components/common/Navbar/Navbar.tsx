@@ -29,85 +29,86 @@ const MobileNavItem = ({ item }: { item: any }) => {
     <div className="menu-item-stagger">
       <div className="hidden lg:block space-y-4">
         <h5 className="text-gray-400 font-bold tracking-wider text-xs border-b border-gray-100 pb-2">
-          {item.title}
+          {!hasSubmenu ? (
+            <Link
+              href={item.href}
+              className="hover:text-primary transition-colors"
+            >
+              {item.title}
+            </Link>
+          ) : (
+            item.title
+          )}
         </h5>
-        <ul className="space-y-2 text-sm font-medium text-gray-600">
-          {hasSubmenu ? (
-            item.submenu.map((subItem: any) => (
+        {hasSubmenu && (
+          <ul className="space-y-2 text-sm font-medium text-gray-600">
+            {item.submenu.map((subItem: any) => (
               <li key={subItem.id}>
-                <a
+                <Link
                   href={subItem.href}
                   className="hover:text-primary transition-colors block py-1 hover:translate-x-1 duration-200"
                 >
                   {subItem.title}
-                </a>
+                </Link>
               </li>
-            ))
-          ) : (
-            <li>
-              <a
-                href={item.href}
-                className="hover:text-primary transition-colors block py-1 hover:translate-x-1 duration-200"
-              >
-                {item.title}
-              </a>
-            </li>
-          )}
-        </ul>
+            ))}
+          </ul>
+        )}
       </div>
 
       {/* Mobile Layout: Accordion */}
       <div className="block lg:hidden border-b border-gray-50 last:border-0">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-full flex justify-between items-center py-4 text-left group"
-        >
-          <span
-            className={`font-bold text-lg ${
-              isOpen ? "text-primary" : "text-gray-800"
-            }`}
+        {!hasSubmenu ? (
+          <Link
+            href={item.href}
+            onClick={() => setIsOpen(false)}
+            className="w-full flex justify-between items-center py-4 text-left group"
           >
-            {item.title}
-          </span>
-          {hasSubmenu && (
-            <ChevronDown
-              size={20}
-              className={`text-gray-400 transition-transform duration-300 ${
-                isOpen ? "rotate-180 text-primary" : ""
-              }`}
-            />
-          )}
-        </button>
+            <span className="font-bold text-lg text-gray-800 hover:text-primary transition-colors">
+              {item.title}
+            </span>
+          </Link>
+        ) : (
+          <>
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="w-full flex justify-between items-center py-4 text-left group"
+            >
+              <span
+                className={`font-bold text-lg ${
+                  isOpen ? "text-primary" : "text-gray-800"
+                }`}
+              >
+                {item.title}
+              </span>
+              <ChevronDown
+                size={20}
+                className={`text-gray-400 transition-transform duration-300 ${
+                  isOpen ? "rotate-180 text-primary" : ""
+                }`}
+              />
+            </button>
 
-        <div
-          className={`overflow-hidden transition-all duration-300 ${
-            isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-          }`}
-        >
-          <ul className="pb-4 space-y-3 pl-2">
-            {hasSubmenu ? (
-              item.submenu.map((subItem: any) => (
-                <li key={subItem.id}>
-                  <Link
-                    href={subItem.href}
-                    className="text-gray-600 font-medium block text-sm hover:text-primary"
-                  >
-                    {subItem.title}
-                  </Link>
-                </li>
-              ))
-            ) : (
-              <li>
-                <Link
-                  href={item.href}
-                  className="text-gray-600 font-medium block text-sm hover:text-primary"
-                >
-                  {item.title}
-                </Link>
-              </li>
-            )}
-          </ul>
-        </div>
+            <div
+              className={`overflow-hidden transition-all duration-300 ${
+                isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+              }`}
+            >
+              <ul className="pb-4 space-y-3 pl-2">
+                {item.submenu.map((subItem: any) => (
+                  <li key={subItem.id}>
+                    <Link
+                      href={subItem.href}
+                      className="text-gray-600 font-medium block text-sm hover:text-primary"
+                    >
+                      {subItem.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -157,7 +158,7 @@ const Header: React.FC = () => {
             </button>
 
             <div
-              className="grid grid-cols-1 lg:grid-cols-4 gap-10 lg:gap-16 mt-12"
+              className="grid grid-cols-1 lg:grid-cols-4 gap-10 lg:gap-12 mt-12"
               ref={menuRef}
               role="dialog"
               aria-modal="true"
@@ -165,7 +166,7 @@ const Header: React.FC = () => {
               id="mobile-menu"
             >
               <div className="lg:col-span-1 order-1 mx-auto lg:order-none flex flex-col items-center lg:items-start menu-item-stagger">
-                <div className="flex flex-row mx-auto gap-3 mt-6 w-full">
+                <div className="flex flex-row mx-auto gap-3 w-full">
                   <Link
                     href="/auth/login"
                     className="flex items-center justify-center gap-2 px-6 py-2.5 border-2 border-primary text-primary font-semibold text-sm rounded-full hover:bg-primary hover:text-white transition-all duration-300"
@@ -202,9 +203,9 @@ const Header: React.FC = () => {
                 aria-label="Contact and Social"
               >
                 <div className="space-y-4">
-                  <h4 className="text-primary font-bold text-lg mb-1">
+                  <h5 className="text-primary font-bold tracking-wider text-xs border-b border-gray-100 pb-2">
                     संपर्क | Contact
-                  </h4>
+                  </h5>
                   <div
                     className="text-xl sm:text-2xl font-semibold text-gray-800 hover:text-primary transition-colors cursor-pointer"
                     onClick={() => window.open("tel:+919429693593")}
