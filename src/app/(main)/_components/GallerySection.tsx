@@ -30,8 +30,18 @@ interface DisplayGalleryItem {
 }
 
 const GallerySection: React.FC = () => {
-  const { images, loading: loadingImages } = useImageGallery();
-  const { videos, loading: loadingVideos } = useVideoGallery();
+  const {
+    images,
+    loading: loadingImages,
+    error: errorImages,
+    fetchImages,
+  } = useImageGallery();
+  const {
+    videos,
+    loading: loadingVideos,
+    error: errorVideos,
+    fetchVideos,
+  } = useVideoGallery();
 
   const [activeTab, setActiveTab] = useState<TabType>("images");
   const [selectedItem, setSelectedItem] = useState<DisplayGalleryItem | null>(
@@ -77,6 +87,7 @@ const GallerySection: React.FC = () => {
 
   const currentItems = activeTab === "images" ? displayImages : displayVideos;
   const isLoading = activeTab === "images" ? loadingImages : loadingVideos;
+  const error = activeTab === "images" ? errorImages : errorVideos;
 
   const openModal = (item: DisplayGalleryItem, index: number) => {
     setSelectedItem(item);
@@ -169,8 +180,27 @@ const GallerySection: React.FC = () => {
           </div>
         )}
 
+        {/* Error State */}
+        {!isLoading && error && (
+          <div className="text-center p-10 border-2 border-red-100 rounded-xl bg-red-50 text-red-600 mb-8">
+            <X className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p className="text-lg font-medium mb-2 uppercase tracking-tight">
+              Failed to load {activeTab}
+            </p>
+            <p className="text-sm opacity-80">{error}</p>
+            <button
+              onClick={() =>
+                activeTab === "images" ? fetchImages() : fetchVideos()
+              }
+              className="mt-4 text-xs font-bold uppercase tracking-widest bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
         {/* Empty State */}
-        {!isLoading && currentItems.length === 0 && (
+        {!isLoading && !error && currentItems.length === 0 && (
           <div className="text-center p-10 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 text-gray-500">
             {activeTab === "images" ? (
               <ImageIcon className="w-12 h-12 mx-auto mb-4 opacity-50" />

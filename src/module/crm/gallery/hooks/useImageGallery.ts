@@ -1,9 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import type {
-  ImageGalleryItem,
-  ImageGalleryFormData,
-} from "../types";
+import type { ImageGalleryItem, ImageGalleryFormData } from "../types";
 import useAxios from "@/hooks/use-axios";
 
 export const useImageGallery = () => {
@@ -17,7 +14,7 @@ export const useImageGallery = () => {
     setError(null);
     try {
       const response = await axios.get<ImageGalleryItem[]>(
-        `/admin/image-gallery/list`
+        `/admin/image-gallery/list/`
       );
       setImages(response.data);
     } catch (err) {

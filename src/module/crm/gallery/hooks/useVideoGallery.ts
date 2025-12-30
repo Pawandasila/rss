@@ -1,9 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import type {
-  VideoGalleryItem,
-  VideoGalleryFormData,
-} from "../types";
+import type { VideoGalleryItem, VideoGalleryFormData } from "../types";
 import useAxios from "@/hooks/use-axios";
 
 export const useVideoGallery = () => {
@@ -17,7 +14,7 @@ export const useVideoGallery = () => {
     setError(null);
     try {
       const response = await axios.get<VideoGalleryItem[]>(
-        `/admin/video-gallery/list`
+        `/admin/video-gallery/list/`
       );
       setVideos(response.data);
     } catch (err) {
