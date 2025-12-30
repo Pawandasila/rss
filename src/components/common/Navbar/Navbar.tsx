@@ -221,15 +221,6 @@ const Header: React.FC = () => {
                         Bawana, New Delhi – 110040
                       </p>
                     </div>
-                    <div>
-                      <p className="text-primary text-xs uppercase tracking-wider font-bold mb-1">
-                        Uttarakhand Office
-                      </p>
-                      <p className="text-gray-600 text-sm leading-relaxed">
-                        Bareilly–Nainital Road, Near Motahaldu Bus Stop,
-                        Haldwani, Nainital – 263139
-                      </p>
-                    </div>
                   </div>
                 </div>
                 <div className="flex flex-col items-center lg:items-start">

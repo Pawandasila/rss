@@ -45,11 +45,6 @@ export const offices: OfficeInfo[] = [
     address:
       "D BLOCK, POCKET-5 (Flat No. 34), DDA Flat, CRPF Flat, Bawana, New Delhi – 110040",
   },
-  {
-    location: "Uttarakhand Office",
-    address:
-      "Bareilly–Nainital Road, Near Motahaldu Bus Stop, Haldwani, Nainital – 263139",
-  },
 ];
 
 export const contactInfo = {

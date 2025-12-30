@@ -154,24 +154,6 @@ const Footer = () => {
                     Bawana, New Delhi – 110040
                   </span>
                 </div>
-                {/* <div>
-                  <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-600 mb-1">
-                    Uttarakhand Office
-                  </span>
-                  <span className="text-gray-400 text-sm leading-relaxed block">
-                    Bareilly - Nainital Road, Near Motahaldu Bus Stop, Haldwani,
-                    Nainital - 263139
-                  </span>
-                </div>
-                <div>
-                  <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-600 mb-1">
-                    Chattisgarh Office
-                  </span>
-                  <span className="text-gray-400 text-sm leading-relaxed block">
-                    Shyam colony, Baloda bazar, near Asvsconstruction Pvt ltd
-                    chattisgarh - 493332
-                  </span>
-                </div> */}
               </div>
             </div>
           </div>
