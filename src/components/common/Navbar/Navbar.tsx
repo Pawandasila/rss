@@ -66,7 +66,7 @@ const MobileNavItem = ({ item }: { item: any }) => {
           className="w-full flex justify-between items-center py-4 text-left group"
         >
           <span
-            className={`font-bold text-lg ${
+            className={`font-bold text-md ${
               isOpen ? "text-primary" : "text-gray-800"
             }`}
           >
@@ -196,15 +196,14 @@ const Header: React.FC = () => {
               aria-label="Mobile Navigation"
               id="mobile-menu"
             >
-              {/* Logo Section - Order 1 on Mobile */}
-              <div className="lg:col-span-1 order-1 lg:order-none flex flex-row items-center justify-center lg:items-start menu-item-stagger">
-                {/* Auth Buttons in Menu */}
-                <div className="flex flex-row items-center justify-center gap-3 mt-6 w-full sm:w-auto">
+              <div className="lg:col-span-1 order-1 lg:order-none flex flex-col items-center lg:items-start menu-item-stagger">
+                {/* Auth Buttons - Consolidated */}
+                <div className="flex flex-row gap-3 mt-6 w-full sm:w-auto lg:w-full">
                   {user ? (
                     <>
                       <Link
                         href="/dashboard"
-                        className="flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-white font-semibold rounded-full text-sm hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl"
+                        className="flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-white font-semibold rounded-full text-sm hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl w-full"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         <LayoutDashboard size={18} />
@@ -215,7 +214,7 @@ const Header: React.FC = () => {
                           setIsMenuOpen(false);
                           handleLogout();
                         }}
-                        className="flex items-center justify-center gap-2 px-6 py-2.5 border-2 border-red-500 text-red-500 font-semibold text-sm rounded-full hover:bg-red-500 hover:text-white transition-all duration-300"
+                        className="flex items-center justify-center gap-2 px-6 py-2.5 border-2 border-red-500 text-red-500 font-semibold text-sm rounded-full hover:bg-red-500 hover:text-white transition-all duration-300 w-full"
                       >
                         <LogOut size={18} />
                         Logout
@@ -225,7 +224,7 @@ const Header: React.FC = () => {
                     <>
                       <Link
                         href="/auth/login"
-                        className="flex items-center justify-center gap-2 px-6 py-2.5 border-2 border-primary text-primary font-semibold text-sm rounded-full hover:bg-primary hover:text-white transition-all duration-300"
+                        className="flex items-center justify-center gap-2 px-6 py-2.5 border-2 border-primary text-primary font-semibold text-sm rounded-full hover:bg-primary hover:text-white transition-all duration-300 w-full"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         <LogIn size={18} />
@@ -233,7 +232,7 @@ const Header: React.FC = () => {
                       </Link>
                       <Link
                         href="/auth/signup"
-                        className="flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-white font-semibold rounded-full text-sm hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl"
+                        className="flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-white font-semibold whitespace-nowrap rounded-full text-sm hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl w-full"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         <UserPlus size={18} />
@@ -243,8 +242,8 @@ const Header: React.FC = () => {
                   )}
                 </div>
 
-                {/* Home Link - Below Auth Buttons */}
-                <div className="mt-8 hidden lg:block">
+                {/* Home Link - Below Auth Buttons on Desktop */}
+                <div className="mt-8 hidden lg:block w-full">
                   <h5 className="text-gray-400 font-bold uppercase tracking-widest text-xs border-b border-gray-100 pb-2 mb-4">
                     मुख्य पृष्ठ | Home
                   </h5>
@@ -264,19 +263,19 @@ const Header: React.FC = () => {
                 aria-label="Main Site Navigation"
               >
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-8 gap-y-4 lg:gap-y-10">
-                  {/* Mobile: Show Home first */}
+                  {/* Mobile: Show Home first if navigation Grid is displayed */}
                   <div className="lg:hidden menu-item-stagger">
                     <Link
                       href="/"
                       className="w-full flex justify-between items-center py-4 text-left"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      <span className="font-bold text-lg text-gray-800 hover:text-primary transition-colors">
+                      <span className="font-bold text-md text-gray-800 hover:text-primary transition-colors">
                         मुख्य पृष्ठ | Home
                       </span>
                     </Link>
                   </div>
-                  {/* Filter out the Home item on desktop since it's shown above */}
+                  {/* Navigation Items excluding Home */}
                   {navigationItems
                     .filter((item) => item.id !== "home")
                     .map((item) => (
@@ -322,9 +321,7 @@ const Header: React.FC = () => {
                   </h4>
                   <p className="text-xs text-gray-500 mt-2 leading-relaxed max-w-xs mx-auto lg:mx-0 font-medium">
                     Largest voluntary organization with over{" "}
-                    <span className="text-primary font-bold">
-                      50,000+ Shakhas
-                    </span>{" "}
+                    <span className="text-primary font-bold">15 + states</span>{" "}
                     conducting daily activities across Bharat.
                   </p>
                 </div>
