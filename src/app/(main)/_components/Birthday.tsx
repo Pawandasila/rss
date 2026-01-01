@@ -117,14 +117,14 @@ const BirthdaySection: React.FC = () => {
             >
               {birthdays.map((person) => (
                 <SwiperSlide key={person.id}>
-                  <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto aspect-[3/4] sm:aspect-[4/5] lg:aspect-[5/5] rounded-[1.5rem] sm:rounded-[2rem] lg:rounded-[2.5rem] overflow-hidden shadow-xl sm:shadow-2xl group border border-orange-200/50 bg-gradient-to-b from-orange-50 to-white">
+                  <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto aspect-auto sm:aspect-[4/5] lg:aspect-[1/1] rounded-[1.5rem] sm:rounded-[2rem] lg:rounded-[2.5rem] overflow-hidden shadow-xl sm:shadow-2xl group border border-orange-200/50 bg-gradient-to-b from-orange-50 to-white">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-orange-100/40 via-transparent to-transparent opacity-60" />
 
                     <div className="absolute top-0 inset-x-0 h-16 sm:h-20 lg:h-20 bg-gradient-to-b from-orange-500/10 to-transparent" />
                     <div className="absolute -top-8 -left-8 w-32 sm:w-40 lg:w-48 h-32 sm:h-40 lg:h-48 bg-orange-400/10 rounded-full blur-3xl animate-pulse" />
                     <div className="absolute -top-8 -right-8 w-32 sm:w-40 lg:w-48 h-32 sm:h-40 lg:h-48 bg-orange-400/10 rounded-full blur-3xl animate-pulse delay-700" />
 
-                    <div className="relative h-full flex flex-col items-center pt-5 sm:pt-6 lg:pt-6 pb-4 sm:pb-5 lg:pb-4 px-4 sm:px-5 lg:px-6">
+                    <div className="relative h-full flex flex-col items-center pt-4 sm:pt-6 lg:pt-6 pb-4 sm:pb-5 lg:pb-4 px-4 sm:px-5 lg:px-6">
                       <div className="mb-4 sm:mb-5 lg:mb-6 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
                         <span className="text-[10px] sm:text-xs font-bold text-primary uppercase tracking-[0.15em] sm:tracking-[0.2em] font-hind">
                           जन्मदिन की शुभकामनाएँ

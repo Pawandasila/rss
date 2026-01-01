@@ -87,9 +87,9 @@ const FeaturesSection: React.FC = () => {
       <section className="py-12 md:py-20 bg-gray-50">
         <div className="w-full px-4 md:px-8 lg:px-16 xl:px-24 text-center">
           <SectionHeader
-            title="Our Mission"
+            title="Ongoing Efforts"
             badgeIcon={UserCircle}
-            badgeTitle="सेवा क्षेत्र"
+            badgeTitle="निरंतर प्रयास"
             viewAll="view all missions"
             viewAllLink="/"
           />
@@ -110,9 +110,9 @@ const FeaturesSection: React.FC = () => {
     <section className="py-12 md:py-20 bg-gray-50" ref={containerRef}>
       <div className="w-full px-4 md:px-8 lg:px-16 xl:px-24">
         <SectionHeader
-          title="Our Mission"
+          title="Ongoing Efforts"
           badgeIcon={UserCircle}
-          badgeTitle="सेवा क्षेत्र"
+          badgeTitle="निरंतर प्रयास"
           viewAll="view all missions"
           viewAllLink="/"
         />
