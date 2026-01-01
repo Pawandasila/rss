@@ -197,9 +197,9 @@ const Header: React.FC = () => {
               id="mobile-menu"
             >
               {/* Logo Section - Order 1 on Mobile */}
-              <div className="lg:col-span-1 order-1 lg:order-none flex flex-col items-center lg:items-start menu-item-stagger">
+              <div className="lg:col-span-1 order-1 lg:order-none flex flex-row items-center justify-center lg:items-start menu-item-stagger">
                 {/* Auth Buttons in Menu */}
-                <div className="flex flex-col sm:flex-row gap-3 mt-6 w-full sm:w-auto">
+                <div className="flex flex-row items-center justify-center gap-3 mt-6 w-full sm:w-auto">
                   {user ? (
                     <>
                       <Link
