@@ -21,6 +21,7 @@ export interface Mission {
   created_at: string;
   images?: MissionImage[];
   mission_content?: MissionContent[];
+  short_content?: string;
 }
 
 export interface CreateMissionPayload {
@@ -30,6 +31,7 @@ export interface CreateMissionPayload {
   headline?: string;
   icon?: File | null;
   category?: string;
+  short_content?: string;
 }
 
 export interface UpdateMissionPayload extends Partial<CreateMissionPayload> {

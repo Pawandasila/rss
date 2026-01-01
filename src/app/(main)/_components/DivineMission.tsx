@@ -33,7 +33,7 @@ const FeaturesSection: React.FC = () => {
       id: mission.id,
       category: "Mission",
       title: mission.title,
-      description: mission.description || "",
+      description: mission.short_content || "",
       image: mission.image || "",
       icon: mission.icon || null,
       cta: "Learn More",

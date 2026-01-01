@@ -29,7 +29,7 @@ const ServicesSection: React.FC = () => {
       title: s.title,
       icon: s.icon,
       image: s.image || "",
-      description: s.content || "",
+      description: s.short_content || "",
       features: [],
     }));
   }, [services]);

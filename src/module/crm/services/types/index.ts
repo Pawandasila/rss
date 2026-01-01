@@ -1,12 +1,13 @@
 export interface Service {
   id: number;
   title: string;
-  content: string; // Used in lists, or fallback
+  content: string;
   image: string;
   icon?: string;
   created_at: string;
   images?: ServiceImage[];
-  service_content?: ServiceContent; // Renamed to avoid confusion with content string
+  service_content?: ServiceContent;
+  short_content?: string;
 }
 
 export interface ServiceImage {
@@ -26,6 +27,7 @@ export interface CreateServicePayload {
   content: string;
   image?: File | null;
   icon?: File | null;
+  short_content?: string;
 }
 
 export interface UpdateServicePayload extends Partial<CreateServicePayload> {
