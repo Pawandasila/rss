@@ -485,7 +485,7 @@ const Hero = () => {
             </button>
             <button
               onClick={() => setActiveTab("donate")}
-              className={`py-4 px-6 flex-1 uppercase tracking-widest flex items-center justify-center gap-2 transition-all duration-300 relative ${
+              className={`py-4 px-6 whitespace-nowrap flex-1 uppercase tracking-widest flex items-center justify-center gap-2 transition-all duration-300 relative ${
                 activeTab === "donate"
                   ? "text-primary bg-primary/5 font-black"
                   : "text-gray-400 hover:text-primary hover:bg-gray-50"
