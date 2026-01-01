@@ -139,7 +139,11 @@ const ServicesSection: React.FC = () => {
                       className="object-contain"
                     />
                   ) : (
-                    <HeartHandshake size={25} strokeWidth={1.5} />
+                    <HeartHandshake
+                      size={25}
+                      strokeWidth={1.5}
+                      className="text-apml-red"
+                    />
                   )}
                 </div>
                 <span
