@@ -198,13 +198,6 @@ const Header: React.FC = () => {
             >
               {/* Logo Section - Order 1 on Mobile */}
               <div className="lg:col-span-1 order-1 lg:order-none flex flex-col items-center lg:items-start menu-item-stagger">
-                <div
-                  className="w-fit cursor-pointer"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Logo />
-                </div>
-
                 {/* Auth Buttons in Menu */}
                 <div className="flex flex-col sm:flex-row gap-3 mt-6 w-full sm:w-auto">
                   {user ? (
@@ -249,6 +242,20 @@ const Header: React.FC = () => {
                     </>
                   )}
                 </div>
+
+                {/* Home Link - Below Auth Buttons */}
+                <div className="mt-8 hidden lg:block">
+                  <h5 className="text-gray-400 font-bold uppercase tracking-widest text-xs border-b border-gray-100 pb-2 mb-4">
+                    मुख्य पृष्ठ | Home
+                  </h5>
+                  <Link
+                    href="/"
+                    className="text-sm font-medium text-gray-600 hover:text-primary transition-colors block py-1 hover:translate-x-1 duration-200"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Home
+                  </Link>
+                </div>
               </div>
 
               {/* Navigation Section - Order 2 on Mobile */}
@@ -257,9 +264,24 @@ const Header: React.FC = () => {
                 aria-label="Main Site Navigation"
               >
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-8 gap-y-4 lg:gap-y-10">
-                  {navigationItems.map((item, idx) => (
-                    <MobileNavItem key={item.id} item={item} />
-                  ))}
+                  {/* Mobile: Show Home first */}
+                  <div className="lg:hidden menu-item-stagger">
+                    <Link
+                      href="/"
+                      className="w-full flex justify-between items-center py-4 text-left"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <span className="font-bold text-lg text-gray-800 hover:text-primary transition-colors">
+                        मुख्य पृष्ठ | Home
+                      </span>
+                    </Link>
+                  </div>
+                  {/* Filter out the Home item on desktop since it's shown above */}
+                  {navigationItems
+                    .filter((item) => item.id !== "home")
+                    .map((item) => (
+                      <MobileNavItem key={item.id} item={item} />
+                    ))}
                 </div>
               </nav>
 
