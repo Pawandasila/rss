@@ -119,17 +119,16 @@ const BirthdaySection: React.FC = () => {
             >
               {birthdays.map((person) => (
                 <SwiperSlide key={person.id}>
-                  <div className="relative w-full max-w-lg mx-auto aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl group border border-orange-200/50 bg-gradient-to-b from-orange-50 to-white">
+                  <div className="relative w-full max-w-lg mx-auto aspect-[4/5] lg:aspect-[5/5] rounded-[2.5rem] overflow-hidden shadow-2xl group border border-orange-200/50 bg-gradient-to-b from-orange-50 to-white">
                     {/* Premium Background Frame */}
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-orange-100/40 via-transparent to-transparent opacity-60" />
 
-                    {/* Decorative Saffron Arches */}
-                    <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-orange-500/10 to-transparent" />
+                    <div className="absolute top-0 inset-x-0 h-24 lg:h-20 bg-gradient-to-b from-orange-500/10 to-transparent" />
                     <div className="absolute -top-12 -left-12 w-48 h-48 bg-orange-400/10 rounded-full blur-3xl animate-pulse" />
                     <div className="absolute -top-12 -right-12 w-48 h-48 bg-orange-400/10 rounded-full blur-3xl animate-pulse delay-700" />
 
                     {/* Content Container */}
-                    <div className="relative h-full flex flex-col items-center pt-10 pb-8 px-6">
+                    <div className="relative h-full flex flex-col items-center pt-8 lg:pt-6 pb-6 lg:pb-4 px-6">
                       {/* Badge / Header */}
                       <div className="mb-6 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
                         <span className="text-xs font-bold text-primary uppercase tracking-[0.2em] font-hind">

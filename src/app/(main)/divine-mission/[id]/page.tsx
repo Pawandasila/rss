@@ -6,24 +6,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Heart,
   Users,
   ArrowLeft,
   Calendar,
-  Clock,
   Share2,
-  Maximize2,
+  Plus,
   ChevronLeft,
   ChevronRight,
+  ArrowRight,
 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { IMAGE_BLUR_DATA_URL } from "@/lib/image-placeholder";
 import { useMissionApi } from "@/module/crm/mission/hooks";
@@ -36,22 +34,25 @@ const MissionDetailPage = () => {
   const { mission: fetchedMission, isLoadingMissions: isLoadingMission } =
     useMissionApi(missionId);
 
-  // Fetch all missions for related content
   const { missions: allMissions } = useMissionApi();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("hi-IN", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
 
   const handleShare = () => {
     if (navigator.share) {
-      navigator
-        .share({
-          title: "मिशन विवरण",
-          text: "इस मिशन के बारे में जानें और इसमें शामिल हों!",
-          url: window.location.href,
-        })
-        .then(() => "साझा किया गया")
-        .catch((error) => console.log("साझा करने में त्रुटि:", error));
-    } else {
-      console.log("शेयरिंग आपके ब्राउज़र द्वारा समर्थित नहीं है।");
+      navigator.share({
+        title: "मिशन विवरण",
+        text: "इस मिशन के बारे में जानें और इसमें शामिल हों!",
+        url: window.location.href,
+      });
     }
   };
 
@@ -61,19 +62,7 @@ const MissionDetailPage = () => {
     return {
       ...fetchedMission,
       image: buildMediaUrl(fetchedMission.image),
-      postedDate: new Date(fetchedMission.created_at).toLocaleDateString(
-        "hi-IN",
-        {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        }
-      ),
-      author: {
-        name: "Admin",
-        image: "",
-        role: "Administrator",
-      },
+      postedDate: formatDate(fetchedMission.created_at),
       images: (fetchedMission.images || []).map((img) => ({
         ...img,
         url: buildMediaUrl(img.image),
@@ -81,9 +70,26 @@ const MissionDetailPage = () => {
     };
   }, [fetchedMission]);
 
+  const recentMissions = useMemo(() => {
+    if (!allMissions) return [];
+    return allMissions
+      .filter((m) => m.id !== missionId)
+      .slice(0, 5)
+      .map((m) => ({
+        ...m,
+        image: buildMediaUrl(m.image),
+        postedDate: formatDate(m.created_at),
+      }));
+  }, [allMissions, missionId]);
+
+  const openLightbox = (index: number) => {
+    setActiveImageIndex(index);
+    setLightboxOpen(true);
+  };
+
   if (isLoadingMission) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
@@ -91,9 +97,9 @@ const MissionDetailPage = () => {
 
   if (!mission) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-foreground">मिशन नहीं मिला</h1>
+          <h1 className="text-2xl font-bold text-gray-900">मिशन नहीं मिला</h1>
           <Button onClick={() => router.push("/divine-mission")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             सभी मिशन देखें
@@ -103,411 +109,298 @@ const MissionDetailPage = () => {
     );
   }
 
-  const relatedMissions = (allMissions || [])
-    .filter((m) => m.id !== mission.id)
-    .slice(0, 3)
-    .map((m) => ({
-      ...m,
-      image: buildMediaUrl(m.image),
-      postedDate: new Date(m.created_at).toLocaleDateString("hi-IN", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      }),
-    }));
-
   return (
-    <div className="min-h-screen bg-slate-50/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 space-y-12">
-        <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-gray-100 transition-all hover:shadow-xl duration-500">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16">
-            <div className="flex flex-col justify-center">
-              <Badge className="bg-primary/10 text-primary border-none mb-6 w-fit px-4 py-1.5 rounded-full shadow-sm font-bold font-hind">
-                <Clock className="w-3.5 h-3.5 mr-2" />
-                दिव्य मिशन (Divine Mission)
-              </Badge>
+    <div className="min-h-screen bg-white">
+      {/* Hero Banner */}
+      <section className="relative h-[50vh] md:h-[60vh] w-full overflow-hidden">
+        <Image
+          src={mission.image!}
+          alt={mission.title}
+          fill
+          className="object-cover"
+          priority
+          placeholder="blur"
+          blurDataURL={IMAGE_BLUR_DATA_URL}
+        />
+        <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-black/90 via-black/40 to-transparent z-[5]" />
 
-              <h1 className="text-3xl md:text-5xl lg:text-5xl font-black text-slate-900 mb-8 leading-[1.2] font-hind">
-                {mission.title}
-              </h1>
+        <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-12 lg:p-24">
+          <div className="max-w-6xl mx-auto w-full">
+            <Badge className="bg-primary/90 backdrop-blur-md text-white text-[10px] md:text-sm px-4 py-1.5 rounded-full border-none shadow-lg mb-4 md:mb-6">
+              दिव्य मिशन
+            </Badge>
 
-              <div className="flex flex-wrap items-center gap-6 text-sm text-slate-500 mb-10 pb-8 border-b border-gray-100">
-                <div className="flex items-center gap-3">
-                  <Avatar className="w-10 h-10 border-2 border-primary/20 shadow-md">
-                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold font-hind">
-                      AD
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col">
-                    <span className="font-bold text-slate-900 font-hind">
-                      प्रबंधक (Admin)
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                      Author
-                    </span>
-                  </div>
-                </div>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.1] mb-6 md:mb-8 font-hind drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] max-w-5xl">
+              {mission.title}
+            </h1>
 
-                <div className="flex items-center gap-2 font-bold uppercase tracking-widest text-[10px]">
+            <div className="flex flex-wrap items-center gap-6 md:gap-8 text-white/90">
+              <div className="flex items-center gap-2.5 text-sm font-bold">
+                <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-md">
                   <Calendar className="w-4 h-4 text-primary" />
-                  <span>{mission.postedDate}</span>
                 </div>
+                <span className="opacity-90">{mission.postedDate}</span>
               </div>
-
-              <div className="flex flex-wrap gap-4">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="gap-3 rounded-full hover:bg-gray-50 border-gray-200 font-bold uppercase tracking-tighter text-xs"
-                  onClick={handleShare}
-                >
-                  <Share2 className="w-4 h-4" />
-                  शेयर करें
-                </Button>
-                <Button
-                  size="lg"
-                  className="gap-3 rounded-full font-black uppercase tracking-widest text-xs bg-slate-900 hover:bg-slate-800 text-white"
-                  onClick={() => (window.location.href = "/donate-now")}
-                >
-                  <Heart className="w-4 h-4 fill-current text-primary" />
-                  सहयोग दें (Donate)
-                </Button>
-              </div>
-            </div>
-
-            <div className="relative w-full aspect-[4/3] rounded-[3rem] overflow-hidden shadow-2xl group">
-              <Image
-                src={buildMediaUrl(mission.image)!}
-                alt={mission.title}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                placeholder="blur"
-                blurDataURL={IMAGE_BLUR_DATA_URL}
-                priority
-              />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-white/80 hover:text-white hover:bg-white/10 rounded-full"
+                onClick={handleShare}
+              >
+                <Share2 className="w-4 h-4 mr-2" />
+                Share
+              </Button>
             </div>
           </div>
         </div>
+      </section>
 
-        <div className="max-w-4xl mx-auto space-y-20">
-          <div className="bg-white rounded-[3rem] p-10 md:p-16 border border-gray-50 shadow-sm relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-bl-full -z-0 opacity-50" />
-            <div className="relative z-10">
-              <div className="flex items-center gap-4 mb-10">
-                <div className="w-2 h-10 bg-primary rounded-full shadow-lg shadow-primary/20" />
-                <h2 className="text-3xl font-black text-slate-900 font-hind">
-                  मिशन का विवरण (Mission Overview)
-                </h2>
-              </div>
-
-              <div className="blog-content-container overflow-hidden break-words">
-                <style jsx global>{`
+      {/* Main Content Grid */}
+      <div className="max-w-6xl mx-auto px-5 py-12 md:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          {/* Main Content Area */}
+          <div className="lg:col-span-8">
+            <article className="blog-content-container overflow-hidden break-words">
+              <style jsx global>{`
+                .blog-content-container p {
+                  margin-bottom: 2rem;
+                  line-height: 1.9;
+                  font-family: var(--font-hind), sans-serif;
+                  font-size: 1.125rem;
+                  color: #1f2937;
+                  overflow-wrap: break-word;
+                }
+                @media (max-width: 768px) {
                   .blog-content-container p {
-                    margin-bottom: 2rem;
-                    line-height: 1.9;
-                    font-family: var(--font-hind), sans-serif;
-                    font-size: 1.15rem;
-                    color: #334155;
-                    font-weight: 400;
-                  }
-                  .blog-content-container blockquote {
-                    border-left: 6px solid var(--primary);
-                    padding: 2.5rem 3rem;
-                    margin: 4rem 0;
-                    background: linear-gradient(
-                      to right,
-                      rgba(var(--primary-rgb), 0.05),
-                      #ffffff
-                    );
-                    border-radius: 0 2rem 2rem 0;
-                    font-style: italic;
-                    color: #1e293b;
-                    font-size: 1.4rem;
+                    font-size: 1.05rem;
                     line-height: 1.8;
-                    position: relative;
+                    margin-bottom: 1.5rem;
                   }
-                  .blog-content-container blockquote::before {
-                    content: "“";
-                    position: absolute;
-                    top: -20px;
-                    left: 20px;
-                    font-size: 6rem;
-                    color: rgba(var(--primary-rgb), 0.1);
-                    font-family: serif;
-                  }
-                  .blog-content-container ul {
-                    margin-bottom: 3rem;
-                    padding-left: 1.5rem;
-                    list-style: none;
-                  }
-                  .blog-content-container li {
-                    margin-bottom: 1.25rem;
-                    line-height: 1.8;
-                    font-family: var(--font-hind), sans-serif;
-                    color: #475569;
-                    font-size: 1.15rem;
-                    position: relative;
-                    padding-left: 2rem;
-                  }
-                  .blog-content-container li::before {
-                    content: "";
-                    position: absolute;
-                    left: 0;
-                    top: 12px;
-                    width: 12px;
-                    height: 12px;
-                    background: var(--primary);
-                    border-radius: 4px;
-                    opacity: 0.6;
-                  }
-                  .blog-content-container strong {
-                    color: #0f172a;
-                    font-weight: 800;
-                  }
-                  .blog-content-container h2,
-                  .blog-content-container h3 {
-                    font-family: var(--font-hind), sans-serif;
-                    font-weight: 900;
-                    color: #0f172a;
-                    margin: 3rem 0 1.5rem 0;
-                    line-height: 1.3;
-                  }
-                  .blog-content-container h2 {
-                    font-size: 2.25rem;
-                  }
-                  .blog-content-container h3 {
-                    font-size: 1.75rem;
-                  }
-                `}</style>
-                <div
-                  className="prose prose-primary max-w-none mb-10"
-                  dangerouslySetInnerHTML={{ __html: mission.description }}
-                />
+                }
+                .blog-content-container strong {
+                  color: #111827;
+                  font-weight: 800;
+                  font-size: 1.1em;
+                }
+                .blog-content-container h2 {
+                  font-size: 1.75rem;
+                  font-weight: 900;
+                  color: #111827;
+                  margin: 2.5rem 0 1.5rem;
+                  font-family: var(--font-hind), sans-serif;
+                }
+                .blog-content-container img {
+                  border-radius: 1.5rem;
+                  margin: 3rem 0;
+                  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+                }
+              `}</style>
+              <div
+                className="prose prose-lg prose-primary max-w-none prose-img:rounded-2xl"
+                dangerouslySetInnerHTML={{ __html: mission.description }}
+              />
+            </article>
 
-                {mission.mission_content &&
-                  mission.mission_content.map((content: any) => (
-                    <div key={content.id} className="mt-12 group">
-                      <h3 className="text-2xl font-black text-slate-800 mb-6 font-hind flex items-center gap-3">
-                        <span className="w-1.5 h-6 bg-primary/40 rounded-full group-hover:bg-primary transition-colors" />
+            {/* Mission Content Sections */}
+            {mission.mission_content && mission.mission_content.length > 0 && (
+              <div className="mt-16 space-y-12">
+                {mission.mission_content.map((content: any) => (
+                  <div key={content.id}>
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-1 bg-primary rounded-full" />
+                      <h3 className="text-xl font-black text-gray-900 font-hind">
                         {content.title}
                       </h3>
-                      <div
-                        className="prose prose-slate max-w-none text-slate-600 font-hind leading-relaxed text-lg"
-                        dangerouslySetInnerHTML={{ __html: content.content }}
+                    </div>
+                    <div
+                      className="prose prose-lg prose-primary max-w-none"
+                      dangerouslySetInnerHTML={{ __html: content.content }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Gallery Section */}
+            {mission.images && mission.images.length > 0 && (
+              <div className="mt-20">
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="w-12 h-1.5 bg-primary rounded-full" />
+                  <h3 className="text-2xl font-black text-gray-900 font-hind">
+                    फोटो गैलरी
+                  </h3>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                  {mission.images.map((img: any, index: number) => (
+                    <div
+                      key={img.id}
+                      className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all duration-500 group"
+                      onClick={() => openLightbox(index)}
+                    >
+                      <Image
+                        src={img.url}
+                        alt={`Gallery ${index}`}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
                       />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-500 flex items-center justify-center">
+                        <Plus
+                          size={32}
+                          className="text-white opacity-0 group-hover:opacity-100 transition-all duration-500 transform scale-50 group-hover:scale-100"
+                        />
+                      </div>
                     </div>
                   ))}
-              </div>
-
-              {mission.images && mission.images.length > 0 && (
-                <div className="mt-24">
-                  <div className="flex items-center gap-4 mb-10">
-                    <div className="w-10 h-1 bg-primary/20 rounded-full" />
-                    <h2 className="text-2xl font-black text-slate-900 font-hind uppercase tracking-tight">
-                      गैलरी (Image Gallery)
-                    </h2>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                    {mission.images.map((img: any, index: number) => (
-                      <Dialog key={img.id}>
-                        <DialogTrigger asChild>
-                          <div
-                            className="relative aspect-square rounded-[2rem] overflow-hidden group cursor-pointer shadow-md hover:shadow-xl transition-all duration-500 border-4 border-white"
-                            onClick={() => setActiveImageIndex(index)}
-                          >
-                            <Image
-                              src={img.url}
-                              alt={`Mission ${mission.title}`}
-                              fill
-                              className="object-cover transition-transform duration-700 group-hover:scale-110"
-                            />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <Maximize2 className="text-white w-8 h-8 scale-75 group-hover:scale-100 transition-transform duration-500" />
-                            </div>
-                          </div>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-4xl p-0 overflow-hidden bg-transparent border-none shadow-none">
-                          <DialogHeader>
-                            <DialogTitle className="sr-only">
-                              Image Gallery View
-                            </DialogTitle>
-                          </DialogHeader>
-                          <div className="relative aspect-[16/10] w-full">
-                            <Image
-                              src={
-                                buildMediaUrl(
-                                  mission.images[activeImageIndex].url
-                                )!
-                              }
-                              alt="Gallery Preview"
-                              fill
-                              className="object-contain"
-                            />
-                            <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2">
-                              {mission.images.map((_: any, i: number) => (
-                                <button
-                                  key={i}
-                                  className={`w-2 h-2 rounded-full transition-all ${
-                                    i === activeImageIndex
-                                      ? "bg-white w-6"
-                                      : "bg-white/40"
-                                  }`}
-                                  onClick={() => setActiveImageIndex(i)}
-                                />
-                              ))}
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/20 hover:bg-black/40 text-white rounded-full h-12 w-12"
-                              onClick={() =>
-                                setActiveImageIndex((prev) =>
-                                  prev === 0
-                                    ? mission.images!.length - 1
-                                    : prev - 1
-                                )
-                              }
-                            >
-                              <ChevronLeft className="w-8 h-8" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/20 hover:bg-black/40 text-white rounded-full h-12 w-12"
-                              onClick={() =>
-                                setActiveImageIndex((prev) =>
-                                  prev === mission.images!.length - 1
-                                    ? 0
-                                    : prev + 1
-                                )
-                              }
-                            >
-                              <ChevronRight className="w-8 h-8" />
-                            </Button>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    ))}
-                  </div>
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
+            )}
 
-          <div className="bg-slate-900 rounded-[4rem] p-12 md:p-20 shadow-2xl text-center text-white relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent opacity-50" />
-            <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px]" />
-            <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-orange-500/10 rounded-full blur-[100px]" />
-
-            <div className="relative z-10 max-w-2xl mx-auto">
-              <Badge className="bg-primary/20 text-primary border-none mb-6 px-4 py-1.5 rounded-full font-bold font-hind">
-                योगदान दें (Contribute)
-              </Badge>
-              <h2 className="text-3xl md:text-5xl font-black mb-6 font-hind tracking-tight leading-tight text-white">
-                इस पावन मिशन में हाथ बटाएं
-              </h2>
-              <p className="text-slate-400 mb-12 text-lg md:text-xl font-hind leading-relaxed">
+            {/* CTA Card */}
+            <div className="mt-20 p-8 md:p-10 bg-gray-900 rounded-[2.5rem] text-center text-white relative overflow-hidden">
+              <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/20 rounded-full blur-[80px]" />
+              <h3 className="text-2xl font-black mb-4 font-hind relative z-10">
+                इस मिशन में योगदान दें
+              </h3>
+              <p className="text-gray-400 mb-8 max-w-xl mx-auto relative z-10">
                 आपका छोटा सा योगदान समाज में विशाल सकारात्मक परिवर्तन ला सकता
-                है। हमारे साथ जुड़ें और सेवा की इस अनूठी यात्रा का हिस्सा बनें।
+                है।
               </p>
-              <div className="flex flex-col sm:flex-row gap-5 justify-center">
-                <Button
-                  onClick={() => (window.location.href = "/donate-now")}
-                  className="bg-primary hover:bg-primary/90 text-white transition-all px-10 py-7 rounded-full font-black uppercase tracking-widest text-sm shadow-xl shadow-primary/25 hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3"
-                >
-                  <Heart className="w-5 h-5 fill-current" />
-                  दान करें (Donate Now)
-                </Button>
-
-                <Button
-                  onClick={() => (window.location.href = "/auth/login")}
-                  variant="outline"
-                  className="bg-transparent border-2 border-white/20 text-white hover:bg-white/10 transition-all px-10 py-7 rounded-full font-black uppercase tracking-widest text-sm backdrop-blur-sm flex items-center justify-center gap-3"
-                >
-                  <Users className="w-5 h-5" />
-                  सदस्य बनें
-                </Button>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
+                <Link href="/donate-now">
+                  <Button className="bg-primary hover:bg-primary/90 text-white px-8 py-6 rounded-xl font-bold uppercase tracking-widest text-xs">
+                    <Heart className="w-4 h-4 mr-2 fill-current" />
+                    दान करें
+                  </Button>
+                </Link>
+                <Link href="/become-member">
+                  <Button
+                    variant="outline"
+                    className="border-white/20 text-black hover:text-white hover:bg-white/10 px-8 py-6 rounded-xl font-bold uppercase tracking-widest text-xs"
+                  >
+                    <Users className="w-4 h-4 mr-2" />
+                    सदस्य बनें
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-12">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-1 bg-slate-200 rounded-full" />
-                <h2 className="text-3xl font-black text-slate-900 font-hind">
-                  अन्य दिव्य मिशन (Other Missions)
-                </h2>
-              </div>
-              <Link
-                href="/divine-mission"
-                className="text-primary font-bold text-sm uppercase tracking-widest hover:underline flex items-center gap-2 group"
+          {/* Sidebar Area */}
+          <aside className="lg:col-span-4 space-y-12">
+            {/* Share Section */}
+            <div className="p-6 bg-white rounded-3xl border border-gray-100 shadow-sm">
+              <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">
+                Share Mission
+              </h4>
+              <Button
+                variant="outline"
+                className="w-full rounded-xl py-5 font-bold"
+                onClick={handleShare}
               >
-                सभी अभियान देखें
-                <ArrowLeft className="w-4 h-4 rotate-180 group-hover:translate-x-1 transition-transform" />
-              </Link>
+                <Share2 className="w-4 h-4 mr-2" />
+                Share This Mission
+              </Button>
             </div>
 
-            {relatedMissions.length === 0 ? (
-              <div className="text-center py-20 bg-gray-50 rounded-[3rem] text-gray-400 font-hind italic">
-                कोई संबंधित मिशन इस समय उपलब्ध नहीं है।
+            {/* Recent Missions */}
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-8 h-1 bg-primary rounded-full" />
+                <h3 className="text-xl font-black text-gray-900 font-hind">
+                  Other Missions
+                </h3>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {relatedMissions.map((relatedMission) => (
+              <div className="space-y-6">
+                {recentMissions.map((m) => (
                   <Link
-                    key={relatedMission.id}
-                    href={`/divine-mission/${relatedMission.id}`}
-                    className="group block"
+                    key={m.id}
+                    href={`/divine-mission/${m.id}`}
+                    className="group flex gap-4"
                   >
-                    <div className="bg-white rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-sm hover:shadow-2xl transition-all duration-500 h-full flex flex-col group/card">
-                      <div className="relative aspect-video overflow-hidden">
-                        <Image
-                          src={buildMediaUrl(relatedMission.image)!}
-                          alt={relatedMission.title}
-                          fill
-                          className="object-cover transition-transform duration-700 group-hover:scale-110"
-                          placeholder="blur"
-                          blurDataURL={IMAGE_BLUR_DATA_URL}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent opacity-80 group-hover/card:opacity-100 transition-opacity" />
-                        <div className="absolute inset-x-0 bottom-0 p-6 translate-y-2 group-hover/card:translate-y-0 transition-transform">
-                          <h3 className="text-white font-black text-lg leading-tight line-clamp-2 drop-shadow-xl font-hind">
-                            {relatedMission.title}
-                          </h3>
-                        </div>
-                      </div>
-                      <div className="p-6 flex-1 flex flex-col">
-                        <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between text-slate-400 font-bold uppercase tracking-widest text-[9px]">
-                          <div className="flex items-center gap-2">
-                            <Calendar size={12} className="text-primary" />
-                            <span>{relatedMission.postedDate}</span>
-                          </div>
-                          <span className="text-primary opacity-0 group-hover/card:opacity-100 transition-opacity inline-flex items-center gap-1">
-                            देखें <ArrowLeft className="w-3 h-3 rotate-180" />
-                          </span>
-                        </div>
+                    <div className="relative size-20 flex-shrink-0 rounded-xl overflow-hidden shadow-sm">
+                      <Image
+                        src={m.image || ""}
+                        alt={m.title}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-sm font-bold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 font-hind leading-snug mb-2">
+                        {m.title}
+                      </h4>
+                      <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-tight">
+                        <Calendar size={10} className="text-primary" />
+                        {m.postedDate}
                       </div>
                     </div>
                   </Link>
                 ))}
               </div>
-            )}
-          </div>
-        </div>
-
-        <div className="pt-20 text-center">
-          <Link href="/divine-mission">
-            <Button
-              variant="ghost"
-              className="text-slate-400 hover:text-primary transition-colors gap-2 font-bold uppercase tracking-widest text-xs"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              सभी मिशनों की सूची
-            </Button>
-          </Link>
+              <Link href="/divine-mission" className="mt-8 block">
+                <Button className="w-full bg-gray-900 hover:bg-primary text-white font-black uppercase tracking-widest text-xs py-6 rounded-2xl transition-all shadow-lg hover:shadow-primary/20 group">
+                  View All Missions
+                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            </div>
+          </aside>
         </div>
       </div>
+
+      {/* Lightbox Dialog */}
+      {mission.images && mission.images.length > 0 && (
+        <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+          <DialogContent className="max-w-5xl p-0 overflow-hidden bg-black/95 border-none">
+            <DialogHeader>
+              <DialogTitle className="sr-only">Image Gallery</DialogTitle>
+            </DialogHeader>
+            <div className="relative aspect-[16/10] w-full">
+              <Image
+                src={mission.images[activeImageIndex]?.url || ""}
+                alt={`Gallery Image ${activeImageIndex + 1}`}
+                fill
+                className="object-contain"
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full h-12 w-12"
+                onClick={() =>
+                  setActiveImageIndex((prev) =>
+                    prev === 0 ? mission.images!.length - 1 : prev - 1
+                  )
+                }
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full h-12 w-12"
+                onClick={() =>
+                  setActiveImageIndex((prev) =>
+                    prev === mission.images!.length - 1 ? 0 : prev + 1
+                  )
+                }
+              >
+                <ChevronRight className="w-6 h-6" />
+              </Button>
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                {mission.images.map((_: any, i: number) => (
+                  <button
+                    key={i}
+                    className={`w-2 h-2 rounded-full transition-all ${
+                      i === activeImageIndex ? "bg-white w-6" : "bg-white/40"
+                    }`}
+                    onClick={() => setActiveImageIndex(i)}
+                  />
+                ))}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
