@@ -21,6 +21,23 @@ interface DisplayService {
 const ServicesSection: React.FC = () => {
   const { services, isLoadingServices } = useServiceApi();
 
+  // Helper function to clean HTML content - remove background colors and inline styles
+  const cleanHtmlContent = (html: string): string => {
+    if (!html) return "";
+
+    // Remove background-color styles
+    let cleaned = html.replace(/background-color:\s*[^;]+;?/gi, "");
+
+    // Remove background styles (shorthand)
+    cleaned = cleaned.replace(/background:\s*[^;]+;?/gi, "");
+
+    // Remove empty style attributes
+    cleaned = cleaned.replace(/style="\s*"/gi, "");
+    cleaned = cleaned.replace(/style=''/gi, "");
+
+    return cleaned;
+  };
+
   const displayServices: DisplayService[] = React.useMemo(() => {
     if (!services || services.length === 0) return [];
 
@@ -29,7 +46,7 @@ const ServicesSection: React.FC = () => {
       title: s.title,
       icon: s.icon,
       image: s.image || "",
-      description: s.short_content || "",
+      description: cleanHtmlContent(s.short_content || s.content || ""),
       features: [],
     }));
   }, [services]);
