@@ -2,9 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
   Phone,
-  Search,
   Menu,
-  Flag,
   X,
   Globe,
   Facebook,
@@ -14,12 +12,17 @@ import {
   ChevronDown,
   LogIn,
   UserPlus,
+  User,
+  LayoutDashboard,
+  LogOut,
 } from "lucide-react";
 
 import gsap from "gsap";
 import Logo from "./Logo";
 import { navigationItems } from "./Navitems";
 import Link from "next/link";
+import { useAuth } from "@/hooks/use-auth";
+import { useRouter } from "next/navigation";
 
 const MobileNavItem = ({ item }: { item: any }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,87 +31,86 @@ const MobileNavItem = ({ item }: { item: any }) => {
   return (
     <div className="menu-item-stagger">
       <div className="hidden lg:block space-y-4">
-        <h5 className="text-gray-400 font-bold tracking-wider text-xs border-b border-gray-100 pb-2">
-          {!hasSubmenu ? (
-            <Link
-              href={item.href}
-              className="hover:text-primary transition-colors"
-            >
-              {item.title}
-            </Link>
-          ) : (
-            item.title
-          )}
+        <h5 className="text-gray-400 font-bold uppercase tracking-widest text-xs border-b border-gray-100 pb-2">
+          {item.title}
         </h5>
-        {hasSubmenu && (
-          <ul className="space-y-2 text-sm font-medium text-gray-600">
-            {item.submenu.map((subItem: any) => (
+        <ul className="space-y-2 text-sm font-medium text-gray-600">
+          {hasSubmenu ? (
+            item.submenu.map((subItem: any) => (
               <li key={subItem.id}>
-                <Link
+                <a
                   href={subItem.href}
                   className="hover:text-primary transition-colors block py-1 hover:translate-x-1 duration-200"
                 >
                   {subItem.title}
-                </Link>
+                </a>
               </li>
-            ))}
-          </ul>
-        )}
+            ))
+          ) : (
+            <li>
+              <a
+                href={item.href}
+                className="hover:text-primary transition-colors block py-1 hover:translate-x-1 duration-200"
+              >
+                {item.title}
+              </a>
+            </li>
+          )}
+        </ul>
       </div>
 
       {/* Mobile Layout: Accordion */}
       <div className="block lg:hidden border-b border-gray-50 last:border-0">
-        {!hasSubmenu ? (
-          <Link
-            href={item.href}
-            onClick={() => setIsOpen(false)}
-            className="w-full flex justify-between items-center py-4 text-left group"
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full flex justify-between items-center py-4 text-left group"
+        >
+          <span
+            className={`font-bold text-lg ${
+              isOpen ? "text-primary" : "text-gray-800"
+            }`}
           >
-            <span className="font-bold text-lg text-gray-800 hover:text-primary transition-colors">
-              {item.title}
-            </span>
-          </Link>
-        ) : (
-          <>
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="w-full flex justify-between items-center py-4 text-left group"
-            >
-              <span
-                className={`font-bold text-lg ${
-                  isOpen ? "text-primary" : "text-gray-800"
-                }`}
-              >
-                {item.title}
-              </span>
-              <ChevronDown
-                size={20}
-                className={`text-gray-400 transition-transform duration-300 ${
-                  isOpen ? "rotate-180 text-primary" : ""
-                }`}
-              />
-            </button>
-
-            <div
-              className={`overflow-hidden transition-all duration-300 ${
-                isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+            {item.title}
+          </span>
+          {hasSubmenu && (
+            <ChevronDown
+              size={20}
+              className={`text-gray-400 transition-transform duration-300 ${
+                isOpen ? "rotate-180 text-primary" : ""
               }`}
-            >
-              <ul className="pb-4 space-y-3 pl-2">
-                {item.submenu.map((subItem: any) => (
-                  <li key={subItem.id}>
-                    <Link
-                      href={subItem.href}
-                      className="text-gray-600 font-medium block text-sm hover:text-primary"
-                    >
-                      {subItem.title}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </>
-        )}
+            />
+          )}
+        </button>
+
+        <div
+          className={`overflow-hidden transition-all duration-300 ${
+            isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <ul className="pb-4 space-y-3 pl-2">
+            {hasSubmenu ? (
+              item.submenu.map((subItem: any) => (
+                <li key={subItem.id}>
+                  <Link
+                    href={subItem.href}
+                    className="text-gray-600 font-medium block text-sm hover:text-primary"
+                  >
+                    {subItem.title}
+                  </Link>
+                </li>
+              ))
+            ) : (
+              <li>
+                <Link
+                  href={item.href}
+                  className="text-gray-600 font-medium block text-sm hover:text-primary"
+                >
+                  {item.title}
+                </Link>
+              </li>
+            )}
+          </ul>
+        </div>
       </div>
     </div>
   );
@@ -116,9 +118,27 @@ const MobileNavItem = ({ item }: { item: any }) => {
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const router = useRouter();
 
   const headerRef = useRef(null);
   const menuRef = useRef(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target as Node)
+      ) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Lock body scroll when menu is open
   useEffect(() => {
@@ -141,6 +161,17 @@ const Header: React.FC = () => {
     }
   }, [isMenuOpen]);
 
+  const handleLogout = async () => {
+    setIsProfileOpen(false);
+    await logout();
+    router.push("/");
+  };
+
+  const handleDashboard = () => {
+    setIsProfileOpen(false);
+    router.push("/dashboard");
+  };
+
   return (
     <header
       className="sticky top-0 z-[50] bg-white font-sans shadow-lg"
@@ -158,34 +189,69 @@ const Header: React.FC = () => {
             </button>
 
             <div
-              className="grid grid-cols-1 lg:grid-cols-4 gap-10 lg:gap-12 mt-12"
+              className="grid grid-cols-1 lg:grid-cols-4 gap-10 lg:gap-16 mt-12"
               ref={menuRef}
               role="dialog"
               aria-modal="true"
               aria-label="Mobile Navigation"
               id="mobile-menu"
             >
-              <div className="lg:col-span-1 order-1 mx-auto lg:order-none flex flex-col items-center lg:items-start menu-item-stagger">
-                <div className="flex flex-row mx-auto gap-3 w-full">
-                  <Link
-                    href="/auth/login"
-                    className="flex items-center justify-center gap-2 px-6 py-2.5 border-2 border-primary text-primary font-semibold text-sm rounded-full hover:bg-primary hover:text-white transition-all duration-300"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <LogIn size={18} />
-                    लॉगिन | Login
-                  </Link>
-                  <Link
-                    href="/auth/become-member"
-                    className="flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-white font-semibold rounded-full text-sm hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <UserPlus size={18} />
-                    जुड़ें | Join Us
-                  </Link>
+              {/* Logo Section - Order 1 on Mobile */}
+              <div className="lg:col-span-1 order-1 lg:order-none flex flex-col items-center lg:items-start menu-item-stagger">
+                <div
+                  className="w-fit cursor-pointer"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Logo />
+                </div>
+
+                {/* Auth Buttons in Menu */}
+                <div className="flex flex-col sm:flex-row gap-3 mt-6 w-full sm:w-auto">
+                  {user ? (
+                    <>
+                      <Link
+                        href="/dashboard"
+                        className="flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-white font-semibold rounded-full text-sm hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <LayoutDashboard size={18} />
+                        Dashboard
+                      </Link>
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          handleLogout();
+                        }}
+                        className="flex items-center justify-center gap-2 px-6 py-2.5 border-2 border-red-500 text-red-500 font-semibold text-sm rounded-full hover:bg-red-500 hover:text-white transition-all duration-300"
+                      >
+                        <LogOut size={18} />
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        href="/auth/login"
+                        className="flex items-center justify-center gap-2 px-6 py-2.5 border-2 border-primary text-primary font-semibold text-sm rounded-full hover:bg-primary hover:text-white transition-all duration-300"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <LogIn size={18} />
+                        Login
+                      </Link>
+                      <Link
+                        href="/auth/signup"
+                        className="flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-white font-semibold rounded-full text-sm hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <UserPlus size={18} />
+                        Sign Up
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
 
+              {/* Navigation Section - Order 2 on Mobile */}
               <nav
                 className="lg:col-span-3 lg:row-span-2 order-2 lg:order-none"
                 aria-label="Main Site Navigation"
@@ -203,14 +269,14 @@ const Header: React.FC = () => {
                 aria-label="Contact and Social"
               >
                 <div className="space-y-4">
-                  <h5 className="text-primary font-bold tracking-wider text-xs border-b border-gray-100 pb-2">
-                    संपर्क | Contact
-                  </h5>
+                  <h4 className="text-primary font-bold text-lg mb-1">
+                    Contact
+                  </h4>
                   <div
                     className="text-xl sm:text-2xl font-semibold text-gray-800 hover:text-primary transition-colors cursor-pointer"
                     onClick={() => window.open("tel:+919429693593")}
                   >
-                    94296 93593
+                    +91 94296 93593
                   </div>
                   <div className="space-y-3 mt-4">
                     <div>
@@ -234,13 +300,15 @@ const Header: React.FC = () => {
                   </h4>
                   <p className="text-xs text-gray-500 mt-2 leading-relaxed max-w-xs mx-auto lg:mx-0 font-medium">
                     Largest voluntary organization with over{" "}
-                    <span className="text-primary font-bold">15+ states</span>{" "}
+                    <span className="text-primary font-bold">
+                      50,000+ Shakhas
+                    </span>{" "}
                     conducting daily activities across Bharat.
                   </p>
                 </div>
                 <div>
-                  <h4 className="text-primary font-bold mb-4 text-sm tracking-widest">
-                    जुड़ें | Connect
+                  <h4 className="text-primary font-bold mb-4 text-sm uppercase tracking-widest">
+                    Connect
                   </h4>
                   <div className="flex justify-center lg:justify-start gap-6">
                     <Link href="https://www.facebook.com/joinrss">
@@ -310,15 +378,68 @@ const Header: React.FC = () => {
               onClick={() => window.open("tel:+919429693593")}
               className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors bg-gray-100 px-3 py-1.5 rounded-full whitespace-nowrap text-gray-700"
             >
-              <Phone size={16} /> 94296 93593
+              <Phone size={16} /> +91 94296 93593
             </span>
-            <Link
-              href="/auth/login"
-              className="flex items-center gap-2 px-4 py-2 text-primary font-semibold border-2 border-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300"
-            >
-              <LogIn size={16} />
-              लॉगिन | Login
-            </Link>
+
+            {/* Conditional: Show Profile Menu or Login Button */}
+            {user ? (
+              <div className="relative" ref={profileRef}>
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="flex items-center gap-2 px-3 py-2 bg-primary/10 text-primary font-semibold rounded-full hover:bg-primary/20 transition-all duration-300"
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">
+                    {user.name?.charAt(0).toUpperCase() || <User size={16} />}
+                  </div>
+                  <span className="max-w-[100px] truncate hidden xl:block">
+                    {user.name?.split(" ")[0] || "User"}
+                  </span>
+                  <ChevronDown
+                    size={16}
+                    className={`transition-transform duration-200 ${
+                      isProfileOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isProfileOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-semibold text-gray-800 truncate">
+                        {user.name || "User"}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {user.email}
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleDashboard}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
+                    >
+                      <LayoutDashboard size={18} />
+                      Dashboard
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <LogOut size={18} />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/auth/login"
+                className="flex items-center gap-2 px-4 py-2 text-primary font-semibold border-2 border-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300"
+              >
+                <LogIn size={16} />
+                Login
+              </Link>
+            )}
+
             <Menu
               size={28}
               className="cursor-pointer hover:text-primary ml-2"
