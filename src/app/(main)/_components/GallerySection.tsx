@@ -28,7 +28,7 @@ interface DisplayGalleryItem {
   videoSrc?: string;
   size: string;
 }
-
+// work
 const GallerySection: React.FC = () => {
   const {
     images,

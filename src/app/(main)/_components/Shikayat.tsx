@@ -19,9 +19,9 @@ const ShikayatSection: React.FC = () => {
     <section className="py-24 bg-primary-50 relative overflow-hidden w-full">
       <div className="w-full px-4 md:px-8 lg:px-16 xl:px-24 relative z-10">
         <SectionHeader
-          badgeTitle="जन सेवा एवं समाधान पोर्टल"
+          badgeTitle="जनशिकायत एवं समाधान पोर्टल"
           badgeIcon={CircleDashed}
-          title="Jan Seva & Samadhan Porta"
+          title="Janshikayat & Samadhan Portal"
           viewAll="Track Shikayat"
           // viewAllLink="#"
         />
